@@ -7,7 +7,8 @@ import { Configuration, OpenAIApi } from 'openai';
 const configuration = new Configuration({
   apiKey: ''
 });
-const openai = new OpenAIApi(configuration);
+
+let myOpenAI
 
 /**
  * A kernel that chats content back.
@@ -54,11 +55,14 @@ export class ChatKernel extends BaseKernel {
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
       configuration.apiKey = content.code.trim().slice('key='.length);
+
+      myOpenAI = new OpenAIApi(configuration);
+
       this.publishExecuteResult({
         execution_count: this.executionCount,
         data: {
           'text/plain':
-            'OpenAI API (' + configuration.apiKey + ') Key has been assigned.'
+            'OpenAI API Key (' + configuration.apiKey + ') has been assigned.'
         },
         metadata: {}
       });
@@ -69,7 +73,7 @@ export class ChatKernel extends BaseKernel {
         user_expressions: {}
       };
     }
-    const completion = await openai.createChatCompletion({
+    const completion = await myOpenAI.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: content.code }]
     });
