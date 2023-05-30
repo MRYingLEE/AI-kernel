@@ -55,7 +55,8 @@ export class ChatKernel extends BaseKernel {
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
       configuration.apiKey = content.code.trim().slice('key='.length);
-
+      delete configuration.baseOptions.headers['User-Agent'];
+      
       myOpenAI = new OpenAIApi(configuration);
 
       this.publishExecuteResult({
