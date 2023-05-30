@@ -8,7 +8,7 @@ const configuration = new Configuration({
   apiKey: ''
 });
 
-let myOpenAI;
+let myOpenAI= new OpenAIApi(configuration);
 
 /**
  * A kernel that chats content back.
