@@ -63,7 +63,8 @@ export class ChatKernel extends BaseKernel {
         execution_count: this.executionCount,
         data: {
           'text/plain':
-            'OpenAI API Key (' + configuration.apiKey + ') has been assigned. Good luck!'
+            'OpenAI API Key (' + configuration.apiKey +
+            ') has been assigned. Good luck!'
         },
         metadata: {}
       });
