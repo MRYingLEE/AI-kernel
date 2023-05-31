@@ -5,7 +5,7 @@ import { BaseKernel } from '@jupyterlite/kernel';
 import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
-  apiKey: ''
+  apiKey: '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'
 });
 
 delete configuration.baseOptions.headers['User-Agent'];
