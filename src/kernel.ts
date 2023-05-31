@@ -2,8 +2,7 @@ import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel } from '@jupyterlite/kernel';
 
-import { Configuration, OpenAIApi } from 'ope
-nai';
+import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
   apiKey: 'AILearn.live'
