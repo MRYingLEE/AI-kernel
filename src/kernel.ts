@@ -8,6 +8,7 @@ const configuration = new Configuration({
   apiKey: ''
 });
 
+delete configuration.baseOptions.headers['User-Agent'];
 let myOpenAI = new OpenAIApi(configuration);
 
 /**
@@ -62,7 +63,7 @@ export class ChatKernel extends BaseKernel {
         execution_count: this.executionCount,
         data: {
           'text/plain':
-            'OpenAI API Key (' + configuration.apiKey + ') has been assigned.'
+            'OpenAI API Key (' + configuration.apiKey + ') has been assigned. Good luck!'
         },
         metadata: {}
       });
