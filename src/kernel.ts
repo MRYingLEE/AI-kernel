@@ -2,10 +2,11 @@ import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel } from '@jupyterlite/kernel';
 
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi } from 'ope
+nai';
 
 const configuration = new Configuration({
-  apiKey: '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'
+  apiKey: 'AILearn.live'
 });
 
 delete configuration.baseOptions.headers['User-Agent'];
@@ -55,9 +56,12 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
-      configuration.apiKey = content.code.trim().slice('key='.length);
-      delete configuration.baseOptions.headers['User-Agent'];
-      myOpenAI = new OpenAIApi(configuration);
+
+      const configuration2 = new Configuration({
+        apiKey: content.code.trim().slice('key='.length);
+      });
+      delete configuration2.baseOptions.headers['User-Agent'];
+      myOpenAI = new OpenAIApi(configuration2);
 
       this.publishExecuteResult({
         execution_count: this.executionCount,
@@ -65,7 +69,7 @@ export class ChatKernel extends BaseKernel {
           'text/plain':
             'OpenAI API Key (' +
             configuration.apiKey +
-            ') has been assigned. Good luck!'
+            ') has been assigned. Try now!'
         },
         metadata: {}
       });
