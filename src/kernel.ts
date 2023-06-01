@@ -57,7 +57,7 @@ export class ChatKernel extends BaseKernel {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
 
       const configuration2 = new Configuration({
-        apiKey: content.code.trim().slice('key='.length),
+        apiKey: content.code.trim().slice('key='.length)
       });
       delete configuration2.baseOptions.headers['User-Agent'];
       myOpenAI = new OpenAIApi(configuration2);
