@@ -49,6 +49,7 @@
     "@jupyterlab/services": "^6.1.13",
     "@jupyterlite/kernel": "^0.1.0-alpha.10",
     "@jupyterlite/server": "^0.1.0-alpha.10",
+    "handlebars": "^4.7.7",
     "openai": "^3.2.1"
   },
   "devDependencies": {

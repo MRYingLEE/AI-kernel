@@ -10,7 +10,12 @@ const configuration = new Configuration({
 
 delete configuration.baseOptions.headers['User-Agent'];
 let myOpenAI = new OpenAIApi(configuration);
-
+/**
+ * Test Handlebars
+ */
+const Handlebars = require("handlebars");
+const template = Handlebars.compile("Name: {{name}}");
+console.log(template({ name: "Nils" }));
 /**
  * A kernel that chats content back.
  */
