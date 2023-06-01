@@ -55,7 +55,6 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
-
       const configuration2 = new Configuration({
         apiKey: content.code.trim().slice('key='.length)
       });
