@@ -74,7 +74,9 @@ export class ChatKernel extends BaseKernel {
           'text/plain':
             'OpenAI API Key (' +
             configuration.apiKey +
-            ') has been assigned. Try now!'
+            ') has been assigned.' +
+            template({ name: 'Nils' }) +
+            'Try now!'
         },
         metadata: {}
       });
