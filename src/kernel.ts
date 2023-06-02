@@ -10,7 +10,7 @@ const configuration = new Configuration({
 
 delete configuration.baseOptions.headers['User-Agent'];
 let myOpenAI = new OpenAIApi(configuration);
-import Handlebars from "handlebars/lib/handlebars";
+import Handlebars from 'handlebars/lib/handlebars';
 /**
  * A kernel that chats content back.
  */
