@@ -14,7 +14,7 @@ let myOpenAI = new OpenAIApi(configuration);
  * Test Handlebars
  */
 
-const Handlebars = require('handlebars');
+const Handlebars = await import('handlebars');
 const template = Handlebars.compile('Name: {{name}}');
 console.log(template({ name: 'Nils' }));
 /**
