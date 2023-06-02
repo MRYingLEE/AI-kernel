@@ -10,7 +10,7 @@ const configuration = new Configuration({
 
 delete configuration.baseOptions.headers['User-Agent'];
 let myOpenAI = new OpenAIApi(configuration);
-
+import Handlebars from "handlebars/lib/handlebars";
 /**
  * A kernel that chats content back.
  */
@@ -64,7 +64,7 @@ export class ChatKernel extends BaseKernel {
        * Test Handlebars
        */
 
-      const Handlebars = await import('handlebars');
+      // const Handlebars = await import('handlebars');
       const template = Handlebars.compile('Name: {{name}}');
       console.log(template({ name: 'Nils' }));
 
