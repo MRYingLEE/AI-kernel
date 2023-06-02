@@ -22,16 +22,11 @@
     "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "types": "lib/index.d.ts, src/types/handlebars1.ts",
   "style": "style/index.css",
   "repository": {
     "type": "git",
     "url": "https://github.com/MRYingLEE/chat-kernel.git"
-  },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
