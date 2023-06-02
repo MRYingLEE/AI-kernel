@@ -13,7 +13,8 @@ let myOpenAI = new OpenAIApi(configuration);
 /**
  * Test Handlebars
  */
-import Handlebars from 'handlebars';
+
+const Handlebars = require('handlebars');
 const template = Handlebars.compile('Name: {{name}}');
 console.log(template({ name: 'Nils' }));
 /**
