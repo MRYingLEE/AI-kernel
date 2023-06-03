@@ -14,5 +14,21 @@ method newCaht: to start a new chat template without history.
 
 // AI Kernel is also a typical Jupyter Kernel with a few AI service provider behind.
 
+/*
+/clear slash command
+*/
 
+// const template = promptTemplates[templateName];
 
+// if (focalcode_text.toLowerCase().startsWith('/clear')) {
+//   if (template !== null) {
+//     template.startNewSession();
+//     return [];
+//   }
+// }
+
+// if (template !== null) {
+//   return template.buildTemplate(statuses);
+// } else {
+//   return [];
+// }
