@@ -16,6 +16,7 @@ export enum CefrLevel {
 
 export class user {
   name: string; // the name of the this
+  othernames: string[] = []; // the other names of the this //Todo: Names in all kinds of language
   age: number; // the age of the this
   gender: string; // the gender of the this
   city: string;
