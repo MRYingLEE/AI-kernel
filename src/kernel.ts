@@ -66,7 +66,7 @@ export class ChatKernel extends BaseKernel {
 
       // const Handlebars = await import('handlebars');
       const template = Handlebars.compile('Name: {{name}}');
-      console.log(template({ name: 'Nils' }));
+      console.log(template({ name: 'Max' }));
 
       this.publishExecuteResult({
         execution_count: this.executionCount,
@@ -76,7 +76,7 @@ export class ChatKernel extends BaseKernel {
             configuration.apiKey +
             ') has been assigned.' +
             template({ name: 'Nils' }) +
-            'Try now!'
+            ', try now!'
         },
         metadata: {}
       });
