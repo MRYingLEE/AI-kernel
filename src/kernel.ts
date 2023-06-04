@@ -71,7 +71,7 @@ export class ChatKernel extends BaseKernel {
        */
 
       // const Handlebars = await import('handlebars');
-      const welcomeTemplate = Handlebars.compile('Name: {{name}}');
+      const welcomeTemplate = Handlebars.compile('{{name}}');
       console.log(welcomeTemplate({ name: user.current_user.name }));
 
       let allActions = '';
@@ -86,12 +86,12 @@ export class ChatKernel extends BaseKernel {
         execution_count: this.executionCount,
         data: {
           'text/markdown':
+            welcomeTemplate({ name: user.current_user.name }) +
+            ', try now!' +
+            '---' +
             'OpenAI API Key (' +
             configuration.apiKey +
             ') has been assigned.' +
-            '---' +
-            welcomeTemplate({ name: user.current_user.name }) +
-            ', try now!' +
             '---' +
             'FYI: The current list is as the following:<p/>' +
             allActions
