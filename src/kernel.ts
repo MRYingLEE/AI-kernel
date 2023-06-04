@@ -8,6 +8,8 @@ import { extractPersonAndMessage } from './chatSyntax';
 
 import { promptTemplates } from './promptTemplate';
 
+import { user } from './user';
+
 const configuration = new Configuration({
   apiKey: 'AILearn.live'
 });
@@ -69,8 +71,8 @@ export class ChatKernel extends BaseKernel {
        */
 
       // const Handlebars = await import('handlebars');
-      const template = Handlebars.compile('Name: {{name}}');
-      console.log(template({ name: 'Max' }));
+      const welcomeTemplate = Handlebars.compile('Name: {{name}}');
+      console.log(welcomeTemplate({ name: user.current_user.name }));
 
       this.publishExecuteResult({
         execution_count: this.executionCount,
@@ -79,7 +81,7 @@ export class ChatKernel extends BaseKernel {
             'OpenAI API Key (' +
             configuration.apiKey +
             ') has been assigned.' +
-            template({ name: 'Nils' }) +
+            welcomeTemplate({ name: user.current_user.name }) +
             ', try now!'
         },
         metadata: {}
@@ -101,7 +103,17 @@ export class ChatKernel extends BaseKernel {
       errorMsg = '@ 2 or more actions are not supported so far!';
     } else if (actions.length === 1) {
       if (!promptTemplates[actions[0]]) {
-        errorMsg = 'The action ' + actions[0] + ' is not defined!';
+        errorMsg =
+          'The action ' +
+          actions[0] +
+          ' is not defined! \r\n The current list is as the following:';
+
+        for (const key in promptTemplates) {
+          if (!promptTemplates[key]) {
+            continue;
+          }
+          errorMsg += '\r\n' + key;
+        }
       }
     }
 
