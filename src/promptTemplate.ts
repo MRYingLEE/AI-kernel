@@ -2,7 +2,10 @@
 // import render from './ejs';
 
 // The chat format terms are based on ones of ChatGPT
-
+import {
+  ChatCompletionRequestMessage,
+  ChatCompletionRequestMessageRoleEnum
+} from 'openai';
 import { user } from './user';
 
 interface IPromptTemplateProps {
@@ -21,17 +24,17 @@ interface IPromptTemplateProps {
   withMemory?: boolean; //false is the default //added by Ying
 }
 
-class coreMessage {
-  role: 'system' | 'user' | 'assistant' = 'user';
-  content = '';
-  name = '';
-}
+// class ChatCompletionRequestMessage {
+//   role: 'system' | 'user' | 'assistant' = 'user';
+//   content = '';
+//   name = '';
+// }
 
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime
 class message {
   template: IPromptTemplateProps;
 
-  coremessage: coreMessage;
+  coremessage: ChatCompletionRequestMessage;
 
   timestamp: Date;
   newSession: boolean;
@@ -40,19 +43,21 @@ class message {
 
   constructor(
     template: IPromptTemplateProps,
-    role: 'system' | 'user' | 'assistant',
+    role: ChatCompletionRequestMessageRoleEnum, //'system' | 'user' | 'assistant',
     content: string,
     name: string,
     timestamp: Date,
     newSession: boolean,
     tokenUsage = 0
   ) {
-    this.coremessage = new coreMessage();
+    this.coremessage = {
+      role: role,
+      content: content,
+      name: name
+    };
 
     this.template = template;
-    this.coremessage.role = role;
-    this.coremessage.content = content;
-    this.coremessage.name = name;
+
     this.timestamp = timestamp;
     this.newSession = newSession;
 
@@ -151,10 +156,10 @@ class promptTemplate implements IPromptTemplateProps {
     this.newSession = true;
   }
 
-  getSessionHistoy(tokenLimit = 4000): coreMessage[] {
+  getSessionHistoy(tokenLimit = 4000): ChatCompletionRequestMessage[] {
     //Todo: A lot of improvement here. 1. Token limit instead of char limit 2. Guarantee the pair of messages are added. 3. Avoid failed user message 4. Retry
 
-    const history: coreMessage[] = [];
+    const history: ChatCompletionRequestMessage[] = [];
 
     let totalToken = 0;
 
@@ -198,7 +203,9 @@ class promptTemplate implements IPromptTemplateProps {
 
   static TokenLimit = 1000;
 
-  buildTemplate(statuses: { [key: string]: string }): coreMessage[] {
+  buildTemplate(statuses: {
+    [key: string]: string;
+  }): ChatCompletionRequestMessage[] {
     let sysContent = '';
     if (this.newSession) {
       sysContent = renderTemplate(this.systemMessageTemplate);
@@ -629,4 +636,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   )
 };
 
-export { coreMessage, promptTemplates, promptTemplate };
+export {
+  ChatCompletionRequestMessage as coreMessage,
+  promptTemplates,
+  promptTemplate
+};

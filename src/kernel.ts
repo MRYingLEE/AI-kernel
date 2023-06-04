@@ -2,7 +2,11 @@ import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel } from '@jupyterlite/kernel';
 
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
+
+import { extractPersonAndMessage } from './chatSyntax';
+
+import { promptTemplates } from './promptTemplate';
 
 const configuration = new Configuration({
   apiKey: 'AILearn.live'
@@ -87,9 +91,48 @@ export class ChatKernel extends BaseKernel {
         user_expressions: {}
       };
     }
+
+    const [actions, pureMessage] = extractPersonAndMessage(content.code);
+
+    let errorMsg = '';
+
+    // To check p
+    if (actions.length > 1) {
+      errorMsg = '@ 2 or more actions are not supported so far!';
+    } else if (actions.length === 1) {
+      if (!promptTemplates[actions[0]]) {
+        errorMsg = 'The action ' + actions[0] + ' is not defined!';
+      }
+    }
+
+    if (errorMsg.length > 0) {
+      this.publishExecuteResult({
+        execution_count: this.executionCount,
+        data: {
+          'text/plain': errorMsg
+        },
+        metadata: {}
+      });
+
+      return {
+        status: 'ok',
+        execution_count: this.executionCount,
+        user_expressions: {}
+      };
+    }
+
+    let messages: ChatCompletionRequestMessage[] = [];
+    const statuses: { [key: string]: string } = { cell_text: content.code };
+
+    if (actions.length === 0) {
+      messages.push({ role: 'user', content: pureMessage });
+    } else {
+      messages = promptTemplates[actions[0]].buildTemplate(statuses);
+    }
+
     const completion = await myOpenAI.createChatCompletion({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: content.code }]
+      messages: messages
     });
 
     const response = completion.data.choices[0].message?.content;
