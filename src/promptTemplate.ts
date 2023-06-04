@@ -94,15 +94,11 @@ class promptTemplate implements IPromptTemplateProps {
   tokenInMessage = 0;
   tokenInResponse = 0;
 
-  f_sysTemplate: (text: string) => string = (text: string) => {
-    // function body here
-    return text;
-  };
+  // f_sysTemplate: { [key: string]: string } | undefined;
+  f_sysTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
-  f_userTemplate: (text: string) => string = (text: string) => {
-    // function body here
-    return text;
-  };
+  // f_userTemplate: { [key: string]: string } | undefined;
+  f_userTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
   static global_messages: message[] = [];
 
@@ -137,20 +133,26 @@ class promptTemplate implements IPromptTemplateProps {
     this.newSession = newSession ?? true;
 
     try {
-      this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
+      const t = Handlebars.compile(this.systemMessageTemplate);
+      if (typeof t === typeof this.f_sysTemplate) {
+        this.f_sysTemplate = t;
+      }
     } catch {
       console.log(this.systemMessageTemplate);
     }
 
     try {
-      this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
+      const t = Handlebars.compile(this.userMessageTemplate);
+      if (typeof t === typeof this.f_userTemplate) {
+        this.f_userTemplate = t;
+      }
     } catch {
-      console.log(this.systemMessageTemplate);
+      console.log(this.userMessageTemplate);
     }
   }
 
   addMessage(
-    Role: 'system' | 'user' | 'assistant',
+    Role: ChatCompletionRequestMessageRoleEnum, //'system' | 'user' | 'assistant',
     content: string,
     name: string,
     tokenUsage = 0
@@ -226,15 +228,49 @@ class promptTemplate implements IPromptTemplateProps {
 
   static TokenLimit = 1000;
 
+  renderSysTemplate(statuses: { [key: string]: string }): string {
+    let content = this.systemMessageTemplate.replace(
+      '{{self_introduction}}',
+      user.current_user.self_introduction()
+    ); // a global parameter
+
+    try {
+      if (this.f_sysTemplate) {
+        content = this.f_sysTemplate(statuses);
+      }
+    } catch {
+      console.log(this.systemMessageTemplate);
+    }
+
+    return content;
+  }
+
+  renderUserTemplate(statuses: { [key: string]: string }): string {
+    let content = this.userMessageTemplate.replace(
+      '{{self_introduction}}',
+      user.current_user.self_introduction()
+    ); // a global parameter
+
+    try {
+      if (this.f_userTemplate) {
+        content = this.f_userTemplate(statuses);
+      }
+    } catch {
+      console.log(this.userMessageTemplate);
+    }
+
+    return content;
+  }
+
   buildTemplate(statuses: {
     [key: string]: string;
   }): ChatCompletionRequestMessage[] {
     let sysContent = '';
     if (this.newSession) {
-      sysContent = renderSysTemplate(statuses);
+      sysContent = this.renderSysTemplate(statuses);
     }
 
-    let usrContent = renderUserTemplate(statuses);
+    let usrContent = this.renderUserTemplate(statuses);
 
     if ((sysContent + usrContent).trim() === '') {
       return [];
@@ -261,36 +297,6 @@ class promptTemplate implements IPromptTemplateProps {
     const messages = this.getSessionHistoy(promptTemplate.TokenLimit);
 
     return messages;
-
-    function renderSysTemplate(statuses: { [key: string]: string }): string {
-      let content = this.systemMessageTemplate.replace(
-        '{{self_introduction}}',
-        user.current_user.self_introduction()
-      ); // a global parameter
-
-      try {
-        content = this.f_sysTemplate(statuses);
-      } catch {
-        console.log(this.systemMessageTemplate);
-      }
-
-      return content;
-    }
-
-    function renderUserTemplate(statuses: { [key: string]: string }): string {
-      let content = this.userMessageTemplate.replace(
-        '{{self_introduction}}',
-        user.current_user.self_introduction()
-      ); // a global parameter
-
-      try {
-        content = this.f_userTemplate(statuses);
-      } catch {
-        console.log(this.userMessageTemplate);
-      }
-
-      return content;
-    }
   }
 }
 
