@@ -2,6 +2,7 @@
 // import render from './ejs';
 
 // The chat format terms are based on ones of ChatGPT
+// import { Contents } from '@jupyterlab/services';
 import {
   ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum
@@ -228,37 +229,37 @@ class promptTemplate implements IPromptTemplateProps {
 
   static TokenLimit = 1000;
 
-  renderSysTemplate(statuses: { [key: string]: string }): string {
-    let content = this.systemMessageTemplate.replace(
-      '{{self_introduction}}',
-      user.current_user.self_introduction()
-    ); // a global parameter
-
-    try {
-      if (this.f_sysTemplate) {
-        content = this.f_sysTemplate(statuses);
-      }
-    } catch {
-      console.log(this.systemMessageTemplate);
-    }
-
-    return content;
-  }
-
   renderUserTemplate(statuses: { [key: string]: string }): string {
-    let content = this.userMessageTemplate.replace(
-      '{{self_introduction}}',
-      user.current_user.self_introduction()
-    ); // a global parameter
-
+    let content = '';
     try {
       if (this.f_userTemplate) {
         content = this.f_userTemplate(statuses);
+        content = content.replace(
+          '{{self_introduction}}',
+          user.current_user.self_introduction()
+        ); // a global parameter
       }
     } catch {
       console.log(this.userMessageTemplate);
     }
+    console.log('content:', content);
+    return content;
+  }
 
+  renderSysTemplate(statuses: { [key: string]: string }): string {
+    let content = '';
+    try {
+      if (this.f_sysTemplate) {
+        content = this.f_sysTemplate(statuses);
+        content = content.replace(
+          '{{self_introduction}}',
+          user.current_user.self_introduction()
+        ); // a global parameter
+      }
+    } catch {
+      console.log(this.systemMessageTemplate);
+    }
+    console.log('content:', content);
     return content;
   }
 

@@ -106,7 +106,7 @@ export class ChatKernel extends BaseKernel {
         errorMsg =
           'The action ' +
           actions[0] +
-          ' is not defined! \r\n The current list is as the following:';
+          ' is not defined! Please check. \n FYI: The current list is as the following:';
 
         for (const key in promptTemplates) {
           if (!promptTemplates[key]) {
