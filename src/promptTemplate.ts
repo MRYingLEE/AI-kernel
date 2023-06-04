@@ -12,7 +12,7 @@ interface IPromptTemplateProps {
   systemMessageTemplate: string;
   userMessageTemplate: string;
 
-  templateFormat?: 'f-string' | 'jinja2';
+  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars';
   // validateTemplate?: boolean;
 
   //short_reminding for every user message? Such as you are Ana.
@@ -76,7 +76,7 @@ class promptTemplate implements IPromptTemplateProps {
   systemMessageTemplate: string;
   userMessageTemplate: string;
 
-  templateFormat?: 'f-string' | 'jinja2';
+  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars';
   // validateTemplate?: boolean;
 
   // get_inputVariables(): [string]{
@@ -94,6 +94,16 @@ class promptTemplate implements IPromptTemplateProps {
   tokenInMessage = 0;
   tokenInResponse = 0;
 
+  f_sysTemplate: (text: string) => string = (text: string) => {
+    // function body here
+    return text;
+  };
+
+  f_userTemplate: (text: string) => string = (text: string) => {
+    // function body here
+    return text;
+  };
+
   static global_messages: message[] = [];
 
   constructor(
@@ -103,7 +113,8 @@ class promptTemplate implements IPromptTemplateProps {
     userMessageTemplate: string,
     /* inputVariables: string[], messages: [message],*/ templateFormat?:
       | 'f-string'
-      | 'jinja2',
+      | 'jinja2'
+      | 'Handlebars',
     validateTemplate?: boolean,
     inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
     outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
@@ -124,6 +135,18 @@ class promptTemplate implements IPromptTemplateProps {
     this.outputCellType = outputCellType;
     this.withMemory = withMemory ?? false;
     this.newSession = newSession ?? true;
+
+    try {
+      this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
+    } catch {
+      console.log(this.systemMessageTemplate);
+    }
+
+    try {
+      this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
+    } catch {
+      console.log(this.systemMessageTemplate);
+    }
   }
 
   addMessage(
@@ -208,10 +231,10 @@ class promptTemplate implements IPromptTemplateProps {
   }): ChatCompletionRequestMessage[] {
     let sysContent = '';
     if (this.newSession) {
-      sysContent = renderTemplate(this.systemMessageTemplate);
+      sysContent = renderSysTemplate(statuses);
     }
 
-    let usrContent = renderTemplate(this.userMessageTemplate);
+    let usrContent = renderUserTemplate(statuses);
 
     if ((sysContent + usrContent).trim() === '') {
       return [];
@@ -239,18 +262,33 @@ class promptTemplate implements IPromptTemplateProps {
 
     return messages;
 
-    function renderTemplate(messageTemplate: string) {
-      let content = messageTemplate;
-      //Todo: A lot of improvement space here
-      // content.replace("{{messages_histroy}}", ""); // messages_history should be processed in another message
-      content = content.replace(
+    function renderSysTemplate(statuses: { [key: string]: string }): string {
+      let content = this.systemMessageTemplate.replace(
         '{{self_introduction}}',
         user.current_user.self_introduction()
       ); // a global parameter
 
-      for (const status in statuses) {
-        content = content.replace('{{' + status + '}}', statuses[status]);
+      try {
+        content = this.f_sysTemplate(statuses);
+      } catch {
+        console.log(this.systemMessageTemplate);
       }
+
+      return content;
+    }
+
+    function renderUserTemplate(statuses: { [key: string]: string }): string {
+      let content = this.userMessageTemplate.replace(
+        '{{self_introduction}}',
+        user.current_user.self_introduction()
+      ); // a global parameter
+
+      try {
+        content = this.f_userTemplate(statuses);
+      } catch {
+        console.log(this.userMessageTemplate);
+      }
+
       return content;
     }
   }
@@ -432,23 +470,23 @@ class promptTemplate implements IPromptTemplateProps {
 // **AI: Happy to review your code, here is a list with my suggestions and recommendations for your code. I will include a copy of the code I am referring to in a code block whenever possible.:**
 // `;
 
-const questionPrompt = `
-**Your name is AI and you are a coding assistant. You are helping the user with their task.**
+// const questionPrompt = `
+// **Your name is AI and you are a coding assistant. You are helping the user with their task.**
 
-Here are the requirements for being a good assistant:
+// Here are the requirements for being a good assistant:
 
-- Be polite and respectful in your response.
-- When providing code, make sure it is intelligent, correct, efficient, and readable.
-- If you are not sure about something, don't guess. 
-- Keep your responses short and to the point.
-- Provide any code and completions formatted as markdown code blocks.
+// - Be polite and respectful in your response.
+// - When providing code, make sure it is intelligent, correct, efficient, and readable.
+// - If you are not sure about something, don't guess.
+// - Keep your responses short and to the point.
+// - Provide any code and completions formatted as markdown code blocks.
 
-Here is the task or question that the user is asking you:
+// Here is the task or question that the user is asking you:
 
-{{cell_text}}
+// {{cell_text}}
 
-**AI: Happy to help, here is my response:**
-`;
+// **AI: Happy to help, here is my response:**
+// `;
 
 // const pythonPromt = `
 // You are a data scientist.You are good at coding Pythonic style Python in Jupyter Notebook. When I give you a task, try to generate pure Python code to solve it.
@@ -521,35 +559,35 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   // "format": new JupyterPromptTemplate([], formatPrompt, "jinja2", true, "Code", "Code"),
   // "debug": new JupyterPromptTemplate([], debugPrompt, "jinja2", true, "Code", "Code"),
   // "review": new JupyterPromptTemplate([], reviewPrompt, "jinja2", true, "Code", "Code"),
-  question: new promptTemplate(
-    'question',
-    '',
-    questionPrompt,
-    '',
-    'jinja2',
-    true,
-    'Cell',
-    'Markdown',
-    false
-  ),
+  // question: new promptTemplate(
+  //   'question',
+  //   '',
+  //   questionPrompt,
+  //   '',
+  //   'Handlebars',
+  //   true,
+  //   'Cell',
+  //   'Markdown',
+  //   false
+  // ),
   // "python helper": new JupyterPromptTemplate([], pythonPromt, "jinja2", true, "Cell", "Code"),
-  'to English': new promptTemplate(
+  '@2e': new promptTemplate(
     'to English',
     '',
     all2EnglishPrompt,
     '',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
     false
   ),
-  'to Chinese': new promptTemplate(
+  '@2c': new promptTemplate(
     'to Chinese',
     '',
     all2ChinesePrompt,
     '',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -560,7 +598,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     refineryPrompt,
     '',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -572,7 +610,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     NewYorkGirlPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -583,7 +621,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     LondonGirlPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -594,7 +632,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     HongKongBoyPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -606,7 +644,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     JasonPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -617,7 +655,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     ZhuGeLiangPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
@@ -628,7 +666,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     SunWuKongPrompt,
     '{{cell_text}}',
-    'jinja2',
+    'Handlebars',
     true,
     'Cell',
     'Markdown',
