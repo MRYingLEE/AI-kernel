@@ -158,6 +158,7 @@ class promptTemplate implements IPromptTemplateProps {
     name: string,
     tokenUsage = 0
   ): void {
+    console.log('conetnt:', content);
     promptTemplate.global_messages.push(
       new message(
         this,
@@ -266,8 +267,10 @@ class promptTemplate implements IPromptTemplateProps {
     if (this.newSession) {
       sysContent = this.renderSysTemplate(statuses);
     }
+    console.log('sysContent:', sysContent);
 
     let usrContent = this.renderUserTemplate(statuses);
+    console.log('usrContent:', usrContent);
 
     if ((sysContent + usrContent).trim() === '') {
       return [];

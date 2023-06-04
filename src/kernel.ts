@@ -88,13 +88,14 @@ export class ChatKernel extends BaseKernel {
           'text/markdown':
             welcomeTemplate({ name: user.current_user.name }) +
             ', try now!' +
-            '---' +
+            '<p>' +
             'OpenAI API Key (' +
             configuration.apiKey +
             ') has been assigned.' +
-            '---' +
+            '</p><p>' +
             'FYI: The current list is as the following:<p/>' +
-            allActions
+            allActions +
+            '</p>'
         },
         metadata: {}
       });
@@ -151,6 +152,7 @@ export class ChatKernel extends BaseKernel {
     if (actions.length === 0) {
       messages.push({ role: 'user', content: pureMessage });
     } else {
+      console.log('Action:', actions[0]);
       messages = promptTemplates[actions[0]].buildTemplate(statuses);
     }
 
@@ -165,12 +167,12 @@ export class ChatKernel extends BaseKernel {
       execution_count: this.executionCount,
       data: {
         'text/markdown':
-          '**Prompt in Json:**' +
-            '---' +
-            messages.toString() +
-            '---' +
+          '**Prompt in JSON:**' +
+            '<p>' +
+            JSON.stringify(messages) +
+            '</p><p>' +
             '**Response:**' +
-            '---' +
+            '</p><p>' +
             response || ''
       },
       metadata: {}
