@@ -5,6 +5,7 @@ include package.json
 include install.json
 include ts*.json
 include yarn.lock
+recursive-include icons *.png
 
 graft jupyterlite_chat_kernel/labextension
 
