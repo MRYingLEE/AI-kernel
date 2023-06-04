@@ -74,15 +74,27 @@ export class ChatKernel extends BaseKernel {
       const welcomeTemplate = Handlebars.compile('Name: {{name}}');
       console.log(welcomeTemplate({ name: user.current_user.name }));
 
+      let allActions = '';
+      for (const key in promptTemplates) {
+        if (!promptTemplates[key]) {
+          continue;
+        }
+        allActions += '\n' + key;
+      }
+
       this.publishExecuteResult({
         execution_count: this.executionCount,
         data: {
-          'text/plain':
+          'text/markdown':
             'OpenAI API Key (' +
             configuration.apiKey +
             ') has been assigned.' +
+            '---' +
             welcomeTemplate({ name: user.current_user.name }) +
-            ', try now!'
+            ', try now!' +
+            '---' +
+            'FYI: The current list is as the following:<p/>' +
+            allActions
         },
         metadata: {}
       });
@@ -152,7 +164,14 @@ export class ChatKernel extends BaseKernel {
     this.publishExecuteResult({
       execution_count: this.executionCount,
       data: {
-        'text/plain': response || ''
+        'text/markdown':
+          '**Prompt in Json:**' +
+            '---' +
+            messages.toString() +
+            '---' +
+            '**Response:**' +
+            '---' +
+            response || ''
       },
       metadata: {}
     });

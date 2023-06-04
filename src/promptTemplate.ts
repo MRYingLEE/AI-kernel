@@ -230,14 +230,12 @@ class promptTemplate implements IPromptTemplateProps {
   static TokenLimit = 1000;
 
   renderUserTemplate(statuses: { [key: string]: string }): string {
+    const new_statuses = statuses;
+    new_statuses['self_introduction'] = user.current_user.self_introduction();
     let content = '';
     try {
       if (this.f_userTemplate) {
-        content = this.f_userTemplate(statuses);
-        content = content.replace(
-          '{{self_introduction}}',
-          user.current_user.self_introduction()
-        ); // a global parameter
+        content = this.f_userTemplate(new_statuses);
       }
     } catch {
       console.log(this.userMessageTemplate);
@@ -247,14 +245,12 @@ class promptTemplate implements IPromptTemplateProps {
   }
 
   renderSysTemplate(statuses: { [key: string]: string }): string {
+    const new_statuses = statuses;
+    new_statuses['self_introduction'] = user.current_user.self_introduction();
     let content = '';
     try {
       if (this.f_sysTemplate) {
-        content = this.f_sysTemplate(statuses);
-        content = content.replace(
-          '{{self_introduction}}',
-          user.current_user.self_introduction()
-        ); // a global parameter
+        content = this.f_sysTemplate(new_statuses);
       }
     } catch {
       console.log(this.systemMessageTemplate);
