@@ -136,7 +136,7 @@ class promptTemplate implements IPromptTemplateProps {
     this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
     this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
   }
-
+  //Todo: Should we support a global Message list directly?
   addMessage(
     Role: ChatCompletionRequestMessageRoleEnum, //'system' | 'user' | 'assistant',
     content: string,
@@ -262,7 +262,7 @@ class promptTemplate implements IPromptTemplateProps {
     }
 
     if (usrContent.trim() === '') {
-      this.addMessage('user', sysContent, ''); //The system message is not taken attention by ChatGPT. So we have to put it in user message.
+      // this.addMessage('user', sysContent, ''); //The system message is not taken attention by ChatGPT. So we have to put it in user message.
       if (this.withMemory) {
         this.newSession = false;
       }
@@ -276,7 +276,7 @@ class promptTemplate implements IPromptTemplateProps {
         usrContent = sysContent + '\n' + usrContent;
       }
 
-      this.addMessage('user', usrContent, '');
+      // this.addMessage('user', usrContent, '');
     }
 
     const messages = this.getSessionHistoy(promptTemplate.TokenLimit);
@@ -461,23 +461,23 @@ class promptTemplate implements IPromptTemplateProps {
 // **AI: Happy to review your code, here is a list with my suggestions and recommendations for your code. I will include a copy of the code I am referring to in a code block whenever possible.:**
 // `;
 
-// const questionPrompt = `
-// **Your name is AI and you are a coding assistant. You are helping the user with their task.**
+const aiPrompt = `
+**Your name is AI and you are a coding assistant. You are helping the user with their task.**
 
-// Here are the requirements for being a good assistant:
+Here are the requirements for being a good assistant:
 
-// - Be polite and respectful in your response.
-// - When providing code, make sure it is intelligent, correct, efficient, and readable.
-// - If you are not sure about something, don't guess.
-// - Keep your responses short and to the point.
-// - Provide any code and completions formatted as markdown code blocks.
+- Be polite and respectful in your response.
+- When providing code, make sure it is intelligent, correct, efficient, and readable.
+- If you are not sure about something, don't guess.
+- Keep your responses short and to the point.
+- Provide any code and completions formatted as markdown code blocks.
 
-// Here is the task or question that the user is asking you:
+Here is the task or question that the user is asking you:
 
-// {{cell_text}}
+{{cell_text}}
 
-// **AI: Happy to help, here is my response:**
-// `;
+**AI: Happy to help, here is my response:**
+`;
 
 // const pythonPromt = `
 // You are a data scientist.You are good at coding Pythonic style Python in Jupyter Notebook. When I give you a task, try to generate pure Python code to solve it.
@@ -550,17 +550,17 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   // "format": new JupyterPromptTemplate([], formatPrompt, "jinja2", true, "Code", "Code"),
   // "debug": new JupyterPromptTemplate([], debugPrompt, "jinja2", true, "Code", "Code"),
   // "review": new JupyterPromptTemplate([], reviewPrompt, "jinja2", true, "Code", "Code"),
-  // question: new promptTemplate(
-  //   'question',
-  //   '',
-  //   questionPrompt,
-  //   '',
-  //   'Handlebars',
-  //   true,
-  //   'Cell',
-  //   'Markdown',
-  //   false
-  // ),
+  '@ai': new promptTemplate(
+    '@ai',
+    '',
+    aiPrompt,
+    '',
+    'Handlebars',
+    true,
+    'Cell',
+    'Markdown',
+    false
+  ),
   // "python helper": new JupyterPromptTemplate([], pythonPromt, "jinja2", true, "Cell", "Code"),
   '@2e': new promptTemplate(
     'to English',
@@ -584,7 +584,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     'Markdown',
     false
   ),
-  refinery: new promptTemplate(
+  '@refinery': new promptTemplate(
     'refinery',
     '',
     refineryPrompt,
@@ -596,7 +596,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     false
   ),
 
-  '@Ana(NY)': new promptTemplate(
+  '@Ana': new promptTemplate(
     '@Ana(NY)',
     '',
     NewYorkGirlPrompt,
@@ -607,7 +607,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     'Markdown',
     true
   ),
-  '@Maisie(London)': new promptTemplate(
+  '@Maisie': new promptTemplate(
     '@Maisie(London)',
     '',
     LondonGirlPrompt,
@@ -618,7 +618,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     'Markdown',
     true
   ),
-  '@Max(HK)': new promptTemplate(
+  '@Max': new promptTemplate(
     '@Max(HK)',
     '',
     HongKongBoyPrompt,
@@ -630,7 +630,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     true
   ),
 
-  '@Jason(HK)': new promptTemplate(
+  '@Jason': new promptTemplate(
     '@Jason(HK)',
     '',
     JasonPrompt,

@@ -163,6 +163,24 @@ export class ChatKernel extends BaseKernel {
 
     const response = completion.data.choices[0].message?.content;
 
+    let theTemplate = promptTemplates['@ai'];
+
+    if (promptTemplates[actions[0]]) {
+      theTemplate = promptTemplates[actions[0]];
+    }
+
+    theTemplate.addMessage(
+      'user',
+      pureMessage,
+      '',
+      completion.data.usage?.prompt_tokens || 0
+    );
+    theTemplate.addMessage(
+      'assistant',
+      response || '',
+      '',
+      completion.data.usage?.completion_tokens || 0
+    );
     this.publishExecuteResult({
       execution_count: this.executionCount,
       data: {
