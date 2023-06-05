@@ -133,23 +133,8 @@ class promptTemplate implements IPromptTemplateProps {
     this.withMemory = withMemory ?? false;
     this.newSession = newSession ?? true;
 
-    try {
-      const t = Handlebars.compile(this.systemMessageTemplate);
-      if (typeof t === typeof this.f_sysTemplate) {
-        this.f_sysTemplate = t;
-      }
-    } catch {
-      console.log(this.systemMessageTemplate);
-    }
-
-    try {
-      const t = Handlebars.compile(this.userMessageTemplate);
-      if (typeof t === typeof this.f_userTemplate) {
-        this.f_userTemplate = t;
-      }
-    } catch {
-      console.log(this.userMessageTemplate);
-    }
+    this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
+    this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
   }
 
   addMessage(
