@@ -1,41 +1,34 @@
-// The class is adapted from https://github.com/hwchase17/langchain/blob/a31c9511e88f81ecc26e6ade24ece2c4d91136d4/langchain/prompts/prompt.py
-// import render from './ejs';
-
 // The chat format terms are based on ones of ChatGPT
-// import { Contents } from '@jupyterlab/services';
 import {
   ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum
 } from 'openai';
 import { user } from './user';
+import Handlebars from 'handlebars/lib/handlebars';
 
 interface IPromptTemplateProps {
   systemMessageTemplate: string;
-  userMessageTemplate: string;
-
-  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars';
-  // validateTemplate?: boolean;
-
   //short_reminding for every user message? Such as you are Ana.
 
+  userMessageTemplate: string;
+
+  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //If possible, we will support any templating language
   // get_inputVariables(): [string];
-  inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
-  outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
-  withMemory?: boolean; //false is the default //added by Ying
+  // validateTemplate?: boolean;
+
+  // We give up the idea of cell 2 cell, but use a code to result pattern.
+  // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
+  // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
+
+  withMemory: boolean; //false is the default //added by Ying
 }
-
-// class ChatCompletionRequestMessage {
-//   role: 'system' | 'user' | 'assistant' = 'user';
-//   content = '';
-//   name = '';
-// }
 
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime
 class message {
-  template: IPromptTemplateProps;
+  template: IPromptTemplateProps; // The prompt template
 
-  coremessage: ChatCompletionRequestMessage;
+  coremessage: ChatCompletionRequestMessage; // The real request message to OpenAI service
 
   timestamp: Date;
   newSession: boolean;
@@ -88,7 +81,7 @@ class promptTemplate implements IPromptTemplateProps {
   inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
   outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
-  withMemory?: boolean; //false is the default //added by Ying
+  withMemory: boolean; //false is the default //added by Ying
 
   newSession: boolean; //false is the default //added by Ying
 
@@ -112,9 +105,9 @@ class promptTemplate implements IPromptTemplateProps {
       | 'f-string'
       | 'jinja2'
       | 'Handlebars',
-    validateTemplate?: boolean,
-    inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
-    outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
+    // validateTemplate?: boolean,
+    // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
+    // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
     withMemory?: boolean,
     newSession?: boolean
   ) {
@@ -128,10 +121,10 @@ class promptTemplate implements IPromptTemplateProps {
 
     this.templateFormat = templateFormat;
     // this.validateTemplate = validateTemplate;
-    this.inputCellType = inputCellType;
-    this.outputCellType = outputCellType;
-    this.withMemory = withMemory ?? false;
-    this.newSession = newSession ?? true;
+    // this.inputCellType = inputCellType;
+    // this.outputCellType = outputCellType;
+    this.withMemory = withMemory || false;
+    this.newSession = newSession || true;
 
     this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
     this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
@@ -557,8 +550,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     false
   ),
   // "python helper": new JupyterPromptTemplate([], pythonPromt, "jinja2", true, "Cell", "Code"),
@@ -569,8 +562,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     false
   ),
   '@2c': new promptTemplate(
@@ -580,8 +573,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     false
   ),
   '@refinery': new promptTemplate(
@@ -591,8 +584,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     false
   ),
 
@@ -603,8 +596,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   ),
   '@Maisie': new promptTemplate(
@@ -614,8 +607,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   ),
   '@Max': new promptTemplate(
@@ -625,8 +618,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   ),
 
@@ -637,8 +630,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   ),
   '@諸葛亮': new promptTemplate(
@@ -648,8 +641,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   ),
   '@孫悟空': new promptTemplate(
@@ -659,8 +652,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
     '{{cell_text}}',
     'Handlebars',
     true,
-    'Cell',
-    'Markdown',
+    // 'Cell',
+    // 'Markdown',
     true
   )
 };
