@@ -83,7 +83,7 @@ class promptTemplate implements IPromptTemplateProps {
 
   withMemory: boolean; //false is the default //added by Ying
 
-  newSession: boolean; //false is the default //added by Ying
+  newSession: boolean; //true is the default //added by Ying
 
   tokenInMessage = 0;
   tokenInResponse = 0;
@@ -142,7 +142,7 @@ class promptTemplate implements IPromptTemplateProps {
     // this.validateTemplate = validateTemplate;
     // this.inputCellType = inputCellType;
     // this.outputCellType = outputCellType;
-    this.withMemory = withMemory || false;
+    this.withMemory = withMemory ?? false;
     this.newSession = newSession ?? true;
 
     // this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
@@ -260,6 +260,14 @@ class promptTemplate implements IPromptTemplateProps {
   buildTemplate(statuses: {
     [key: string]: string;
   }): ChatCompletionRequestMessage[] {
+    console.log(
+      'statuses:',
+      statuses,
+      '\n this.systemMessageTemplate:',
+      this.systemMessageTemplate,
+      '\nthis.userMessageTemplate:',
+      this.userMessageTemplate
+    );
     let sysContent = '';
     if (this.newSession) {
       sysContent = this.renderSysTemplate(statuses);
