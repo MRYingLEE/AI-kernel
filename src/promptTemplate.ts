@@ -95,6 +95,25 @@ class promptTemplate implements IPromptTemplateProps {
   f_userTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
   static global_messages: message[] = [];
+  static generateTemplateFunctions(): void {
+    for (const element of Object.values(promptTemplates)) {
+      try {
+        element.f_sysTemplate = Handlebars.compile(
+          element.systemMessageTemplate
+        );
+      } catch {
+        element.f_sysTemplate = undefined;
+      }
+
+      try {
+        element.f_userTemplate = Handlebars.compile(
+          element.userMessageTemplate
+        );
+      } catch {
+        element.f_userTemplate = undefined;
+      }
+    }
+  }
 
   constructor(
     templateName: string,
@@ -124,10 +143,10 @@ class promptTemplate implements IPromptTemplateProps {
     // this.inputCellType = inputCellType;
     // this.outputCellType = outputCellType;
     this.withMemory = withMemory || false;
-    this.newSession = newSession || true;
+    this.newSession = newSession ?? true;
 
-    this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
-    this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
+    // this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
+    // this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
   }
   //Todo: Should we support a global Message list directly?
   addMessage(
