@@ -6,7 +6,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
-import { promptTemplate, promptTemplates } from './promptTemplate';
+import { promptTemplates } from './promptTemplate';
 
 import { user } from './user';
 
@@ -100,7 +100,23 @@ export class ChatKernel extends BaseKernel {
         metadata: {}
       });
 
-      promptTemplate.generateTemplateFunctions();
+      for (const element of Object.values(promptTemplates)) {
+        try {
+          element.f_sysTemplate = Handlebars.compile(
+            element.systemMessageTemplate
+          );
+        } catch {
+          element.f_sysTemplate = undefined;
+        }
+
+        try {
+          element.f_userTemplate = Handlebars.compile(
+            element.userMessageTemplate
+          );
+        } catch {
+          element.f_userTemplate = undefined;
+        }
+      }
 
       return {
         status: 'ok',

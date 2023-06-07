@@ -4,7 +4,6 @@ import {
   ChatCompletionRequestMessageRoleEnum
 } from 'openai';
 import { user } from './user';
-import Handlebars from 'handlebars/lib/handlebars';
 
 interface IPromptTemplateProps {
   systemMessageTemplate: string;
@@ -95,25 +94,6 @@ class promptTemplate implements IPromptTemplateProps {
   f_userTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
   static global_messages: message[] = [];
-  static generateTemplateFunctions(): void {
-    for (const element of Object.values(promptTemplates)) {
-      try {
-        element.f_sysTemplate = Handlebars.compile(
-          element.systemMessageTemplate
-        );
-      } catch {
-        element.f_sysTemplate = undefined;
-      }
-
-      try {
-        element.f_userTemplate = Handlebars.compile(
-          element.userMessageTemplate
-        );
-      } catch {
-        element.f_userTemplate = undefined;
-      }
-    }
-  }
 
   constructor(
     templateName: string,
