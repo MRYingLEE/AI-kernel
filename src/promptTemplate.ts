@@ -143,7 +143,7 @@ class promptTemplate implements IPromptTemplateProps {
     // this.inputCellType = inputCellType;
     // this.outputCellType = outputCellType;
     this.withMemory = withMemory ?? false;
-    this.newSession = newSession ?? true;
+    this.newSession = true; //newSession ?? true;
 
     // this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
     // this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
@@ -236,6 +236,7 @@ class promptTemplate implements IPromptTemplateProps {
         content = this.f_userTemplate(new_statuses);
       }
     } catch {
+      content = this.userMessageTemplate;
       console.log(this.userMessageTemplate);
     }
     console.log('content:', content);
@@ -251,6 +252,7 @@ class promptTemplate implements IPromptTemplateProps {
         content = this.f_sysTemplate(new_statuses);
       }
     } catch {
+      content = this.systemMessageTemplate;
       console.log(this.systemMessageTemplate);
     }
     console.log('content:', content);
@@ -260,14 +262,10 @@ class promptTemplate implements IPromptTemplateProps {
   buildTemplate(statuses: {
     [key: string]: string;
   }): ChatCompletionRequestMessage[] {
-    console.log(
-      'statuses:',
-      statuses,
-      '\n this.systemMessageTemplate:',
-      this.systemMessageTemplate,
-      '\nthis.userMessageTemplate:',
-      this.userMessageTemplate
-    );
+    console.log('statuses:', statuses);
+    console.log('this.systemMessageTemplate:', this.systemMessageTemplate);
+    console.log('this.userMessageTemplate:', this.userMessageTemplate);
+
     let sysContent = '';
     if (this.newSession) {
       sysContent = this.renderSysTemplate(statuses);
