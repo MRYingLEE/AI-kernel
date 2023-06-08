@@ -257,12 +257,13 @@ class promptTemplate implements IPromptTemplateProps {
       return [];
     }
 
-    if (usrContent.trim() === '') {
-      // this.addMessage('user', sysContent, ''); //The system message is not taken attention by ChatGPT. So we have to put it in user message.
-      if (this.withMemory) {
-        this.newSession = false;
-      }
-    } else {
+    // if (usrContent.trim() === '') {
+    //   // this.addMessage('user', sysContent, ''); //The system message is not taken attention by ChatGPT. So we have to put it in user message.
+    //   if (this.withMemory) {
+    //     this.newSession = false;
+    //   }
+    // } else
+    {
       if (sysContent) {
         // this.addMessage("system", sysContent, "");  The system message is not taken attention by ChatGPT. So we have to put it in user message.
         if (this.withMemory) {
@@ -272,7 +273,7 @@ class promptTemplate implements IPromptTemplateProps {
         usrContent = sysContent + '\n' + usrContent;
       }
 
-      // this.addMessage('user', usrContent, '');
+      this.addMessage('user', usrContent, '');
     }
 
     const messages = this.getSessionHistoy(promptTemplate.TokenLimit);

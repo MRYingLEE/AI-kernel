@@ -187,12 +187,12 @@ export class ChatKernel extends BaseKernel {
       theTemplate = promptTemplates[actions[0]];
     }
 
-    theTemplate.addMessage(
-      'user',
-      pureMessage,
-      '',
-      completion.data.usage?.prompt_tokens || 0
-    );
+    // theTemplate.addMessage(
+    //   'user',
+    //   pureMessage,
+    //   '',
+    //   completion.data.usage?.prompt_tokens || 0
+    // );
     theTemplate.addMessage(
       'assistant',
       response || '',
