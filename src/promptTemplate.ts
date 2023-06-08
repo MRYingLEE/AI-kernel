@@ -210,14 +210,13 @@ class promptTemplate implements IPromptTemplateProps {
   renderUserTemplate(statuses: { [key: string]: string }): string {
     const new_statuses = statuses;
     new_statuses['self_introduction'] = user.current_user.self_introduction();
-    let content = '';
+    let content = this.userMessageTemplate;
     try {
-      if (this.f_userTemplate) {
+      if (!(this.f_userTemplate === undefined)) {
         content = this.f_userTemplate(new_statuses);
       }
     } catch {
-      content = this.userMessageTemplate;
-      console.log(this.userMessageTemplate);
+      console.log('usrTemplate:', this.userMessageTemplate);
     }
     console.log('content:', content);
     return content;
@@ -226,14 +225,13 @@ class promptTemplate implements IPromptTemplateProps {
   renderSysTemplate(statuses: { [key: string]: string }): string {
     const new_statuses = statuses;
     new_statuses['self_introduction'] = user.current_user.self_introduction();
-    let content = '';
+    let content = this.systemMessageTemplate;
     try {
-      if (this.f_sysTemplate) {
+      if (!(this.f_sysTemplate === undefined)) {
         content = this.f_sysTemplate(new_statuses);
       }
     } catch {
-      content = this.systemMessageTemplate;
-      console.log(this.systemMessageTemplate);
+      console.log('sysTemplate:', this.systemMessageTemplate);
     }
     console.log('content:', content);
     return content;

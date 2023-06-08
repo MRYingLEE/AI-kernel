@@ -165,7 +165,7 @@ export class ChatKernel extends BaseKernel {
     }
 
     let messages: ChatCompletionRequestMessage[] = [];
-    const statuses: { [key: string]: string } = { cell_text: content.code };
+    const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
     if (actions.length === 0) {
       messages.push({ role: 'user', content: pureMessage });
