@@ -65,7 +65,21 @@ jobs:
         cp dist/*.tar.gz chatkernel.tar.gz
         pip uninstall -y chatkernel jupyterlab
         rm -rf chatkernel
-
+        
+    - name: Publish Symbols
+      uses: microsoft/action-publish-symbols@v2.1.6
+      with:
+        # The Azure DevOps account name to publish the symbols to
+        accountName: work.ying.lee@gmail.com
+        # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
+        personalAccessToken: ujwl47bv4bxlpopxhgj2k4fmmaxow7yuqygjzjmdyzifr6biuwnq
+        # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
+#         symbolsFolder: # optional
+#         # The search pattern used to search for symbols
+#         searchPattern: # optional, default is **/bin/**/*.pdb
+#         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
+#         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
+    
     - uses: actions/upload-artifact@v2
       with:
         name: chatkernel-sdist
