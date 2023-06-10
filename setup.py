@@ -56,6 +56,7 @@ setup_args = dict(
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
     classifiers=[
+        "License :: AILearn.live",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
