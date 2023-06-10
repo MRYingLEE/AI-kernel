@@ -18,7 +18,10 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "es2017",
-    "types": []
+    "types": [],
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "sourceRoot": "./src"
   },
   "include": ["src/*","src/types/*"]
 }
