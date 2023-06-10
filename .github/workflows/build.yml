@@ -63,7 +63,7 @@ jobs:
         pip install build
         python -m build --wheel
         cp dist/*.whl *.whl
-        # ls dist/*.*
+        
         pip uninstall -y chatkernel jupyterlab
         
 #     - name: Stamp js sourcemaps
@@ -87,10 +87,15 @@ jobs:
       run: |
         rm -rf chatkernel
 
+    - name: Zip fie
+      run: |
+        sudo apt-get install zip
+        zip chatkernel-wheel.zip *.whl
+
     - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: /*.whl
+        path: chatkernel-wheel.zip
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
@@ -119,12 +124,15 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: chatkernel-wheel
+
     - name: Install and Test
       run: |
         set -eux
         # Remove NodeJS, twice to take care of system and locally installed node versions.
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
+        sudo apt-get install unzip
+        unzip chatkernel-wheel.zip 
         pip install ./*.whl
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
