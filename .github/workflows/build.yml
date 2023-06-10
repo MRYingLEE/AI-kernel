@@ -102,7 +102,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: '*.whl'
+        source_file: 'chatkernel-wheel.zip'
         destination_repo: 'MRYingLEE/AILearn.live'
         destination_folder: '/'
         user_email: 'MRYingLEE@gmail.com'
