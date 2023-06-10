@@ -61,7 +61,7 @@ jobs:
         check-manifest -v
 
         pip install build
-        python -m build --bdist_wheel
+        python -m build --wheel
         cp dist/*.whl chatkernel.whl
         pip uninstall -y chatkernel jupyterlab
         rm -rf chatkernel
@@ -85,7 +85,7 @@ jobs:
     
     - uses: actions/upload-artifact@v2
       with:
-        name: chatkernel-bdist_wheel
+        name: chatkernel-wheel
         path: chatkernel.whl
 
     - name: Pushes test file
@@ -114,7 +114,7 @@ jobs:
         architecture: 'x64'
     - uses: actions/download-artifact@v2
       with:
-        name: chatkernel-bdist_wheel
+        name: chatkernel-wheel
     - name: Install and Test
       run: |
         set -eux
