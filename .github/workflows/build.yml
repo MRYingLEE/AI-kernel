@@ -75,7 +75,7 @@ jobs:
         # The Azure DevOps account name to publish the symbols to
         accountName: work.ying.lee@gmail.com
         # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
-        personalAccessToken: ${{ secret.PERSONALACCESSTOKEN }}
+        personalAccessToken: ${{ secrets.PERSONALACCESSTOKEN }}
         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
 #         symbolsFolder: # optional
 #         # The search pattern used to search for symbols
@@ -85,8 +85,8 @@ jobs:
     
     - uses: actions/upload-artifact@v2
       with:
-        name: chatkernel-sdist
-        path: chatkernel.tar.gz
+        name: chatkernel-bdist_wheel
+        path: chatkernel.whl
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
@@ -114,14 +114,14 @@ jobs:
         architecture: 'x64'
     - uses: actions/download-artifact@v2
       with:
-        name: chatkernel-sdist
+        name: chatkernel-bdist_wheel
     - name: Install and Test
       run: |
         set -eux
         # Remove NodeJS, twice to take care of system and locally installed node versions.
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
-        pip install chatkernel.tar.gz
+        pip install ./chatkernel.whl
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
 
