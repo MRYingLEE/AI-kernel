@@ -62,7 +62,7 @@ jobs:
 
         pip install build
         python -m build --wheel
-        cp dist/*.whl chatkernel.whl
+        cp dist/*.whl *.whl
         ls dist/*.*
         pip uninstall -y chatkernel jupyterlab
         
@@ -90,14 +90,14 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: chatkernel-wheel
-        path: chatkernel.whl
+        path: *.whl
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'chatkernel.whl'
+        source_file: '*.whl'
         destination_repo: 'MRYingLEE/AILearn.live'
         destination_folder: '/'
         user_email: 'MRYingLEE@gmail.com'
@@ -125,7 +125,7 @@ jobs:
         # Remove NodeJS, twice to take care of system and locally installed node versions.
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
-        pip install ./chatkernel.whl
+        pip install ./*.whl
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
 
