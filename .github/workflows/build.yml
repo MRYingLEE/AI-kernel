@@ -63,7 +63,7 @@ jobs:
         pip install build
         python -m build --wheel
         cp dist/*.whl *.whl
-        ls dist/*.*
+        # ls dist/*.*
         pip uninstall -y chatkernel jupyterlab
         
 #     - name: Stamp js sourcemaps
@@ -90,7 +90,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: ./*.whl
+        path: /*.whl
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
