@@ -61,8 +61,8 @@ jobs:
         check-manifest -v
 
         pip install build
-        python -m build --sdist
-        cp dist/*.tar.gz chatkernel.tar.gz
+        python -m build --bdist_wheel
+        cp dist/*.whl chatkernel.whl
         pip uninstall -y chatkernel jupyterlab
         rm -rf chatkernel
         
@@ -93,7 +93,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'chatkernel.tar.gz'
+        source_file: 'chatkernel.whl'
         destination_repo: 'MRYingLEE/AILearn.live'
         destination_folder: '/'
         user_email: 'MRYingLEE@gmail.com'
