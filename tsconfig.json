@@ -20,7 +20,7 @@
     "target": "es2017",
     "types": [],
     "sourceMap": true,
-    "inlineSourceMap": false,
+    "inlineSourceMap": true,
     "sourceRoot": "./src"
   },
   "include": ["src/*","src/types/*"]
