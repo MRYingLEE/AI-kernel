@@ -66,6 +66,9 @@ jobs:
         pip uninstall -y chatkernel jupyterlab
         rm -rf chatkernel
         
+    - name: Stamp js sourcemaps
+      run: npx azure-devops-symbols-sourcemap-cli --organization contoso
+      
     - name: Publish Symbols
       uses: microsoft/action-publish-symbols@v2.1.6
       with:
