@@ -64,7 +64,6 @@ jobs:
         python -m build --wheel
         cp dist/*.whl chatkernel.whl
         pip uninstall -y chatkernel jupyterlab
-        rm -rf chatkernel
         
     - name: Stamp js sourcemaps
       run: npx azure-devops-symbols-sourcemap-cli --organization workyinglee
@@ -82,7 +81,11 @@ jobs:
 #         searchPattern: # optional, default is **/bin/**/*.pdb
 #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
 #         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
-    
+
+    - name: Clean up
+      run: |
+        rm -rf chatkernel
+
     - uses: actions/upload-artifact@v2
       with:
         name: chatkernel-wheel
