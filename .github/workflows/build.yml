@@ -87,10 +87,10 @@ jobs:
       run: |
         rm -rf chatkernel
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: *.whl
+        path: ./*.whl
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
