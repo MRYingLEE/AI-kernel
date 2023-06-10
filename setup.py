@@ -45,7 +45,7 @@ setup_args = dict(
     author=pkg_json["author"]["name"],
     author_email=pkg_json["author"]["email"],
     description=pkg_json["description"],
-    license=pkg_json["license"],
+    # license=pkg_json["license"],
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
@@ -56,7 +56,7 @@ setup_args = dict(
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
     classifiers=[
-        "License :: AILearn.live",
+        # "License :: AILearn.live",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
