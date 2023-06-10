@@ -133,7 +133,7 @@ jobs:
         sudo rm -rf $(which node)
         sudo apt-get install unzip
         unzip chatkernel-wheel.zip 
-        pip install ./*.whl
+        pip install *.whl
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
 
