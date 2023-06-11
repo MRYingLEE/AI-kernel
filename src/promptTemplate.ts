@@ -77,8 +77,8 @@ class promptTemplate implements IPromptTemplateProps {
   // }
   // inputVariables: string[];
 
-  inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
-  outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
+  // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
+  // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
   withMemory: boolean; //false is the default //added by Ying
 
@@ -160,7 +160,7 @@ class promptTemplate implements IPromptTemplateProps {
     this.newSession = true;
   }
 
-  getSessionHistoy(tokenLimit = 4000): ChatCompletionRequestMessage[] {
+  getSessionHistory(tokenLimit = 4000): ChatCompletionRequestMessage[] {
     //Todo: A lot of improvement here. 1. Token limit instead of char limit 2. Guarantee the pair of messages are added. 3. Avoid failed user message 4. Retry
 
     const history: ChatCompletionRequestMessage[] = [];
@@ -174,6 +174,7 @@ class promptTemplate implements IPromptTemplateProps {
           totalToken =
             promptTemplate.global_messages[i].coremessage.content.length;
           systemMessage = promptTemplate.global_messages[i].coremessage;
+          break;
         }
       }
     }
@@ -276,7 +277,7 @@ class promptTemplate implements IPromptTemplateProps {
       this.addMessage('user', usrContent, '');
     }
 
-    const messages = this.getSessionHistoy(promptTemplate.TokenLimit);
+    const messages = this.getSessionHistory(promptTemplate.TokenLimit);
 
     return messages;
   }

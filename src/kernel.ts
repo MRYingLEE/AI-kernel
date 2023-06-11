@@ -1,8 +1,8 @@
 import { KernelMessage } from '@jupyterlab/services';
 
-import { BaseKernel } from '@jupyterlite/kernel';
+import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
-import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai'; ///* */
 
 import { extractPersonAndMessage } from './chatSyntax';
 
@@ -14,11 +14,10 @@ import { promptTemplates } from './promptTemplate';
 We try to init OpenAIApi at the beginning
 */
 const configuration = new Configuration({
-  apiKey: 'AILearn.live'
+  apiKey: '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'
 });
-
 delete configuration.baseOptions.headers['User-Agent'];
-let myOpenAI = new OpenAIApi(configuration);
+let globalOpenAI = new OpenAIApi(configuration);
 
 /*
 //Todo: to make sure Handlebars loaded at the beginning
@@ -29,6 +28,23 @@ let myOpenAI = new OpenAIApi(configuration);
  * A kernel that chats with OpenAI.
  */
 export class ChatKernel extends BaseKernel {
+  /**
+   * Instantiate a new JavaScriptKernel
+   *
+   * @param options The instantiation options for a new ChatKernel
+   */
+  constructor(options: ChatKernel.IOptions) {
+    super(options);
+  }
+
+  /**
+   * Dispose the kernel.
+   */
+  dispose(): void {
+    if (this.isDisposed) {
+      return;
+    }
+  }
   /**
    * Handle a kernel_info_request message
    */
@@ -60,76 +76,76 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
-  async assignKey(
-    apiKey: string
-  ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    const configuration2 = new Configuration({
-      apiKey: apiKey
-    });
-    delete configuration2.baseOptions.headers['User-Agent'];
-    myOpenAI = new OpenAIApi(configuration2);
-    // /**
-    //  * Test Handlebars
-    //  */
-    // // const Handlebars = await import('handlebars');
-    // const welcomeTemplate = Handlebars.compile('{{name}}');
-    // console.log(welcomeTemplate({ name: user.current_user.name }));
+  // async assignKey(
+  //   apiKey: string
+  // ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
+  //   const configuration2 = new Configuration({
+  //     apiKey: apiKey
+  //   });
+  //   delete configuration2.baseOptions.headers['User-Agent'];
+  //   globalOpenAI = new OpenAIApi(configuration2);
+  //   // /**
+  //   //  * Test Handlebars
+  //   //  */
+  //   // // const Handlebars = await import('handlebars');
+  //   // const welcomeTemplate = Handlebars.compile('{{name}}');
+  //   // console.log(welcomeTemplate({ name: user.current_user.name }));
 
-    /*
-      To list all registered actions for debugging
-    */
-    let allActions = '';
-    for (const key in promptTemplates) {
-      if (!promptTemplates[key]) {
-        continue;
-      }
-      allActions += '\n' + key;
-    }
+  //   /*
+  //     To list all registered actions for debugging
+  //   */
+  //   let allActions = '';
+  //   for (const key in promptTemplates) {
+  //     if (!promptTemplates[key]) {
+  //       continue;
+  //     }
+  //     allActions += '\n' + key;
+  //   }
 
-    this.publishExecuteResult({
-      execution_count: this.executionCount,
-      data: {
-        'text/markdown':
-          // welcomeTemplate({ name: user.current_user.name }) +
-          ', try now!' +
-          '<p>' +
-          'OpenAI API Key (' +
-          configuration.apiKey +
-          ') has been assigned.' +
-          '</p><p>' +
-          'FYI: The current list is as the following:<p/>' +
-          allActions +
-          '</p>'
-      },
-      metadata: {}
-    });
-    // /*
-    // Here, we try to compile all promptTamplests
-    // */
-    // for (const element of Object.values(promptTemplates)) {
-    //   try {
-    //     element.f_sysTemplate = Handlebars.compile(
-    //       element.systemMessageTemplate
-    //     );
-    //   } catch {
-    //     element.f_sysTemplate = undefined;
-    //   }
+  //   this.publishExecuteResult({
+  //     execution_count: this.executionCount,
+  //     data: {
+  //       'text/markdown':
+  //         // welcomeTemplate({ name: user.current_user.name }) +
+  //         ', try now!' +
+  //         '<p>' +
+  //         'OpenAI API Key (' +
+  //         configuration.apiKey +
+  //         ') has been assigned.' +
+  //         '</p><p>' +
+  //         'FYI: The current list is as the following:<p/>' +
+  //         allActions +
+  //         '</p>'
+  //     },
+  //     metadata: {}
+  //   });
+  //   // /*
+  //   // Here, we try to compile all promptTamplests
+  //   // */
+  //   // for (const element of Object.values(promptTemplates)) {
+  //   //   try {
+  //   //     element.f_sysTemplate = Handlebars.compile(
+  //   //       element.systemMessageTemplate
+  //   //     );
+  //   //   } catch {
+  //   //     element.f_sysTemplate = undefined;
+  //   //   }
 
-    //   try {
-    //     element.f_userTemplate = Handlebars.compile(
-    //       element.userMessageTemplate
-    //     );
-    //   } catch {
-    //     element.f_userTemplate = undefined;
-    //   }
-    // }
+  //   //   try {
+  //   //     element.f_userTemplate = Handlebars.compile(
+  //   //       element.userMessageTemplate
+  //   //     );
+  //   //   } catch {
+  //   //     element.f_userTemplate = undefined;
+  //   //   }
+  //   // }
 
-    return Promise.resolve({
-      status: 'ok',
-      execution_count: this.executionCount,
-      user_expressions: {}
-    });
-  }
+  //   return Promise.resolve({
+  //     status: 'ok',
+  //     execution_count: this.executionCount,
+  //     user_expressions: {}
+  //   });
+  // }
 
   /**
    * Handle an `execute_request` message
@@ -139,11 +155,11 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
-      const apiKey = content.code.trim().slice('key='.length);
+      // const apiKey = content.code.trim().slice('key='.length);
       //The key should have a 20+ length.
-      if (apiKey.length > 20) {
-        return this.assignKey(apiKey);
-      }
+      // if (apiKey.length > 20) {
+      //   return this.assignKey(apiKey);
+      // }
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
@@ -195,7 +211,7 @@ export class ChatKernel extends BaseKernel {
     }
     console.table(messages);
 
-    const completion = await myOpenAI.createChatCompletion({
+    const completion = await globalOpenAI.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: messages
     });
@@ -219,12 +235,12 @@ export class ChatKernel extends BaseKernel {
       data: {
         'text/markdown':
           '**Prompt in JSON:**' +
-            '<p>' +
-            JSON.stringify(messages) +
-            '</p><p>' +
-            '**Response:**' +
-            '</p><p>' +
-            response || ''
+          '<p>' +
+          JSON.stringify(messages) +
+          '</p><p>' +
+          '**Response:**' +
+          '</p><p>' +
+          response || ''
       },
       metadata: {}
     });
@@ -321,4 +337,14 @@ export class ChatKernel extends BaseKernel {
   async commClose(msg: KernelMessage.ICommCloseMsg): Promise<void> {
     throw new Error('Not implemented');
   }
+}
+
+/**
+ * A namespace for JavaScriptKernel statics
+ */
+namespace ChatKernel {
+  /**
+   * The instantiation options for a Chat kernel.
+   */
+  export type IOptions = IKernel.IOptions;
 }
