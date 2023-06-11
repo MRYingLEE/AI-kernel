@@ -84,32 +84,32 @@ jobs:
 # #         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
 
     
-    # - name: Zip fie
-    #   run: |
-    #     sudo apt-get install zip
-    #       chatkernel-wheel.zip jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
+    - name: Zip fie
+      run: |
+        sudo apt-get install zip
+        zip chatkernel-wheel.zip *.whl
 
     - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
-        
-    - name: Clean up
-      run: |
-        rm -rf chatkernel
+        path: chatkernel-wheel.zip
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'jupyterlite_chat_kernel-0.3.0-py3-none-any.whl'
+        source_file: 'chatkernel-wheel.zip'
         destination_repo: 'MRYingLEE/AILearn.live'
         destination_folder: '/'
         user_email: 'MRYingLEE@gmail.com'
         user_name: 'MRYingLEE'
         commit_message: 'A new version of Chat Kernel'
-
+        
+    - name: Clean up
+      run: |
+        rm -rf chatkernel
+        
   test_isolated:
     needs: build
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
         sudo rm -rf $(which node)
         sudo apt-get install unzip
         unzip chatkernel-wheel.zip 
-        pip install *.whl
+        pip install ./*.whl
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
 
