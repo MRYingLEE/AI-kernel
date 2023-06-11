@@ -173,6 +173,7 @@ export class ChatKernel extends BaseKernel {
       console.log('Action:', actions[0]);
       messages = promptTemplates[actions[0]].buildTemplate(statuses);
     }
+    console.table(messages);
 
     const completion = await myOpenAI.createChatCompletion({
       model: 'gpt-3.5-turbo',
