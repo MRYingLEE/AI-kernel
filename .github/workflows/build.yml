@@ -90,7 +90,7 @@ jobs:
     - name: Zip fie
       run: |
         sudo apt-get install zip
-        zip chatkernel-wheel.zip *.whl
+          chatkernel-wheel.zip jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
 
     - uses: actions/upload-artifact@v3
       with:
