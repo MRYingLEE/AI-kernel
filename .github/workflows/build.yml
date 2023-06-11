@@ -62,7 +62,7 @@ jobs:
 
         pip install build
         python -m build --wheel
-        cp dist/*.whl *.whl
+        cp dist/*.whl .
         
         pip uninstall -y chatkernel jupyterlab
         
@@ -83,10 +83,7 @@ jobs:
 # #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
 # #         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
 
-    - name: Clean up
-      run: |
-        rm -rf chatkernel
-
+    
     # - name: Zip fie
     #   run: |
     #     sudo apt-get install zip
@@ -96,6 +93,10 @@ jobs:
       with:
         name: chatkernel-wheel
         path: jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
+        
+    - name: Clean up
+      run: |
+        rm -rf chatkernel
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
