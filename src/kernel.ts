@@ -8,7 +8,7 @@ import { extractPersonAndMessage } from './chatSyntax';
 
 import { promptTemplates } from './promptTemplate';
 
-// import { user } from './user';
+import { user } from './user';
 
 /*
 We try to init OpenAIApi at the beginning
@@ -76,77 +76,6 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
-  // async assignKey(
-  //   apiKey: string
-  // ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-  //   const configuration2 = new Configuration({
-  //     apiKey: apiKey
-  //   });
-  //   delete configuration2.baseOptions.headers['User-Agent'];
-  //   globalOpenAI = new OpenAIApi(configuration2);
-  //   // /**
-  //   //  * Test Handlebars
-  //   //  */
-  //   // // const Handlebars = await import('handlebars');
-  //   // const welcomeTemplate = Handlebars.compile('{{name}}');
-  //   // console.log(welcomeTemplate({ name: user.current_user.name }));
-
-  //   /*
-  //     To list all registered actions for debugging
-  //   */
-  //   let allActions = '';
-  //   for (const key in promptTemplates) {
-  //     if (!promptTemplates[key]) {
-  //       continue;
-  //     }
-  //     allActions += '\n' + key;
-  //   }
-
-  //   this.publishExecuteResult({
-  //     execution_count: this.executionCount,
-  //     data: {
-  //       'text/markdown':
-  //         // welcomeTemplate({ name: user.current_user.name }) +
-  //         ', try now!' +
-  //         '<p>' +
-  //         'OpenAI API Key (' +
-  //         configuration.apiKey +
-  //         ') has been assigned.' +
-  //         '</p><p>' +
-  //         'FYI: The current list is as the following:<p/>' +
-  //         allActions +
-  //         '</p>'
-  //     },
-  //     metadata: {}
-  //   });
-  //   // /*
-  //   // Here, we try to compile all promptTamplests
-  //   // */
-  //   // for (const element of Object.values(promptTemplates)) {
-  //   //   try {
-  //   //     element.f_sysTemplate = Handlebars.compile(
-  //   //       element.systemMessageTemplate
-  //   //     );
-  //   //   } catch {
-  //   //     element.f_sysTemplate = undefined;
-  //   //   }
-
-  //   //   try {
-  //   //     element.f_userTemplate = Handlebars.compile(
-  //   //       element.userMessageTemplate
-  //   //     );
-  //   //   } catch {
-  //   //     element.f_userTemplate = undefined;
-  //   //   }
-  //   // }
-
-  //   return Promise.resolve({
-  //     status: 'ok',
-  //     execution_count: this.executionCount,
-  //     user_expressions: {}
-  //   });
-  // }
-
   /**
    * Handle an `execute_request` message
    * @param msg The parent message.
@@ -155,11 +84,75 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
-      // const apiKey = content.code.trim().slice('key='.length);
+      const apiKey = content.code.trim().slice('key='.length);
       //The key should have a 20+ length.
-      // if (apiKey.length > 20) {
-      //   return this.assignKey(apiKey);
-      // }
+      if (apiKey.length > 20) {
+        const configuration2 = new Configuration({
+          apiKey: apiKey
+        });
+        delete configuration2.baseOptions.headers['User-Agent'];
+        globalOpenAI = new OpenAIApi(configuration2);
+        /**
+         * Test Handlebars
+         */
+        // const Handlebars = await import('handlebars');
+        const welcomeTemplate = Handlebars.compile('{{name}}');
+        console.log(welcomeTemplate({ name: user.current_user.name }));
+
+        /*
+          To list all registered actions for debugging
+        */
+        let allActions = '';
+        for (const key in promptTemplates) {
+          if (!promptTemplates[key]) {
+            continue;
+          }
+          allActions += '\n' + key;
+        }
+
+        this.publishExecuteResult({
+          execution_count: this.executionCount,
+          data: {
+            'text/markdown':
+              // welcomeTemplate({ name: user.current_user.name }) +
+              ', try now!' +
+              '<p>' +
+              'OpenAI API Key (' +
+              configuration.apiKey +
+              ') has been assigned.</p>' +
+              '<p>FYI: The current list is as the following:<p/>' +
+              allActions +
+              '</p>'
+          },
+          metadata: {}
+        });
+        // /*
+        // Here, we try to compile all promptTamplests
+        // */
+        // for (const element of Object.values(promptTemplates)) {
+        //   try {
+        //     element.f_sysTemplate = Handlebars.compile(
+        //       element.systemMessageTemplate
+        //     );
+        //   } catch {
+        //     element.f_sysTemplate = undefined;
+        //   }
+
+        //   try {
+        //     element.f_userTemplate = Handlebars.compile(
+        //       element.userMessageTemplate
+        //     );
+        //   } catch {
+        //     element.f_userTemplate = undefined;
+        //   }
+        // }
+
+        return {
+          status: 'ok',
+          execution_count: this.executionCount,
+          user_expressions: {}
+        };
+      }
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
@@ -235,12 +228,12 @@ export class ChatKernel extends BaseKernel {
       data: {
         'text/markdown':
           '**Prompt in JSON:**' +
-          '<p>' +
-          JSON.stringify(messages) +
-          '</p><p>' +
-          '**Response:**' +
-          '</p><p>' +
-          response || ''
+            '<p>' +
+            JSON.stringify(messages) +
+            '</p><p>' +
+            '**Response:**' +
+            '</p><p>' +
+            response || ''
       },
       metadata: {}
     });
