@@ -52,6 +52,72 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
+  assignKey(
+    apiKey: string
+  ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
+    const configuration2 = new Configuration({
+      apiKey: apiKey
+    });
+    delete configuration2.baseOptions.headers['User-Agent'];
+    myOpenAI = new OpenAIApi(configuration2);
+    /**
+     * Test Handlebars
+     */
+    // const Handlebars = await import('handlebars');
+    const welcomeTemplate = Handlebars.compile('{{name}}');
+    console.log(welcomeTemplate({ name: user.current_user.name }));
+
+    let allActions = '';
+    for (const key in promptTemplates) {
+      if (!promptTemplates[key]) {
+        continue;
+      }
+      allActions += '\n' + key;
+    }
+
+    this.publishExecuteResult({
+      execution_count: this.executionCount,
+      data: {
+        'text/markdown':
+          welcomeTemplate({ name: user.current_user.name }) +
+          ', try now!' +
+          '<p>' +
+          'OpenAI API Key (' +
+          configuration.apiKey +
+          ') has been assigned.' +
+          '</p><p>' +
+          'FYI: The current list is as the following:<p/>' +
+          allActions +
+          '</p>'
+      },
+      metadata: {}
+    });
+
+    for (const element of Object.values(promptTemplates)) {
+      try {
+        element.f_sysTemplate = Handlebars.compile(
+          element.systemMessageTemplate
+        );
+      } catch {
+        element.f_sysTemplate = undefined;
+      }
+
+      try {
+        element.f_userTemplate = Handlebars.compile(
+          element.userMessageTemplate
+        );
+      } catch {
+        element.f_userTemplate = undefined;
+      }
+    }
+
+    return Promise.resolve({
+      status: 'ok',
+      execution_count: this.executionCount,
+      user_expressions: {}
+    });
+  }
+
   /**
    * Handle an `execute_request` message
    *
@@ -61,68 +127,8 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
-      const configuration2 = new Configuration({
-        apiKey: content.code.trim().slice('key='.length)
-      });
-      delete configuration2.baseOptions.headers['User-Agent'];
-      myOpenAI = new OpenAIApi(configuration2);
-      /**
-       * Test Handlebars
-       */
-
-      // const Handlebars = await import('handlebars');
-      const welcomeTemplate = Handlebars.compile('{{name}}');
-      console.log(welcomeTemplate({ name: user.current_user.name }));
-
-      let allActions = '';
-      for (const key in promptTemplates) {
-        if (!promptTemplates[key]) {
-          continue;
-        }
-        allActions += '\n' + key;
-      }
-
-      this.publishExecuteResult({
-        execution_count: this.executionCount,
-        data: {
-          'text/markdown':
-            welcomeTemplate({ name: user.current_user.name }) +
-            ', try now!' +
-            '<p>' +
-            'OpenAI API Key (' +
-            configuration.apiKey +
-            ') has been assigned.' +
-            '</p><p>' +
-            'FYI: The current list is as the following:<p/>' +
-            allActions +
-            '</p>'
-        },
-        metadata: {}
-      });
-
-      for (const element of Object.values(promptTemplates)) {
-        try {
-          element.f_sysTemplate = Handlebars.compile(
-            element.systemMessageTemplate
-          );
-        } catch {
-          element.f_sysTemplate = undefined;
-        }
-
-        try {
-          element.f_userTemplate = Handlebars.compile(
-            element.userMessageTemplate
-          );
-        } catch {
-          element.f_userTemplate = undefined;
-        }
-      }
-
-      return {
-        status: 'ok',
-        execution_count: this.executionCount,
-        user_expressions: {}
-      };
+      const apiKey = content.code.trim().slice('key='.length);
+      return this.assignKey(apiKey);
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
