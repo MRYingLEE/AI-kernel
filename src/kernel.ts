@@ -10,15 +10,23 @@ import { promptTemplates } from './promptTemplate';
 
 import { user } from './user';
 
+/*
+We try to init OpenAIApi at the beginning
+*/
 const configuration = new Configuration({
   apiKey: 'AILearn.live'
 });
 
 delete configuration.baseOptions.headers['User-Agent'];
 let myOpenAI = new OpenAIApi(configuration);
+
+/*
+//Todo: to make sure Handlebars loaded at the beginning
+*/
 import Handlebars from 'handlebars/lib/handlebars';
+
 /**
- * A kernel that chats content back.
+ * A kernel that chats with OpenAI.
  */
 export class ChatKernel extends BaseKernel {
   /**
@@ -67,6 +75,9 @@ export class ChatKernel extends BaseKernel {
     const welcomeTemplate = Handlebars.compile('{{name}}');
     console.log(welcomeTemplate({ name: user.current_user.name }));
 
+    /*
+      To list all registered actions for debugging
+    */
     let allActions = '';
     for (const key in promptTemplates) {
       if (!promptTemplates[key]) {
@@ -92,7 +103,9 @@ export class ChatKernel extends BaseKernel {
       },
       metadata: {}
     });
-
+    /*
+    Here, we try to compile all promptTamplests
+    */
     for (const element of Object.values(promptTemplates)) {
       try {
         element.f_sysTemplate = Handlebars.compile(
@@ -120,7 +133,6 @@ export class ChatKernel extends BaseKernel {
 
   /**
    * Handle an `execute_request` message
-   *
    * @param msg The parent message.
    */
   async executeRequest(
@@ -128,16 +140,18 @@ export class ChatKernel extends BaseKernel {
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     if (content.code.trim().toLowerCase().startsWith('key=')) {
       const apiKey = content.code.trim().slice('key='.length);
-      return this.assignKey(apiKey);
+      //The key should have a 20+ length.
+      if (apiKey.length > 20) {
+        return this.assignKey(apiKey);
+      }
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
 
     let errorMsg = '';
 
-    // To check p
     if (actions.length > 1) {
-      errorMsg = '@ 2 or more actions are not supported so far!';
+      errorMsg = '@ 2 or more actions are not supported so far!'; // We support this feature in the long future.
     } else if (actions.length === 1) {
       if (!promptTemplates[actions[0]]) {
         errorMsg =
@@ -146,10 +160,10 @@ export class ChatKernel extends BaseKernel {
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
         for (const key in promptTemplates) {
-          if (!promptTemplates[key]) {
+          if (promptTemplates[key] === undefined) {
             continue;
           }
-          errorMsg += '\r\n' + key;
+          errorMsg += '\n' + key;
         }
       }
     }
@@ -158,7 +172,7 @@ export class ChatKernel extends BaseKernel {
       this.publishExecuteResult({
         execution_count: this.executionCount,
         data: {
-          'text/plain': errorMsg
+          'text/markdown': '**' + errorMsg + '**'
         },
         metadata: {}
       });
@@ -194,12 +208,6 @@ export class ChatKernel extends BaseKernel {
       theTemplate = promptTemplates[actions[0]];
     }
 
-    // theTemplate.addMessage(
-    //   'user',
-    //   pureMessage,
-    //   '',
-    //   completion.data.usage?.prompt_tokens || 0
-    // );
     theTemplate.addMessage(
       'assistant',
       response || '',
@@ -220,16 +228,6 @@ export class ChatKernel extends BaseKernel {
       },
       metadata: {}
     });
-
-    // const { code } = content;
-
-    // this.publishExecuteResult({
-    //   execution_count: this.executionCount,
-    //   data: {
-    //     'text/plain': code + ' (powered by ChatGPT)'
-    //   },
-    //   metadata: {}
-    // });
 
     return {
       status: 'ok',
