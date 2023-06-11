@@ -550,8 +550,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   '@ai': new promptTemplate(
     '@ai',
     '',
-    aiPrompt,
     '',
+    aiPrompt,
     'Handlebars',
     true,
     // 'Cell',
@@ -562,8 +562,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   '@2e': new promptTemplate(
     'to English',
     '',
-    all2EnglishPrompt,
     '',
+    all2EnglishPrompt,
     'Handlebars',
     true,
     // 'Cell',
@@ -573,8 +573,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   '@2c': new promptTemplate(
     'to Chinese',
     '',
-    all2ChinesePrompt,
     '',
+    all2ChinesePrompt,
     'Handlebars',
     true,
     // 'Cell',
@@ -584,8 +584,8 @@ const promptTemplates: { [id: string]: promptTemplate } = {
   '@refinery': new promptTemplate(
     'refinery',
     '',
-    refineryPrompt,
     '',
+    refineryPrompt,
     'Handlebars',
     true,
     // 'Cell',
