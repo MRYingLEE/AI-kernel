@@ -60,7 +60,7 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
-  assignKey(
+  async assignKey(
     apiKey: string
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     const configuration2 = new Configuration({
