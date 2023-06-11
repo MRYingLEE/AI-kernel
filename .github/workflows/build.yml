@@ -87,22 +87,22 @@ jobs:
       run: |
         rm -rf chatkernel
 
-    - name: Zip fie
-      run: |
-        sudo apt-get install zip
-          chatkernel-wheel.zip jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
+    # - name: Zip fie
+    #   run: |
+    #     sudo apt-get install zip
+    #       chatkernel-wheel.zip jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
 
     - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: chatkernel-wheel.zip
+        path: jupyterlite_chat_kernel-0.3.0-py3-none-any.whl
 
     - name: Pushes test file
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'chatkernel-wheel.zip'
+        source_file: 'jupyterlite_chat_kernel-0.3.0-py3-none-any.whl'
         destination_repo: 'MRYingLEE/AILearn.live'
         destination_folder: '/'
         user_email: 'MRYingLEE@gmail.com'
