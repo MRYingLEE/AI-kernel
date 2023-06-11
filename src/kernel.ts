@@ -8,7 +8,7 @@ import { extractPersonAndMessage } from './chatSyntax';
 
 import { promptTemplates } from './promptTemplate';
 
-import { user } from './user';
+// import { user } from './user';
 
 /*
 We try to init OpenAIApi at the beginning
@@ -23,7 +23,7 @@ let myOpenAI = new OpenAIApi(configuration);
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
-import Handlebars from 'handlebars/lib/handlebars';
+// import Handlebars from 'handlebars/lib/handlebars';
 
 /**
  * A kernel that chats with OpenAI.
@@ -68,12 +68,12 @@ export class ChatKernel extends BaseKernel {
     });
     delete configuration2.baseOptions.headers['User-Agent'];
     myOpenAI = new OpenAIApi(configuration2);
-    /**
-     * Test Handlebars
-     */
-    // const Handlebars = await import('handlebars');
-    const welcomeTemplate = Handlebars.compile('{{name}}');
-    console.log(welcomeTemplate({ name: user.current_user.name }));
+    // /**
+    //  * Test Handlebars
+    //  */
+    // // const Handlebars = await import('handlebars');
+    // const welcomeTemplate = Handlebars.compile('{{name}}');
+    // console.log(welcomeTemplate({ name: user.current_user.name }));
 
     /*
       To list all registered actions for debugging
@@ -90,7 +90,7 @@ export class ChatKernel extends BaseKernel {
       execution_count: this.executionCount,
       data: {
         'text/markdown':
-          welcomeTemplate({ name: user.current_user.name }) +
+          // welcomeTemplate({ name: user.current_user.name }) +
           ', try now!' +
           '<p>' +
           'OpenAI API Key (' +
@@ -103,26 +103,26 @@ export class ChatKernel extends BaseKernel {
       },
       metadata: {}
     });
-    /*
-    Here, we try to compile all promptTamplests
-    */
-    for (const element of Object.values(promptTemplates)) {
-      try {
-        element.f_sysTemplate = Handlebars.compile(
-          element.systemMessageTemplate
-        );
-      } catch {
-        element.f_sysTemplate = undefined;
-      }
+    // /*
+    // Here, we try to compile all promptTamplests
+    // */
+    // for (const element of Object.values(promptTemplates)) {
+    //   try {
+    //     element.f_sysTemplate = Handlebars.compile(
+    //       element.systemMessageTemplate
+    //     );
+    //   } catch {
+    //     element.f_sysTemplate = undefined;
+    //   }
 
-      try {
-        element.f_userTemplate = Handlebars.compile(
-          element.userMessageTemplate
-        );
-      } catch {
-        element.f_userTemplate = undefined;
-      }
-    }
+    //   try {
+    //     element.f_userTemplate = Handlebars.compile(
+    //       element.userMessageTemplate
+    //     );
+    //   } catch {
+    //     element.f_userTemplate = undefined;
+    //   }
+    // }
 
     return Promise.resolve({
       status: 'ok',
