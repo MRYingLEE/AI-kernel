@@ -109,7 +109,7 @@ jobs:
     - name: Clean up
       run: |
         rm -rf chatkernel
-        
+
   test_isolated:
     needs: build
     runs-on: ubuntu-latest
@@ -133,8 +133,8 @@ jobs:
         sudo rm -rf $(which node)
         sudo rm -rf $(which node)
         sudo apt-get install unzip
-        unzip chatkernel-wheel.zip 
-        pip install ./*.whl
+        unzip -o chatkernel-wheel.zip 
+        for f in *.whl; do pip install "$f"; done
         pip install jupyterlab
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/chat-kernel.*OK"
 
