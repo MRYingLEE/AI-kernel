@@ -80,9 +80,9 @@ jobs:
         personalAccessToken: ${{ secrets.PERSONALACCESSTOKEN }}
         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
         symbolsFolder: lib # optional
-        indexableFileFormats: all
+#         indexableFileFormats: all
 #         # The search pattern used to search for symbols
-#         searchPattern: # optional, default is **/bin/**/*.pdb
+        searchPattern: *.js.map # optional, default is **/bin/**/*.pdb
 #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
 #         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
 
