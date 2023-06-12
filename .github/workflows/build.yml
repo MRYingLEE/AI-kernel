@@ -81,7 +81,7 @@ jobs:
         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
         # symbolsFolder: lib # optional
 #         # The search pattern used to search for symbols
-        searchPattern: **/bin/**/*.map # optional, default is **/bin/**/*.pdb
+        searchPattern: "lib/**/*.map" # optional, default is **/bin/**/*.pdb
 #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
 #         symbolServiceUrl: # optional, default is https://artifacts.dev.azure.com
 
