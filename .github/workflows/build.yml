@@ -77,7 +77,7 @@ jobs:
         # The Azure DevOps account name to publish the symbols to
         accountName: workyinglee
         # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
-        personalAccessToken: ${{ secrets.PERSONALACCESSTOKEN }}
+        personalAccessToken: ${{ secrets.AZURE_SYMBOL_SERVICE }}
         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
         symbolsFolder: lib # optional
 #         # The search pattern used to search for symbols
