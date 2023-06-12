@@ -67,7 +67,9 @@ jobs:
         pip uninstall -y chatkernel jupyterlab
         
     - name: Stamp js sourcemaps
-      run: npx azure-devops-symbols-sourcemap-cli --organization workyinglee --sourcemap-file-path ./lib
+      run: |
+        cd lib
+        npx azure-devops-symbols-sourcemap-cli --organization workyinglee
       
     - name: Publish Symbols
       uses: microsoft/action-publish-symbols@v2.1.6
