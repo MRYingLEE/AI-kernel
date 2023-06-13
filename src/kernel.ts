@@ -22,7 +22,7 @@ let globalOpenAI = new OpenAIApi(configuration);
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
-// import Handlebars from 'handlebars/lib/handlebars';
+import Handlebars from 'handlebars/lib/handlebars';
 
 /**
  * A kernel that chats with OpenAI.
