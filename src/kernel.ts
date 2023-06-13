@@ -8,7 +8,7 @@ import { extractPersonAndMessage } from './chatSyntax';
 
 import { promptTemplates } from './promptTemplate';
 
-// import { user } from './user';
+import { user } from './user';
 
 /*
 We try to init OpenAIApi at the beginning
@@ -22,7 +22,7 @@ let globalOpenAI = new OpenAIApi(configuration);
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
-// import Handlebars from 'handlebars/lib/handlebars';
+import Handlebars from 'handlebars/lib/handlebars';
 
 /**
  * A kernel that chats with OpenAI.
@@ -92,12 +92,17 @@ export class ChatKernel extends BaseKernel {
         });
         delete configuration2.baseOptions.headers['User-Agent'];
         globalOpenAI = new OpenAIApi(configuration2);
-        // /**
-        //  * Test Handlebars
-        //  */
-        // // const Handlebars = await import('handlebars');
-        // const welcomeTemplate = Handlebars.compile('{{name}}');
-        // console.log(welcomeTemplate({ name: user.current_user.name }));
+        /**
+         * Test Handlebars
+         */
+        if (Handlebars) {
+          const welcomeTemplate1 = Handlebars.compile('Welcome 1 ：{{name}}');
+          console.log(welcomeTemplate1({ name: user.current_user.name }));
+        } else {
+          const Handlebars2 = await import('handlebars');
+          const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
+          console.log(welcomeTemplate2({ name: user.current_user.name }));
+        }
 
         /*
           To list all registered actions for debugging
@@ -228,12 +233,12 @@ export class ChatKernel extends BaseKernel {
       data: {
         'text/markdown':
           '**Prompt in JSON:**' +
-            '<p>' +
-            JSON.stringify(messages) +
-            '</p><p>' +
-            '**Response:**' +
-            '</p><p>' +
-            response || ''
+          '<p>' +
+          JSON.stringify(messages) +
+          '</p><p>' +
+          '**Response:**' +
+          '</p><p>' +
+          response || ''
       },
       metadata: {}
     });
