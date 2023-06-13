@@ -98,11 +98,12 @@ export class ChatKernel extends BaseKernel {
         if (Handlebars) {
           const welcomeTemplate1 = Handlebars.compile('Welcome 1 ：{{name}}');
           console.log(welcomeTemplate1({ name: user.current_user.name }));
-        } else {
-          const Handlebars2 = await import('handlebars');
-          const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
-          console.log(welcomeTemplate2({ name: user.current_user.name }));
         }
+        // else {
+        //   const Handlebars2 = await import('handlebars');
+        //   const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
+        //   console.log(welcomeTemplate2({ name: user.current_user.name }));
+        // }
 
         /*
           To list all registered actions for debugging
