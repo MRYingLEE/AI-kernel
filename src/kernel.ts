@@ -92,12 +92,12 @@ export class ChatKernel extends BaseKernel {
         });
         delete configuration2.baseOptions.headers['User-Agent'];
         globalOpenAI = new OpenAIApi(configuration2);
-        /**
-         * Test Handlebars
-         */
-        // const Handlebars = await import('handlebars');
-        const welcomeTemplate = Handlebars.compile('{{name}}');
-        console.log(welcomeTemplate({ name: user.current_user.name }));
+        // /**
+        //  * Test Handlebars
+        //  */
+        // // const Handlebars = await import('handlebars');
+        // const welcomeTemplate = Handlebars.compile('{{name}}');
+        // console.log(welcomeTemplate({ name: user.current_user.name }));
 
         /*
           To list all registered actions for debugging
