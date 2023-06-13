@@ -233,12 +233,12 @@ export class ChatKernel extends BaseKernel {
       data: {
         'text/markdown':
           '**Prompt in JSON:**' +
-          '<p>' +
-          JSON.stringify(messages) +
-          '</p><p>' +
-          '**Response:**' +
-          '</p><p>' +
-          response || ''
+            '<p>' +
+            JSON.stringify(messages) +
+            '</p><p>' +
+            '**Response:**' +
+            '</p><p>' +
+            response || ''
       },
       metadata: {}
     });
