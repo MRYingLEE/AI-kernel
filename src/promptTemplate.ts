@@ -189,12 +189,12 @@ class promptTemplate implements IPromptTemplateProps {
 
         if (
           (totalToken +
-            promptTemplate.global_messages[i].coremessage?.content?.length ??
+            promptTemplate.global_messages[i]?.coremessage?.content?.length ??
             0) < tokenLimit
         ) {
           history.push(promptTemplate.global_messages[i].coremessage);
           totalToken +=
-            promptTemplate.global_messages[i].coremessage?.content?.length ?? 0;
+            promptTemplate.global_messages[i]?.coremessage?.content?.length ?? 0;
         }
       }
     }
