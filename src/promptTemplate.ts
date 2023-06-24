@@ -209,15 +209,22 @@ class promptTemplate implements IPromptTemplateProps {
   static TokenLimit = 1000;
 
   renderUserTemplate(statuses: { [key: string]: string }): string {
+    console.table(statuses);
     const new_statuses = statuses;
     new_statuses['self_introduction'] = user.current_user.self_introduction();
+    console.table(new_statuses);
     let content = this.userMessageTemplate;
     try {
       if (!(this.f_userTemplate === undefined)) {
+        console.log('content before f_userTemplate', content);
         content = this.f_userTemplate(new_statuses);
+        console.log('content after f_userTemplate', content);
       }
     } catch {
       console.log('usrTemplate:', this.userMessageTemplate);
+    }
+    if (content.includes('{{cell_text}}')) {
+      content.replace('{{cell_text}}', '前途是光明的');
     }
     console.log('content:', content);
     return content;
