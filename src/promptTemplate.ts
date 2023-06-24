@@ -70,11 +70,18 @@ class message {
     newSession: boolean,
     tokenUsage = 0
   ) {
-    this.coremessage = {
-      role: role,
-      content: content,
-      name: name
-    };
+    if (name.trim().length > 0) {
+      this.coremessage = {
+        role: role,
+        content: content,
+        name: name
+      };
+    } else {
+      this.coremessage = {
+        role: role,
+        content: content
+      };
+    }
 
     this.template = template;
 

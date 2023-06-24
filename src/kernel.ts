@@ -92,12 +92,15 @@ export class ChatKernel extends BaseKernel {
         });
         delete configuration2.baseOptions.headers['User-Agent'];
         globalOpenAI = new OpenAIApi(configuration2);
+
+        let welcome = 'Welcome';
         /**
          * Test Handlebars
          */
         if (Handlebars) {
-          const welcomeTemplate1 = Handlebars.compile('Welcome 1 ：{{name}}');
-          console.log(welcomeTemplate1({ name: user.current_user.name }));
+          const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
+          welcome = welcomeTemplate1({ name: user.current_user.name });
+          console.log(welcome);
         }
         // else {
         //   const Handlebars2 = await import('handlebars');
@@ -120,7 +123,7 @@ export class ChatKernel extends BaseKernel {
           execution_count: this.executionCount,
           data: {
             'text/markdown':
-              // welcomeTemplate({ name: user.current_user.name }) +
+              welcome +
               ', try now!' +
               '<p>' +
               'OpenAI API Key (' +
