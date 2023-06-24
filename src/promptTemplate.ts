@@ -215,9 +215,8 @@ class promptTemplate implements IPromptTemplateProps {
         }
 
         if (
-          (totalToken +
-            promptTemplate?.global_messages[i]?.coremessage?.content?.length ??
-            0) < tokenLimit
+          (promptTemplate?.global_messages[i]?.coremessage?.content?.length ??
+            0 + totalToken) < tokenLimit
         ) {
           history.push(promptTemplate.global_messages[i].coremessage);
           totalToken +=
