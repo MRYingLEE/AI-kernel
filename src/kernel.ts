@@ -132,26 +132,26 @@ export class ChatKernel extends BaseKernel {
           },
           metadata: {}
         });
-        // /*
-        // Here, we try to compile all promptTamplests
-        // */
-        // for (const element of Object.values(promptTemplates)) {
-        //   try {
-        //     element.f_sysTemplate = Handlebars.compile(
-        //       element.systemMessageTemplate
-        //     );
-        //   } catch {
-        //     element.f_sysTemplate = undefined;
-        //   }
+        /*
+        Here, we try to compile all promptTamplests
+        */
+        for (const element of Object.values(promptTemplates)) {
+          try {
+            element.f_sysTemplate = Handlebars.compile(
+              element.systemMessageTemplate
+            );
+          } catch {
+            element.f_sysTemplate = undefined;
+          }
 
-        //   try {
-        //     element.f_userTemplate = Handlebars.compile(
-        //       element.userMessageTemplate
-        //     );
-        //   } catch {
-        //     element.f_userTemplate = undefined;
-        //   }
-        // }
+          try {
+            element.f_userTemplate = Handlebars.compile(
+              element.userMessageTemplate
+            );
+          } catch {
+            element.f_userTemplate = undefined;
+          }
+        }
 
         return {
           status: 'ok',

@@ -219,12 +219,13 @@ class promptTemplate implements IPromptTemplateProps {
         console.log('content before f_userTemplate', content);
         content = this.f_userTemplate(new_statuses);
         console.log('content after f_userTemplate', content);
+      } else {
+        for (const key in new_statuses) {
+          content = content.replace('{{' + key + '}}', new_statuses[key]);
+        }
       }
     } catch {
       console.log('usrTemplate:', this.userMessageTemplate);
-    }
-    if (content.includes('{{cell_text}}')) {
-      content.replace('{{cell_text}}', '前途是光明的');
     }
     console.log('content:', content);
     return content;
