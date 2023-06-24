@@ -76,11 +76,15 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
-  async process_cell_text(
-    cell_text: string
+  /**
+   * Handle an `execute_request` message
+   * @param msg The parent message.
+   */
+  async executeRequest(
+    content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    if (cell_text.trim().toLowerCase().startsWith('key=')) {
-      const apiKey = cell_text.trim().slice('key='.length);
+    if (content.code.trim().toLowerCase().startsWith('key=')) {
+      const apiKey = content.code.trim().slice('key='.length);
       //The key should have a 20+ length.
       if (apiKey.length > 20) {
         const configuration2 = new Configuration({
@@ -157,7 +161,7 @@ export class ChatKernel extends BaseKernel {
       }
     }
 
-    const [actions, pureMessage] = extractPersonAndMessage(cell_text);
+    const [actions, pureMessage] = extractPersonAndMessage(content.code);
 
     let errorMsg = '';
 
@@ -245,16 +249,6 @@ export class ChatKernel extends BaseKernel {
       execution_count: this.executionCount,
       user_expressions: {}
     };
-  }
-  /**
-   * Handle an `execute_request` message
-   * @param msg The parent message.
-   */
-  async executeRequest(
-    content: KernelMessage.IExecuteRequestMsg['content']
-  ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    const cell_text = content.code;
-    return this.process_cell_text(cell_text);
   }
 
   /**

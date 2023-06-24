@@ -172,7 +172,7 @@ class promptTemplate implements IPromptTemplateProps {
       if (promptTemplate.global_messages[i].template === this) {
         if (promptTemplate.global_messages[i].newSession) {
           totalToken =
-            promptTemplate.global_messages[i].coremessage?.content?.length ?? 0;
+            promptTemplate.global_messages[i].coremessage.content.length;
           systemMessage = promptTemplate.global_messages[i].coremessage;
           break;
         }
@@ -189,13 +189,12 @@ class promptTemplate implements IPromptTemplateProps {
 
         if (
           totalToken +
-            (promptTemplate.global_messages[i].coremessage?.content?.length ??
-              0) <
+            promptTemplate.global_messages[i].coremessage.content.length <
           tokenLimit
         ) {
           history.push(promptTemplate.global_messages[i].coremessage);
           totalToken +=
-            promptTemplate.global_messages[i].coremessage?.content?.length ?? 0;
+            promptTemplate.global_messages[i].coremessage.content.length;
         }
       }
     }
