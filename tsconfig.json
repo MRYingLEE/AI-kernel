@@ -18,7 +18,7 @@
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "es2017",
+    "target": "ES2018",
     "types": [],
     "sourceMap": true,
     "inlineSourceMap": false,
