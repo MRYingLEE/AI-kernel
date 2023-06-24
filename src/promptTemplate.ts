@@ -23,6 +23,33 @@ interface IPromptTemplateProps {
   withMemory: boolean; //false is the default //added by Ying
 }
 
+function renderTemplate(
+  template: string,
+  f_template: HandlebarsTemplateDelegate<any> | undefined,
+  statuses: { [key: string]: string }
+): string {
+  console.table(statuses);
+  const new_statuses = statuses;
+  new_statuses['self_introduction'] = user.current_user.self_introduction();
+  console.table(new_statuses);
+  let content = template;
+  try {
+    if (!(f_template === undefined)) {
+      console.log('content before f_userTemplate', content);
+      content = f_template(new_statuses);
+      console.log('content after f_userTemplate', content);
+    } else {
+      for (const key in new_statuses) {
+        content = content.replace('{{' + key + '}}', new_statuses[key]);
+      }
+    }
+  } catch {
+    console.log('Template:', template);
+  }
+  console.log('content:', content);
+  return content;
+}
+
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime
 class message {
   template: IPromptTemplateProps; // The prompt template
@@ -187,15 +214,16 @@ class promptTemplate implements IPromptTemplateProps {
           break;
         }
 
-        // if (
-        //   (totalToken +
-        //     promptTemplate?.global_messages[i]?.coremessage?.content?.length ??
-        //     0) < tokenLimit
-        // ) {
-        history.push(promptTemplate.global_messages[i].coremessage);
-        totalToken +=
-          promptTemplate.global_messages[i]?.coremessage?.content?.length ?? 0;
-        // }
+        if (
+          (totalToken +
+            promptTemplate?.global_messages[i]?.coremessage?.content?.length ??
+            0) < tokenLimit
+        ) {
+          history.push(promptTemplate.global_messages[i].coremessage);
+          totalToken +=
+            promptTemplate.global_messages[i]?.coremessage?.content?.length ??
+            0;
+        }
       }
     }
 
@@ -209,41 +237,19 @@ class promptTemplate implements IPromptTemplateProps {
   static TokenLimit = 1000;
 
   renderUserTemplate(statuses: { [key: string]: string }): string {
-    console.table(statuses);
-    const new_statuses = statuses;
-    new_statuses['self_introduction'] = user.current_user.self_introduction();
-    console.table(new_statuses);
-    let content = this.userMessageTemplate;
-    try {
-      if (!(this.f_userTemplate === undefined)) {
-        console.log('content before f_userTemplate', content);
-        content = this.f_userTemplate(new_statuses);
-        console.log('content after f_userTemplate', content);
-      } else {
-        for (const key in new_statuses) {
-          content = content.replace('{{' + key + '}}', new_statuses[key]);
-        }
-      }
-    } catch {
-      console.log('usrTemplate:', this.userMessageTemplate);
-    }
-    console.log('content:', content);
-    return content;
+    return renderTemplate(
+      this.userMessageTemplate,
+      this.f_userTemplate,
+      statuses
+    );
   }
 
   renderSysTemplate(statuses: { [key: string]: string }): string {
-    const new_statuses = statuses;
-    new_statuses['self_introduction'] = user.current_user.self_introduction();
-    let content = this.systemMessageTemplate;
-    try {
-      if (!(this.f_sysTemplate === undefined)) {
-        content = this.f_sysTemplate(new_statuses);
-      }
-    } catch {
-      console.log('sysTemplate:', this.systemMessageTemplate);
-    }
-    console.log('content:', content);
-    return content;
+    return renderTemplate(
+      this.systemMessageTemplate,
+      this.f_sysTemplate,
+      statuses
+    );
   }
 
   buildTemplate(statuses: {
