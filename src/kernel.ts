@@ -210,39 +210,45 @@ export class ChatKernel extends BaseKernel {
     }
     console.table(messages);
 
-    const completion = await globalOpenAI.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: messages
-    });
+    try {
+      const completion = await globalOpenAI.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages
+      });
+      console.log('completion.data', completion.data);
 
-    const response = completion.data.choices[0].message?.content;
+      const response = completion.data.choices[0].message?.content;
 
-    let theTemplate = promptTemplates['@ai'];
+      let theTemplate = promptTemplates['@ai'];
 
-    if (promptTemplates[actions[0]]) {
-      theTemplate = promptTemplates[actions[0]];
+      if (promptTemplates[actions[0]]) {
+        theTemplate = promptTemplates[actions[0]];
+      }
+
+      theTemplate.addMessage(
+        'assistant',
+        response || '',
+        '',
+        completion.data.usage?.completion_tokens || 0
+      );
+      this.publishExecuteResult({
+        execution_count: this.executionCount,
+        data: {
+          'text/markdown':
+            '**Prompt in JSON:**' +
+              '<p>' +
+              JSON.stringify(messages) +
+              '</p><p>' +
+              '**Response:**' +
+              '</p><p>' +
+              response || ''
+        },
+        metadata: {}
+      });
+    } catch (error: any) {
+      console.error('Error during createChatCompletion:', error.message);
+      console.error('Stack trace:', error.stack);
     }
-
-    theTemplate.addMessage(
-      'assistant',
-      response || '',
-      '',
-      completion.data.usage?.completion_tokens || 0
-    );
-    this.publishExecuteResult({
-      execution_count: this.executionCount,
-      data: {
-        'text/markdown':
-          '**Prompt in JSON:**' +
-            '<p>' +
-            JSON.stringify(messages) +
-            '</p><p>' +
-            '**Response:**' +
-            '</p><p>' +
-            response || ''
-      },
-      metadata: {}
-    });
 
     return {
       status: 'ok',
