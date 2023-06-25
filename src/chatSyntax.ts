@@ -26,8 +26,9 @@ export function extractPersonAndMessage(
   const personRegex = /(^|\s)@[\p{L}\p{N}]+(?=(?:[^"]*"[^"]*")*[^"]*$)/gu;
 
   // Extract persons from the chat message
-  const persons =
-    chatMessage.match(personRegex)?.forEach(Element => Element.trim()) || [];
+  const persons = (chatMessage.match(personRegex) || []).map(person =>
+    person.trim()
+  );
 
   // Remove persons from the chat message to get the core message
   const coreMessage = chatMessage.replace(personRegex, '').trim();

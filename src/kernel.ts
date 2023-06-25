@@ -255,10 +255,10 @@ export class ChatKernel extends BaseKernel {
         data: {
           'text/markdown':
             '**Prompt in JSON:**' +
-              JSON.stringify(messages) +
               '```json\n' +
               JSON.stringify(messages, null, 2) +
               '\n```' +
+              '</p><p>' +
               '**' +
               theTemplate.templateName +
               ':**' +
