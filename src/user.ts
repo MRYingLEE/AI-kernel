@@ -93,7 +93,7 @@ export class user {
     'Chinese',
     'A2',
     'Po On Commercial Association Wan Ho Kan Primary School',
-    'I like origami and comics.'
+    'I like origami and comics'
   );
 
   static self_introduction(): string {

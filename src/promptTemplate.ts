@@ -292,14 +292,15 @@ class promptTemplate implements IPromptTemplateProps {
   }
 
   buildMessages2send(statuses: { [key: string]: string }): {
-    messages2send: ChatCompletionRequestMessage[];
-    usrContent: string;
+    messages2send: ChatCompletionRequestMessage[]; //The Request Messages to be sent to ChatGPT
+    usrContent: string; //The logical user message for the current chat session
   } {
     // console.log('statuses:', statuses);
     // console.log('this.systemMessageTemplate:', this.systemMessageTemplate);
     // console.log('this.userMessageTemplate:', this.userMessageTemplate);
 
     let messages2send: ChatCompletionRequestMessage[] = [];
+
     const sysContent = this.renderSysTemplate(statuses);
     console.log('sysContent:', sysContent);
 

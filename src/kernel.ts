@@ -183,6 +183,14 @@ export class ChatKernel extends BaseKernel {
           }
           errorMsg += '\n' + key;
         }
+      } else {
+        if (pureMessage.trim().length === 0) {
+          promptTemplates[actions[0]].startNewSession();
+          errorMsg =
+            'The chat history with ' +
+            actions[0] +
+            'has been cleared. Now you have a new session with it.';
+        }
       }
     }
 
@@ -224,7 +232,7 @@ export class ChatKernel extends BaseKernel {
     }
     if (messages2send.length === 0) {
       // if some exception happened, we may give some default but simple processing
-      messages2send.push({ role: 'user', content: pureMessage });
+      messages2send.push({ role: 'user', content: usrContent });
     }
     console.table(messages2send);
 
