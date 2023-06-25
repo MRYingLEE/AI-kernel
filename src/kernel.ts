@@ -6,7 +6,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
-import { promptTemplates } from './promptTemplate';
+import { promptTemplate, promptTemplates } from './promptTemplate';
 
 import { user } from './user';
 
@@ -186,6 +186,12 @@ export class ChatKernel extends BaseKernel {
       }
     }
 
+    if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
+      errorMsg =
+        'The maxinum of input should be half of ' +
+        promptTemplate.MaxTokenLimit;
+    }
+
     if (errorMsg.length > 0) {
       this.publishExecuteResult({
         execution_count: this.executionCount,
@@ -220,14 +226,21 @@ export class ChatKernel extends BaseKernel {
       });
       console.log('completion.data', completion.data);
 
-      const response = completion.data.choices[0].message?.content;
+      const response = completion.data.choices[0].message?.content ?? '';
 
       let theTemplate = promptTemplates['@ai'];
 
       if (promptTemplates[actions[0]]) {
         theTemplate = promptTemplates[actions[0]];
       }
-
+      //To add the prompt message here
+      theTemplate.addMessage(
+        'user',
+        pureMessage || '',
+        '',
+        completion.data.usage?.prompt_tokens || 0
+      );
+      //To add the completion message here
       theTemplate.addMessage(
         'assistant',
         response || '',
@@ -239,9 +252,9 @@ export class ChatKernel extends BaseKernel {
         data: {
           'text/markdown':
             '**Prompt in JSON:**' +
-              '<p>' +
+              '<p>```json' +
               JSON.stringify(messages) +
-              '</p><p>' +
+              '```</p><p>' +
               '**Response:**' +
               '</p><p>' +
               response || ''
