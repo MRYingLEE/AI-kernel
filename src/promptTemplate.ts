@@ -54,7 +54,7 @@ function renderTemplate(
 class message {
   template: IPromptTemplateProps; // The prompt template
 
-  coremessage: ChatCompletionRequestMessage; // The real request message to OpenAI service
+  msg2send: ChatCompletionRequestMessage; // The real request message to OpenAI service
   // The following section is degested from https://platform.openai.com/docs/api-reference/chat/create (as of June 25)
   /* 
   messages
@@ -99,13 +99,13 @@ class message {
     // A big supprise is that if the name is '', the request will fail.
     // So we have to make the following adjust following 1 week debugging
     if (name.trim().length > 0) {
-      this.coremessage = {
+      this.msg2send = {
         role: role,
         content: content,
         name: name
       };
     } else {
-      this.coremessage = {
+      this.msg2send = {
         role: role,
         content: content
       };
@@ -242,7 +242,7 @@ class promptTemplate implements IPromptTemplateProps {
       if (promptTemplate.global_messages[i].template === this) {
         if (promptTemplate.global_messages[i].newSession) {
           totalToken += promptTemplate.global_messages[i].tokenUsage;
-          systemMessage = promptTemplate.global_messages[i].coremessage;
+          systemMessage = promptTemplate.global_messages[i].msg2send;
           break;
         }
       }
@@ -260,7 +260,7 @@ class promptTemplate implements IPromptTemplateProps {
           promptTemplate.global_messages[i].tokenUsage + totalToken <
           promptTemplate.MaxTokenLimit
         ) {
-          history.push(promptTemplate.global_messages[i].coremessage);
+          history.push(promptTemplate.global_messages[i].msg2send);
           totalToken += promptTemplate.global_messages[i].tokenUsage;
         }
       }
@@ -291,24 +291,23 @@ class promptTemplate implements IPromptTemplateProps {
     );
   }
 
-  buildTemplate(statuses: {
-    [key: string]: string;
-  }): ChatCompletionRequestMessage[] {
-    console.log('statuses:', statuses);
-    console.log('this.systemMessageTemplate:', this.systemMessageTemplate);
-    console.log('this.userMessageTemplate:', this.userMessageTemplate);
+  buildMessages2send(statuses: { [key: string]: string }): {
+    messages2send: ChatCompletionRequestMessage[];
+    usrContent: string;
+  } {
+    // console.log('statuses:', statuses);
+    // console.log('this.systemMessageTemplate:', this.systemMessageTemplate);
+    // console.log('this.userMessageTemplate:', this.userMessageTemplate);
 
-    let sysContent = '';
-    if (this.newSession) {
-      sysContent = this.renderSysTemplate(statuses);
-    }
+    let messages2send: ChatCompletionRequestMessage[] = [];
+    const sysContent = this.renderSysTemplate(statuses);
     console.log('sysContent:', sysContent);
 
-    let usrContent = this.renderUserTemplate(statuses);
+    const usrContent = this.renderUserTemplate(statuses);
     console.log('usrContent:', usrContent);
 
     if ((sysContent + usrContent).trim() === '') {
-      return [];
+      return { messages2send, usrContent };
     }
 
     // if (usrContent.trim() === '') {
@@ -318,23 +317,29 @@ class promptTemplate implements IPromptTemplateProps {
     //   }
     // } else
     {
-      if (sysContent) {
+      // A new session starts
+      if (sysContent.trim().length > 0) {
         // this.addMessage("system", sysContent, "");  The system message is not taken attention by ChatGPT. So we have to put it in user message.
         if (this.withMemory) {
           this.newSession = false;
         }
 
-        usrContent = sysContent + '\n' + usrContent;
+        // usrContent = sysContent + '\n' + usrContent;
       }
     }
 
-    const coreMessages = this.getSessionHistory(usrContent.length);
-    const coremessage = {
+    messages2send = this.getSessionHistory(usrContent.length * 2); // for temporation estimation of prompt tokens
+    // if (messages2send.length === 0 || messages2send.length > 2) {
+    //   //For the 1st message in the session
+    //   //In case ChatGPT forgets, remind it again of the system message when 2+ messages
+    //   usrContent = sysContent + '\n' + usrContent;
+    // }
+    const msg2send = {
       role: ChatCompletionRequestMessageRoleEnum.User,
-      content: usrContent
+      content: sysContent + '\n' + usrContent
     };
-    coreMessages.push(coremessage);
-    return coreMessages;
+    messages2send.push(msg2send);
+    return { messages2send, usrContent };
   }
 }
 
@@ -709,7 +714,7 @@ const promptTemplates: { [id: string]: promptTemplate } = {
 };
 
 export {
-  ChatCompletionRequestMessage as coreMessage,
+  ChatCompletionRequestMessage as ChatCompletionRequestMessage,
   promptTemplates,
   promptTemplate
 };

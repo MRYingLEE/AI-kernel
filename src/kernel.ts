@@ -208,24 +208,30 @@ export class ChatKernel extends BaseKernel {
       };
     }
 
-    let messages: ChatCompletionRequestMessage[] = [];
+    let messages2send: ChatCompletionRequestMessage[] = [];
+    let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
     if (actions.length === 0) {
-      messages.push({ role: 'user', content: pureMessage });
+      //No actions are mentioned
+      messages2send.push({ role: 'user', content: pureMessage });
     } else {
-      console.log('Action:', actions[0]);
-      messages = promptTemplates[actions[0]].buildTemplate(statuses);
+      // The mentioned actions, which are critical to the following processing
+      console.table(actions);
+      const p = promptTemplates[actions[0]].buildMessages2send(statuses);
+      messages2send = messages2send.concat(p.messages2send);
+      usrContent = p.usrContent;
     }
-    if (messages.length === 0) {
-      messages.push({ role: 'user', content: pureMessage });
+    if (messages2send.length === 0) {
+      // if some exception happened, we may give some default but simple processing
+      messages2send.push({ role: 'user', content: pureMessage });
     }
-    console.table(messages);
+    console.table(messages2send);
 
     try {
       const completion = await globalOpenAI.createChatCompletion({
         model: 'gpt-3.5-turbo',
-        messages: messages
+        messages: messages2send
       });
       console.log('completion.data', completion.data);
 
@@ -239,7 +245,7 @@ export class ChatKernel extends BaseKernel {
       //To add the prompt message here
       theTemplate.addMessage(
         'user',
-        messages[messages.length - 1]?.content || '',
+        usrContent,
         '',
         completion.data.usage?.prompt_tokens || 0
       );
@@ -254,9 +260,9 @@ export class ChatKernel extends BaseKernel {
         execution_count: this.executionCount,
         data: {
           'text/markdown':
-            '**Prompt in JSON:**' +
+            '**Prompt in JSON:**</p><p>' +
               '```json\n' +
-              JSON.stringify(messages, null, 2) +
+              JSON.stringify(messages2send, null, 2) +
               '\n```' +
               '</p><p>' +
               '**' +
