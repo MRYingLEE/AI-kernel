@@ -217,6 +217,9 @@ export class ChatKernel extends BaseKernel {
       console.log('Action:', actions[0]);
       messages = promptTemplates[actions[0]].buildTemplate(statuses);
     }
+    if (messages.length === 0) {
+      messages.push({ role: 'user', content: pureMessage });
+    }
     console.table(messages);
 
     try {
@@ -236,7 +239,7 @@ export class ChatKernel extends BaseKernel {
       //To add the prompt message here
       theTemplate.addMessage(
         'user',
-        pureMessage || '',
+        messages[messages.length - 1]?.content || '',
         '',
         completion.data.usage?.prompt_tokens || 0
       );
@@ -252,9 +255,10 @@ export class ChatKernel extends BaseKernel {
         data: {
           'text/markdown':
             '**Prompt in JSON:**' +
-              '<p>```json\n{\n' +
               JSON.stringify(messages) +
-              '\n}```</p><p>' +
+              '```json\n' +
+              JSON.stringify(messages, null, 2) +
+              '\n```' +
               '**' +
               theTemplate.templateName +
               ':**' +

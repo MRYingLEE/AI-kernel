@@ -328,13 +328,13 @@ class promptTemplate implements IPromptTemplateProps {
       }
     }
 
-    const messages = this.getSessionHistory(usrContent.length);
+    const coreMessages = this.getSessionHistory(usrContent.length);
     const coremessage = {
       role: ChatCompletionRequestMessageRoleEnum.User,
       content: usrContent
     };
-    messages.push(coremessage);
-    return messages;
+    coreMessages.push(coremessage);
+    return coreMessages;
   }
 }
 
