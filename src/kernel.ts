@@ -2,29 +2,17 @@ import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
-import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai'; ///* */
-
 import { extractPersonAndMessage } from './chatSyntax';
 
-import { promptTemplate, promptTemplates } from './promptTemplate';
-
-import { user } from './user';
-
 import { backOff } from 'exponential-backoff';
-
-/*
-We try to init OpenAIApi at the beginning
-*/
-const configuration = new Configuration({
-  apiKey: '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'
-});
-delete configuration.baseOptions.headers['User-Agent'];
-let globalOpenAI = new OpenAIApi(configuration);
-
+import { OpenAIDriver } from './driver_openai';
+import { ChatCompletionRequestMessage } from 'openai';
+import { globalCodeActions } from './AIKernel';
+import { promptTemplate, promptTemplates } from './promptTemplate';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
-import Handlebars from 'handlebars/lib/handlebars';
+// import Handlebars from 'handlebars/lib/handlebars';
 
 /**
  * A kernel that chats with OpenAI.
@@ -110,10 +98,17 @@ export class ChatKernel extends BaseKernel {
   publishMarkDownMessage(
     msg: string
   ): KernelMessage.IExecuteReplyMsg['content'] {
+    return this.publishMessage(msg, 'text/markdown');
+  }
+
+  publishMessage(
+    msg: string,
+    format: string //limited options later
+  ): KernelMessage.IExecuteReplyMsg['content'] {
     this.publishExecuteResult({
       execution_count: this.executionCount,
       data: {
-        'text/markdown': msg
+        format: msg
       },
       metadata: {}
     });
@@ -132,78 +127,15 @@ export class ChatKernel extends BaseKernel {
   async executeRequest(
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    if (content.code.trim().toLowerCase().startsWith('key=')) {
-      const apiKey = content.code.trim().slice('key='.length);
-      //The key should have a 20+ length.
-      if (apiKey.length > 20) {
-        const configuration2 = new Configuration({
-          apiKey: apiKey
-        });
-        delete configuration2.baseOptions.headers['User-Agent'];
-        globalOpenAI = new OpenAIApi(configuration2);
+    const cell_text = content.code;
 
-        let welcome = 'Welcome';
-        /**
-         * Test Handlebars
-         */
-        if (Handlebars) {
-          const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
-          welcome = welcomeTemplate1({ name: user.current_user.name });
-          console.log(welcome);
-        }
-        // else {
-        //   const Handlebars2 = await import('handlebars');
-        //   const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
-        //   console.log(welcomeTemplate2({ name: user.current_user.name }));
-        // }
+    //To process in chaned actions in turn, ususally non-AI actions
 
-        /*
-          To list all registered actions for debugging
-        */
-        const allActions = getAllActions();
-
-        /*
-        Here, we try to compile all promptTamplests
-        */
-        for (const element of Object.values(promptTemplates)) {
-          try {
-            element.f_sysTemplate = Handlebars.compile(
-              element.systemMessageTemplate
-            );
-          } catch {
-            element.f_sysTemplate = undefined;
-          }
-
-          try {
-            element.f_userTemplate = Handlebars.compile(
-              element.userMessageTemplate
-            );
-          } catch {
-            element.f_userTemplate = undefined;
-          }
-        }
-
-        return this.publishMarkDownMessage(
-          welcome +
-            ', try now!' +
-            '<p>' +
-            'OpenAI API Key (' +
-            configuration.apiKey +
-            ') has been assigned.</p>' +
-            '<p>FYI: The current list is as the following:</p><p>' +
-            allActions +
-            '</p>'
-        );
+    for (let i = 0; i < globalCodeActions.length; i++) {
+      const result = globalCodeActions[i].execute(cell_text);
+      if (result.isProcessed) {
+        return this.publishMessage(result.outputResult, result.outputFormat);
       }
-    }
-
-    if (content.code.trim().toLowerCase().trim() === '/list') {
-      const allActions = getAllActions();
-      return this.publishMarkDownMessage(
-        '<p>FYI: The current list is as the following:</p><p>' +
-          allActions +
-          '</p>'
-      );
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
@@ -266,7 +198,7 @@ export class ChatKernel extends BaseKernel {
 
     try {
       const completion = await backOff(() =>
-        globalOpenAI.createChatCompletion({
+        OpenAIDriver.globalOpenAI.createChatCompletion({
           model: 'gpt-3.5-turbo',
           messages: messages2send
         })
@@ -316,17 +248,6 @@ export class ChatKernel extends BaseKernel {
           ChatKernel.api_errors +
           '</p>'
       );
-    }
-
-    function getAllActions() {
-      let allActions = '';
-      for (const key in promptTemplates) {
-        if (!promptTemplates[key]) {
-          continue;
-        }
-        allActions += '\n' + key;
-      }
-      return allActions;
     }
   }
 
