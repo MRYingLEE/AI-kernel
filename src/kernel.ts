@@ -76,6 +76,24 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
+  publishMarkDownMessage(
+    msg: string
+  ): KernelMessage.IExecuteReplyMsg['content'] {
+    this.publishExecuteResult({
+      execution_count: this.executionCount,
+      data: {
+        'text/markdown': msg
+      },
+      metadata: {}
+    });
+
+    return {
+      status: 'ok',
+      execution_count: this.executionCount,
+      user_expressions: {}
+    };
+  }
+
   /**
    * Handle an `execute_request` message
    * @param msg The parent message.
@@ -119,22 +137,6 @@ export class ChatKernel extends BaseKernel {
           allActions += '\n' + key;
         }
 
-        this.publishExecuteResult({
-          execution_count: this.executionCount,
-          data: {
-            'text/markdown':
-              welcome +
-              ', try now!' +
-              '<p>' +
-              'OpenAI API Key (' +
-              configuration.apiKey +
-              ') has been assigned.</p>' +
-              '<p>FYI: The current list is as the following:<p/>' +
-              allActions +
-              '</p>'
-          },
-          metadata: {}
-        });
         /*
         Here, we try to compile all promptTamplests
         */
@@ -156,11 +158,17 @@ export class ChatKernel extends BaseKernel {
           }
         }
 
-        return {
-          status: 'ok',
-          execution_count: this.executionCount,
-          user_expressions: {}
-        };
+        return this.publishMarkDownMessage(
+          welcome +
+            ', try now!' +
+            '<p>' +
+            'OpenAI API Key (' +
+            configuration.apiKey +
+            ') has been assigned.</p>' +
+            '<p>FYI: The current list is as the following:<p/>' +
+            allActions +
+            '</p>'
+        );
       }
     }
 
@@ -201,19 +209,7 @@ export class ChatKernel extends BaseKernel {
     }
 
     if (errorMsg.length > 0) {
-      this.publishExecuteResult({
-        execution_count: this.executionCount,
-        data: {
-          'text/markdown': '**' + errorMsg + '**'
-        },
-        metadata: {}
-      });
-
-      return {
-        status: 'ok',
-        execution_count: this.executionCount,
-        user_expressions: {}
-      };
+      return this.publishMarkDownMessage(errorMsg);
     }
 
     let messages2send: ChatCompletionRequestMessage[] = [];
@@ -264,33 +260,26 @@ export class ChatKernel extends BaseKernel {
         '',
         completion.data.usage?.completion_tokens || 0
       );
-      this.publishExecuteResult({
-        execution_count: this.executionCount,
-        data: {
-          'text/markdown':
-            '**Prompt in JSON:**</p><p>' +
-              '```json\n' +
-              JSON.stringify(messages2send, null, 2) +
-              '\n```' +
-              '</p><p>' +
-              '**' +
-              theTemplate.templateName +
-              ':**' +
-              '</p><p>' +
-              response || ''
-        },
-        metadata: {}
-      });
+      return this.publishMarkDownMessage(
+        '**Prompt in JSON:**</p><p>' +
+          '```json\n' +
+          JSON.stringify(messages2send, null, 2) +
+          '\n```' +
+          '</p><p>' +
+          '**' +
+          theTemplate.templateName +
+          ':**' +
+          '</p><p>' +
+          response || ''
+      );
     } catch (error: any) {
-      console.error('Error during createChatCompletion:', error.message);
-      console.error('Stack trace:', error.stack);
+      return this.publishMarkDownMessage(
+        '**Error during createChatCompletion**:' +
+          error.message +
+          '\n**Stack trace**:' +
+          error.stack
+      );
     }
-
-    return {
-      status: 'ok',
-      execution_count: this.executionCount,
-      user_expressions: {}
-    };
   }
 
   /**
