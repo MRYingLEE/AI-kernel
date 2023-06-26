@@ -10,6 +10,8 @@ import { promptTemplate, promptTemplates } from './promptTemplate';
 
 import { user } from './user';
 
+import { backOff } from 'exponential-backoff';
+
 /*
 We try to init OpenAIApi at the beginning
 */
@@ -76,6 +78,35 @@ export class ChatKernel extends BaseKernel {
     return content;
   }
 
+  static api_errors_en = `
+  | Code                                       | Overview                                                                                                                                                                                                                                                                               |
+  |--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | 401 - Invalid Authentication               | **Cause:** Invalid Authentication <br> **Solution:** Ensure the correct [API key](/account/api-keys) and requesting organization are being used.                                                                                                                                     |
+  | 401 - Incorrect API key provided           | **Cause:** The requesting API key is not correct. <br> **Solution:** Ensure the API key used is correct, clear your browser cache, or [generate a new one](/account/api-keys).                                                                                                       |
+  | 401 - You must be a member of an organization to use the API | **Cause:** Your account is not part of an organization. <br> **Solution:** Contact us to get added to a new organization or ask your organization manager to [invite you to an organization](/account/members).                                                                     |
+  | 429 - Rate limit reached for requests      | **Cause:** You are sending requests too quickly. <br> **Solution:** Pace your requests. Read the [Rate limit guide](/docs/guides/rate-limits).                                                                                                                                      |
+  | 429 - You exceeded your current quota, please check your plan and billing details | **Cause:** You have hit your maximum monthly spend (hard limit) which you can view in the [account billing section](/account/billing/limits). <br> **Solution:** [Apply for a quota increase](/forms/quota-increase).                                                               |
+  | 500 - The server had an error while processing your request | **Cause:** Issue on our servers. <br> **Solution:** Retry your request after a brief wait and contact us if the issue persists. Check the [status page](https://status.openai.com/){:target="_blank" rel="noopener noreferrer"}.                                                    |
+  | 503 - The engine is currently overloaded, please try again later | **Cause:** Our servers are experiencing high traffic. <br> **Solution:** Please retry your requests after a brief wait.                                                                                                                                                             |
+  `;
+  static api_errors_cn = `
+  | 代码 | 概述 |
+  | --- | --- |
+  | 401 - 认证无效 | 原因：认证无效 <br> 解决方案：确保使用了正确的API密钥和请求组织。 |
+  | 401 - 提供的API密钥不正确 | 原因：请求的API密钥不正确。 <br> 解决方案：确保使用的API密钥正确，清除浏览器缓存或生成一个新的API密钥。 |
+  | 401 - 您必须是组织的成员才能使用API | 原因：您的帐户不是组织的一部分。 <br> 解决方案：联系我们以加入新组织，或要求您的组织管理员邀请您加入组织。 |
+  | 429 - 请求速度过快 | 原因：您发送请求的速度过快。 <br> 解决方案：放慢请求速度。阅读[速率限制指南](/docs/guides/rate-limits)。 |
+  | 429 - 您已超过当前配额，请检查您的计划和账单详情 | 原因：您已达到最大月度支出（硬限制），您可以在[账户计费部分](/account/billing/limits)查看。 <br> 解决方案：[申请配额增加](/forms/quota-increase)。 |
+  | 500 - 服务器在处理您的请求时出错 | 原因：我们的服务器出现问题。 <br> 解决方案：稍等片刻后重试您的请求，如果问题仍然存在，请联系我们。查看[状态页面](https://status.openai.com/){:target="_blank" rel="noopener noreferrer"}。 |
+  | 503 - 引擎当前过载，请稍后再试 | 原因：我们的服务器正在经历高流量。 <br> 解决方案：请稍等片刻后重试您的请求。 |
+  `;
+  static api_errors =
+    '**The API errors of ChatGPT are listed here for your reference**:\n' +
+    ChatKernel.api_errors_en +
+    '\n' +
+    '**ChatGPT API 错误代码表供您参考**：\n' +
+    ChatKernel.api_errors_cn;
+
   publishMarkDownMessage(
     msg: string
   ): KernelMessage.IExecuteReplyMsg['content'] {
@@ -129,13 +160,7 @@ export class ChatKernel extends BaseKernel {
         /*
           To list all registered actions for debugging
         */
-        let allActions = '';
-        for (const key in promptTemplates) {
-          if (!promptTemplates[key]) {
-            continue;
-          }
-          allActions += '\n' + key;
-        }
+        const allActions = getAllActions();
 
         /*
         Here, we try to compile all promptTamplests
@@ -165,11 +190,20 @@ export class ChatKernel extends BaseKernel {
             'OpenAI API Key (' +
             configuration.apiKey +
             ') has been assigned.</p>' +
-            '<p>FYI: The current list is as the following:<p/>' +
+            '<p>FYI: The current list is as the following:</p><p>' +
             allActions +
             '</p>'
         );
       }
+    }
+
+    if (content.code.trim().toLowerCase().trim() === '/list') {
+      const allActions = getAllActions();
+      return this.publishMarkDownMessage(
+        '<p>FYI: The current list is as the following:</p><p>' +
+          allActions +
+          '</p>'
+      );
     }
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
@@ -233,10 +267,12 @@ export class ChatKernel extends BaseKernel {
     console.table(messages2send);
 
     try {
-      const completion = await globalOpenAI.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages2send
-      });
+      const completion = await backOff(() =>
+        globalOpenAI.createChatCompletion({
+          model: 'gpt-3.5-turbo',
+          messages: messages2send
+        })
+      );
       console.log('completion.data', completion.data);
 
       const response = completion.data.choices[0].message?.content ?? '';
@@ -274,11 +310,25 @@ export class ChatKernel extends BaseKernel {
       );
     } catch (error: any) {
       return this.publishMarkDownMessage(
-        '**Error during createChatCompletion**:' +
+        '<p>**Error during createChatCompletion**:' +
           error.message +
-          '\n**Stack trace**:' +
-          error.stack
+          '</p><p>**Stack trace**:' +
+          error.stack +
+          '</p><p>' +
+          ChatKernel.api_errors +
+          '</p>'
       );
+    }
+
+    function getAllActions() {
+      let allActions = '';
+      for (const key in promptTemplates) {
+        if (!promptTemplates[key]) {
+          continue;
+        }
+        allActions += '\n' + key;
+      }
+      return allActions;
     }
   }
 

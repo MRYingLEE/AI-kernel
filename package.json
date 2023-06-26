@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/chat-kernel",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "An chat kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -11,7 +11,7 @@
   "homepage": "https://github.com/MRYingLEE/chat-kernel",
   "bugs": {
     "url": "https://github.com/MRYingLEE/chat-kernel/issues"
-  },  
+  },
   "author": {
     "name": "Ying li",
     "email": "Mr.Ying.LEE@Gmail.com"
@@ -49,6 +49,7 @@
     "@jupyterlite/kernel": "^0.1.0-alpha.10",
     "@jupyterlite/server": "^0.1.0-alpha.10",
     "easy-speech": "^2.0.0",
+    "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
     "openai": "^3.2.1"
   },

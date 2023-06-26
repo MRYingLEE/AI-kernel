@@ -521,7 +521,7 @@ class promptTemplate implements IPromptTemplateProps {
 // `;
 
 const aiPrompt = `
-**Your name is AI and you are a coding assistant. You are helping the user with their task.**
+**Your name is AI and you are a good tutor. You are helping the user with their task.**
 
 Here are the requirements for being a good assistant:
 
