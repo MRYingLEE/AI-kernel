@@ -208,13 +208,13 @@ export class ChatKernel extends BaseKernel {
 
     const [actions, pureMessage] = extractPersonAndMessage(content.code);
 
-    let errorMsg = '';
-
     if (actions.length > 1) {
-      errorMsg = '@ 2 or more actions are not supported so far!'; // We support this feature in the long future.
+      return this.publishMarkDownMessage(
+        '@ 2 or more actions are not supported so far!'
+      ); // We support this feature in the long future.
     } else if (actions.length === 1) {
       if (!promptTemplates[actions[0]]) {
-        errorMsg =
+        let errorMsg =
           'The action ' +
           actions[0] +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
@@ -225,25 +225,23 @@ export class ChatKernel extends BaseKernel {
           }
           errorMsg += '\n' + key;
         }
+        return this.publishMarkDownMessage(errorMsg);
       } else {
         if (pureMessage.trim().length === 0) {
           promptTemplates[actions[0]].startNewSession();
-          errorMsg =
+          return this.publishMarkDownMessage(
             'The chat history with ' +
-            actions[0] +
-            'has been cleared. Now you have a new session with it.';
+              actions[0] +
+              'has been cleared. Now you have a new session with it.'
+          );
         }
       }
     }
 
     if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
-      errorMsg =
-        'The maxinum of input should be half of ' +
-        promptTemplate.MaxTokenLimit;
-    }
-
-    if (errorMsg.length > 0) {
-      return this.publishMarkDownMessage(errorMsg);
+      return this.publishMarkDownMessage(
+        'The maxinum of input should be half of ' + promptTemplate.MaxTokenLimit
+      );
     }
 
     let messages2send: ChatCompletionRequestMessage[] = [];
