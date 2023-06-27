@@ -131,7 +131,7 @@ export class ChatKernel extends BaseKernel {
     this.publishExecuteResult({
       execution_count: this.executionCount,
       data: {
-        format: msg
+        [format]: msg
       },
       metadata: {}
     });
