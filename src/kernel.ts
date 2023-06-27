@@ -7,7 +7,11 @@ import { extractPersonAndMessage } from './chatSyntax';
 import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './driver_openai';
 import { ChatCompletionRequestMessage } from 'openai';
-import { globalCodeActions } from './AIKernel';
+import {
+  inChainedCodeAction,
+  IActionResult,
+  globalCodeActions
+} from './AIKernel';
 import { promptTemplate, promptTemplates } from './promptTemplate';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
@@ -18,6 +22,24 @@ import { promptTemplate, promptTemplates } from './promptTemplate';
  * A kernel that chats with OpenAI.
  */
 export class ChatKernel extends BaseKernel {
+  inDebug = false;
+
+  action_debug(code: string): IActionResult {
+    if (code.trim().toLowerCase() === '/debug:AILive.live') {
+      this.inDebug = !this.inDebug;
+      const mode = this.inDebug ? 'enabled' : 'disbaled';
+      return {
+        outputResult: '<p>**Now debug is **</p>' + mode + '.**',
+        outputFormat: 'text/markdown',
+        isProcessed: true
+      };
+    }
+    return {
+      outputResult: '',
+      outputFormat: 'text/markdown',
+      isProcessed: false
+    };
+  }
   /**
    * Instantiate a new JavaScriptKernel
    *
@@ -25,6 +47,7 @@ export class ChatKernel extends BaseKernel {
    */
   constructor(options: ChatKernel.IOptions) {
     super(options);
+    globalCodeActions.push(new inChainedCodeAction(this.action_debug, 999));
   }
 
   /**
@@ -206,6 +229,7 @@ export class ChatKernel extends BaseKernel {
       console.log('completion.data', completion.data);
 
       const response = completion.data.choices[0].message?.content ?? '';
+      //Todo: We should check the response carefully
 
       let theTemplate = promptTemplates['@ai'];
 
@@ -226,18 +250,24 @@ export class ChatKernel extends BaseKernel {
         '',
         completion.data.usage?.completion_tokens || 0
       );
-      return this.publishMarkDownMessage(
-        '**Prompt in JSON:**</p><p>' +
-          '```json\n' +
-          JSON.stringify(messages2send, null, 2) +
-          '\n```' +
-          '</p><p>' +
-          '**' +
-          theTemplate.templateName +
-          ':**' +
-          '</p><p>' +
-          response || ''
-      );
+      if (this.inDebug) {
+        return this.publishMarkDownMessage(
+          '**Prompt in JSON:**</p><p>' +
+            '```json\n' +
+            JSON.stringify(messages2send, null, 2) +
+            '\n```' +
+            '</p><p>' +
+            '**' +
+            theTemplate.templateName +
+            ':**' +
+            '</p><p>' +
+            response || ''
+        );
+      } else {
+        return this.publishMarkDownMessage(
+          '**' + theTemplate.templateName + ':**' + '</p><p>' + response || ''
+        );
+      }
     } catch (error: any) {
       return this.publishMarkDownMessage(
         '<p>**Error during createChatCompletion**:' +

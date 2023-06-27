@@ -53,13 +53,13 @@ function getAllPromptTemplates() {
   return allActions;
 }
 
-interface IActionResult {
+export interface IActionResult {
   outputResult: string;
   outputFormat: string;
   isProcessed: boolean;
 }
 
-class inChangedCodeAction {
+export class inChainedCodeAction {
   execute: (inputCode: string) => IActionResult;
   priority: number;
   timestamp: number;
@@ -71,9 +71,9 @@ class inChangedCodeAction {
   }
 }
 
-export const globalCodeActions: inChangedCodeAction[] = [];
+export const globalCodeActions: inChainedCodeAction[] = [];
 
-function globalSortedCodeActions(): inChangedCodeAction[] {
+function globalSortedCodeActions(): inChainedCodeAction[] {
   return globalCodeActions.sort((a, b) => {
     if (a.priority === b.priority) {
       return a.timestamp - b.timestamp;
@@ -175,6 +175,6 @@ function action_list(code: string): IActionResult {
   };
 }
 
-globalCodeActions.push(new inChangedCodeAction(action_SetKey, 0));
-globalCodeActions.push(new inChangedCodeAction(action_list, 0));
+globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));
+globalCodeActions.push(new inChainedCodeAction(action_list, 0));
 globalSortedCodeActions();
