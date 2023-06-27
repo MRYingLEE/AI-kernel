@@ -11,7 +11,7 @@ import {
   inChainedCodeAction,
   IActionResult,
   globalCodeActions
-} from './AIKernel';
+} from './codeActions';
 import { promptTemplate, promptTemplates } from './promptTemplate';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
