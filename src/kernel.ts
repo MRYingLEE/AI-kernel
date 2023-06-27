@@ -29,7 +29,7 @@ export class ChatKernel extends BaseKernel {
       this.inDebug = !this.inDebug;
       const mode = this.inDebug ? 'enabled' : 'disbaled';
       return {
-        outputResult: '<p>**Now debug is **</p>' + mode + '.**',
+        outputResult: '<p>**Now debug is ' + mode + '.**</p>',
         outputFormat: 'text/markdown',
         isProcessed: true
       };
