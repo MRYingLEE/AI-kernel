@@ -25,7 +25,7 @@ export class ChatKernel extends BaseKernel {
   inDebug = false;
 
   action_debug(code: string): IActionResult {
-    if (code.trim().toLowerCase() === '/debug:AILive.live') {
+    if (code.trim() === '/debug:AILive.live') {
       this.inDebug = !this.inDebug;
       const mode = this.inDebug ? 'enabled' : 'disbaled';
       return {
