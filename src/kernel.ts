@@ -29,7 +29,7 @@ export class ChatKernel extends BaseKernel {
       this.inDebug = !this.inDebug;
       const mode = this.inDebug ? 'enabled' : 'disbaled';
       return {
-        outputResult: '<p>**Now debug is ' + mode + '.**</p>',
+        outputResult: '<p>**Now debug is ' + mode + '**</p>',
         outputFormat: 'text/markdown',
         isProcessed: true
       };
@@ -187,7 +187,7 @@ export class ChatKernel extends BaseKernel {
           return this.publishMarkDownMessage(
             'The chat history with ' +
               actions[0] +
-              'has been cleared. Now you have a new session with it.'
+              ' has been cleared. Now you have a new session with it.'
           );
         }
       }
@@ -250,6 +250,10 @@ export class ChatKernel extends BaseKernel {
         '',
         completion.data.usage?.completion_tokens || 0
       );
+      if (theTemplate.withMemory) {
+        theTemplate.newSession = false;
+      }
+
       if (this.inDebug) {
         return this.publishMarkDownMessage(
           '**Prompt in JSON:**</p><p>' +
@@ -258,7 +262,7 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            theTemplate.templateName +
+            theTemplate.templateName.substring(1) +
             ':**' +
             '</p><p>' +
             response || ''

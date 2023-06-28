@@ -311,29 +311,12 @@ class promptTemplate implements IPromptTemplateProps {
       return { messages2send, usrContent };
     }
 
-    // if (usrContent.trim() === '') {
-    //   // this.addMessage('user', sysContent, ''); //The system message is not taken attention by ChatGPT. So we have to put it in user message.
-    //   if (this.withMemory) {
-    //     this.newSession = false;
-    //   }
-    // } else
-    if (this.newSession) {
-      // A new session starts
-      // if (sysContent.trim().length > 0) {
-      // this.addMessage("system", sysContent, "");  The system message is not taken attention by ChatGPT. So we have to put it in user message.
-      if (this.withMemory) {
-        this.newSession = false;
-        // }
-
-        // usrContent = sysContent + '\n' + usrContent;
+    if (this.withMemory) {
+      if (this.newSession === false) {
+        messages2send = this.getSessionHistory(usrContent.length * 2); // for temporation estimation of prompt tokens
+      } else {
+        // this.newSession = false; //Maybe only when request succeeds, we make it flase
       }
-    } else {
-      messages2send = this.getSessionHistory(usrContent.length * 2); // for temporation estimation of prompt tokens
-      // if (messages2send.length === 0 || messages2send.length > 2) {
-      //   //For the 1st message in the session
-      //   //In case ChatGPT forgets, remind it again of the system message when 2+ messages
-      //   usrContent = sysContent + '\n' + usrContent;
-      // }
     }
 
     const msg2send = {
