@@ -220,12 +220,21 @@ export class ChatKernel extends BaseKernel {
     console.table(messages2send);
 
     try {
-      const completion = await backOff(() =>
-        OpenAIDriver.globalOpenAI.createChatCompletion({
+      let completion: any = null;
+      if (this.inDebug) {
+        completion = await OpenAIDriver.globalOpenAI.createChatCompletion({
           model: 'gpt-3.5-turbo',
           messages: messages2send
-        })
-      );
+        });
+      } else {
+        completion = await backOff(() =>
+          OpenAIDriver.globalOpenAI.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: messages2send
+          })
+        );
+      }
+
       console.log('completion.data', completion.data);
 
       const response = completion.data.choices[0].message?.content ?? '';
