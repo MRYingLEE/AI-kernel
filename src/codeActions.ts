@@ -60,11 +60,14 @@ export interface IActionResult {
 }
 
 export class inChainedCodeAction {
-  execute: (inputCode: string) => IActionResult;
+  execute: (inputCode: string) => Promise<IActionResult>;
   priority: number;
   timestamp: number;
 
-  constructor(execute: (inputCode: string) => IActionResult, priority: number) {
+  constructor(
+    execute: (inputCode: string) => Promise<IActionResult>,
+    priority: number
+  ) {
     this.execute = execute;
     this.priority = priority;
     this.timestamp = Date.now();
@@ -82,30 +85,58 @@ function globalSortedCodeActions(): inChainedCodeAction[] {
   });
 }
 
-function action_SetKey(code: string): IActionResult {
+async function action_SetKey(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith('key=')) {
     const apiKey = code.trim().slice('key='.length);
-    //The key should have a 20+ length.
+    //The key should have a 20+ length. This one is of ying.li@AILean.live
     if (
       apiKey.trim().length ===
-      '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'.length
+        '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'.length &&
+      apiKey.trim().startsWith('sk-')
     ) {
+      let welcome = 'Welcome';
+      /**
+       * Test Handlebars
+       */
+
+      if (Handlebars) {
+        const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
+        welcome = welcomeTemplate1({ name: user.current_user.name });
+        console.log(welcome);
+      }
       if (OpenAIDriver.refreshAPIKey(apiKey)) {
-        let welcome = 'Welcome';
-        /**
-         * Test Handlebars
-         */
-        if (Handlebars) {
-          const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
-          welcome = welcomeTemplate1({ name: user.current_user.name });
-          console.log(welcome);
-        }
         // else {
         //   const Handlebars2 = await import('handlebars');
         //   const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
         //   console.log(welcomeTemplate2({ name: user.current_user.name }));
         // }
-
+        try {
+          const completion =
+            await OpenAIDriver.globalOpenAI.createChatCompletion({
+              model: 'gpt-3.5-turbo-0613',
+              messages: [
+                {
+                  role: 'system',
+                  content: 'You are a helpful assistant'
+                },
+                {
+                  role: 'user',
+                  content: user.self_introduction() + '\n Please say hello.'
+                }
+              ]
+            });
+          console.log('completion.data', completion.data);
+        } catch (error: any) {
+          return Promise.resolve({
+            outputResult:
+              '<p>**The key is invalid.**' +
+              error.message +
+              '</p><p>**Stack trace**:' +
+              error.stack,
+            outputFormat: 'text/markdown',
+            isProcessed: true
+          });
+        }
         /*
                   To list all registered actions for debugging
                 */
@@ -156,23 +187,23 @@ function action_SetKey(code: string): IActionResult {
   };
 }
 
-function action_list(code: string): IActionResult {
+function action_list(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase() === '/list') {
     const allActions = getAllPromptTemplates();
-    return {
+    return Promise.resolve({
       outputResult:
         '<p>FYI: The current list is as the following:</p><p>' +
         allActions +
         '</p>',
       outputFormat: 'text/markdown',
       isProcessed: true
-    };
+    });
   }
-  return {
+  return Promise.resolve({
     outputResult: '',
     outputFormat: 'text/markdown',
     isProcessed: false
-  };
+  });
 }
 
 globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));

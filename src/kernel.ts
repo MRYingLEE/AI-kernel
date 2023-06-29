@@ -24,21 +24,21 @@ import { promptTemplate, promptTemplates } from './promptTemplate';
 export class ChatKernel extends BaseKernel {
   inDebug = false;
 
-  action_debug(code: string): IActionResult {
+  action_debug(code: string): Promise<IActionResult> {
     if (code.trim() === '/debug:AILive.live') {
       this.inDebug = !this.inDebug;
       const mode = this.inDebug ? 'enabled' : 'disbaled';
-      return {
+      return Promise.resolve({
         outputResult: '<p>**Now debug is ' + mode + '**</p>',
         outputFormat: 'text/markdown',
         isProcessed: true
-      };
+      });
     }
-    return {
+    return Promise.resolve({
       outputResult: '',
       outputFormat: 'text/markdown',
       isProcessed: false
-    };
+    });
   }
   /**
    * Instantiate a new JavaScriptKernel
@@ -118,13 +118,13 @@ export class ChatKernel extends BaseKernel {
     '**ChatGPT API 错误代码表供您参考**：\n' +
     ChatKernel.api_errors_cn;
 
-  publishMarkDownMessage(
+  private publishMarkDownMessage(
     msg: string
   ): KernelMessage.IExecuteReplyMsg['content'] {
     return this.publishMessage(msg, 'text/markdown');
   }
 
-  publishMessage(
+  private publishMessage(
     msg: string,
     format: string //limited options later
   ): KernelMessage.IExecuteReplyMsg['content'] {
@@ -155,7 +155,7 @@ export class ChatKernel extends BaseKernel {
     //To process in chaned actions in turn, ususally non-AI actions
 
     for (let i = 0; i < globalCodeActions.length; i++) {
-      const result = globalCodeActions[i].execute(cell_text);
+      const result = await globalCodeActions[i].execute(cell_text);
       if (result.isProcessed) {
         return this.publishMessage(result.outputResult, result.outputFormat);
       }
@@ -223,13 +223,13 @@ export class ChatKernel extends BaseKernel {
       let completion: any = null;
       if (this.inDebug) {
         completion = await OpenAIDriver.globalOpenAI.createChatCompletion({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-3.5-turbo-0613',
           messages: messages2send
         });
       } else {
         completion = await backOff(() =>
           OpenAIDriver.globalOpenAI.createChatCompletion({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-3.5-turbo-0613',
             messages: messages2send
           })
         );
