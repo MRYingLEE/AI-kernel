@@ -66,24 +66,24 @@ jobs:
         
         pip uninstall -y chatkernel jupyterlab
         
-    - name: Stamp js sourcemaps
-      run: |
-        cd lib
-        npx azure-devops-symbols-sourcemap-cli --organization workyinglee
+    # - name: Stamp js sourcemaps
+    #   run: |
+    #     cd lib
+    #     npx azure-devops-symbols-sourcemap-cli --organization workyinglee
       
-    - name: Publish Symbols
-      uses: microsoft/action-publish-symbols@v2.1.6
-      with:
-        # The Azure DevOps account name to publish the symbols to
-        accountName: workyinglee
-        # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
-        personalAccessToken: ${{ secrets.AZURE_SYMBOL_SERVICE }}
-        # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
-        symbolsFolder: lib # optional
-#         # The search pattern used to search for symbols
-        searchPattern: "*.map" # optional, default is **/bin/**/*.pdb
-#         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
-        # symbolServiceUrl: "https://dev.azure.com/" # optional, default is https://artifacts.dev.azure.com
+#     - name: Publish Symbols
+#       uses: microsoft/action-publish-symbols@v2.1.6
+#       with:
+#         # The Azure DevOps account name to publish the symbols to
+#         accountName: workyinglee
+#         # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
+#         personalAccessToken: ${{ secrets.AZURE_SYMBOL_SERVICE }}
+#         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
+#         symbolsFolder: lib # optional
+# #         # The search pattern used to search for symbols
+#         searchPattern: "*.map" # optional, default is **/bin/**/*.pdb
+# #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
+#         # symbolServiceUrl: "https://dev.azure.com/" # optional, default is https://artifacts.dev.azure.com
     
     - name: Zip fie
       run: |
