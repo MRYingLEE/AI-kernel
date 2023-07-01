@@ -88,25 +88,25 @@ jobs:
     - name: Zip fie
       run: |
         sudo apt-get install zip
-        zip chatkernel-wheel.zip *.whl
+        mkdir zip
+        zip zip/chatkernel-wheel.zip *.whl
 
     - uses: actions/upload-artifact@v3
       with:
         name: chatkernel-wheel
-        path: chatkernel-wheel.zip
+        path: zip/chatkernel-wheel.zip
 
-    - name: Pushes test file
-      uses: dmnemec/copy_file_to_another_repo_action@main
+    - name: Pushes to another repository
+      uses: cpina/github-action-push-to-another-repository@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILearn }}
       with:
-        source_file: 'chatkernel-wheel.zip'
-        destination_repo: 'MRYingLEE/AILearn.live'
-        destination_folder: '/'
-        user_email: 'MRYingLEE@gmail.com'
-        user_name: 'MRYingLEE'
-        commit_message: 'A new version of Chat Kernel'
-        
+        source-directory: 'zip/'
+        destination-github-username: 'MRYingLEE'
+        destination-repository-name: 'AILearn.live'
+        user-email: 'MRYingLEE@gmail.com'
+        target-branch: main
+
     - name: Clean up
       run: |
         rm -rf chatkernel
