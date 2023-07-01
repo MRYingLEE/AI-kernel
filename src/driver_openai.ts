@@ -6,9 +6,9 @@ class OpenAIDriver {
   We try to init OpenAIApi at the beginning
   */
   static globalOpenAI: OpenAIApi;
-  constructor(apiKey = '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') {
-    OpenAIDriver.refreshAPIKey(apiKey);
-  }
+  // constructor(apiKey = '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') {
+  //   OpenAIDriver.refreshAPIKey(apiKey); // A bug! It is not called.
+  // }
   static refreshAPIKey(apiKey: string): boolean {
     const configuration = new Configuration({
       apiKey: apiKey

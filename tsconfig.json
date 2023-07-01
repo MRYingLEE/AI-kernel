@@ -18,7 +18,7 @@
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "ES2018",
+    "target": "ES2019",//Align with Jupyterlite
     "types": [],
     "sourceMap": true,
     "inlineSourceMap": false,

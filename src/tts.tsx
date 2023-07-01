@@ -4,8 +4,8 @@
 
 // EasySpeech.detect();
 // EasySpeech.init({ maxTimeout: 5000, interval: 250 })
-//   .then(() => console.debug('load complete'))
-//   .catch(e => console.error(e));
+//   .then(() => MyConsole.debug('load complete'))
+//   .catch(e => MyConsole.error(e));
 
 // /* -------------------------------------------------------------------------- */
 // /*                                  Functions                                 */
@@ -34,22 +34,22 @@
 //   const [cell_text, focalcode_text, stdout_text, result_text, stderr_text] =
 //     get_focal_data(siteName);
 
-//   console.log('To be spoke:', focalcode_text);
+//   MyConsole.log('To be spoke:', focalcode_text);
 
 //   if ('speechSynthesis' in window) {
 //     const utterance = new SpeechSynthesisUtterance(focalcode_text);
 //     const voices = window.speechSynthesis.getVoices();
 
-//     // console.log("voices length:", voices.length);
+//     // MyConsole.log("voices length:", voices.length);
 
 //     // for (let i = 0; i < voices.length; i++) {
 //     //   if (voices[i].lang.startsWith("en-US")) {
-//     //     console.log("voice name:", voices[i].name);
+//     //     MyConsole.log("voice name:", voices[i].name);
 //     //   }
 //     // }
 //     const lang = detectLanguage(focalcode_text);
 //     utterance.lang = lang;
-//     console.log('Lang:', lang);
+//     MyConsole.log('Lang:', lang);
 
 //     let microsoftVoice = voices.find(voice => voice.lang.startsWith(lang));
 
@@ -67,7 +67,7 @@
 //       utterance.voice = microsoftVoice;
 //     }
 
-//     console.log('voice:', utterance.voice || '');
+//     MyConsole.log('voice:', utterance.voice || '');
 
 //     window.speechSynthesis.speak(utterance);
 //   }
@@ -81,19 +81,19 @@
 //     const [cell_text, focalcode_text, stdout_text, result_text, stderr_text] =
 //       get_focal_data(siteName);
 
-//     console.log('To be spoke:', focalcode_text);
+//     MyConsole.log('To be spoke:', focalcode_text);
 
 //     const voices = EasySpeech.voices();
 
-//     console.log('easy voices length:', voices.length);
+//     MyConsole.log('easy voices length:', voices.length);
 
 //     // for (let i = 0; i < voices.length; i++) {
 //     //   if (voices[i].lang.startsWith("en-US")) {
-//     //     console.log("voice name:", voices[i].name);
+//     //     MyConsole.log("voice name:", voices[i].name);
 //     //   }
 //     // }
 //     const lang = await browserDetectLanguage(focalcode_text);
-//     console.log('Lang:', lang);
+//     MyConsole.log('Lang:', lang);
 
 //     let microsoftVoice = voices.find(voice => voice.lang.startsWith(lang));
 
@@ -114,7 +114,7 @@
 //       rate: 1,
 //       volume: 1,
 //       // there are more events, see the API for supported events
-//       boundary: e => console.debug('boundary reached')
+//       boundary: e => MyConsole.debug('boundary reached')
 //     });
 //   }
 // }

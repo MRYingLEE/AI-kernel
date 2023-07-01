@@ -4,6 +4,7 @@ import {
   ChatCompletionRequestMessageRoleEnum
 } from 'openai';
 import { user } from './user';
+import { MyConsole } from './debugMode';
 
 interface IPromptTemplateProps {
   systemMessageTemplate: string;
@@ -28,25 +29,25 @@ function renderTemplate(
   f_template: HandlebarsTemplateDelegate<any> | undefined,
   statuses: { [key: string]: string }
 ): string {
-  // console.table(statuses);
+  // MyConsole.table(statuses);
   const new_statuses = statuses;
   new_statuses['self_introduction'] = user.current_user.self_introduction();
-  // console.table(new_statuses);
+  // MyConsole.table(new_statuses);
   let content = template;
   try {
     if (!(f_template === undefined)) {
-      console.log('content before f_userTemplate', content);
+      MyConsole.debug('content before f_userTemplate', content);
       content = f_template(new_statuses);
-      console.log('content after f_userTemplate', content);
+      MyConsole.debug('content after f_userTemplate', content);
     } else {
       for (const key in new_statuses) {
         content = content.replace('{{' + key + '}}', new_statuses[key]);
       }
     }
   } catch {
-    console.log('Template:', template);
+    MyConsole.debug('Template:', template);
   }
-  // console.log('content:', content);
+  // MyConsole.debug('content:', content);
   return content;
 }
 
@@ -202,7 +203,7 @@ class promptTemplate implements IPromptTemplateProps {
     name: string,
     tokenUsage = 0
   ): void {
-    console.log('conetnt:', content);
+    MyConsole.debug('conetnt:', content);
     promptTemplate.global_messages.push(
       new message(
         this,
@@ -214,7 +215,7 @@ class promptTemplate implements IPromptTemplateProps {
         tokenUsage
       )
     );
-    console.table(promptTemplate.global_messages);
+    MyConsole.table(promptTemplate.global_messages);
   }
 
   removeLastMessage(): void {
@@ -248,7 +249,7 @@ class promptTemplate implements IPromptTemplateProps {
       }
     }
 
-    console.log('TotalToken:', totalToken);
+    MyConsole.debug('TotalToken:', totalToken);
 
     for (let i = promptTemplate.global_messages.length - 1; i >= 0; i--) {
       if (promptTemplate.global_messages[i].template === this) {
@@ -295,17 +296,17 @@ class promptTemplate implements IPromptTemplateProps {
     messages2send: ChatCompletionRequestMessage[]; //The Request Messages to be sent to ChatGPT
     usrContent: string; //The logical user message for the current chat session
   } {
-    // console.log('statuses:', statuses);
-    // console.log('this.systemMessageTemplate:', this.systemMessageTemplate);
-    // console.log('this.userMessageTemplate:', this.userMessageTemplate);
+    // MyConsole.debug('statuses:', statuses);
+    // MyConsole.debug('this.systemMessageTemplate:', this.systemMessageTemplate);
+    // MyConsole.debug('this.userMessageTemplate:', this.userMessageTemplate);
 
     let messages2send: ChatCompletionRequestMessage[] = [];
 
     const sysContent = this.renderSysTemplate(statuses);
-    console.log('sysContent:', sysContent);
+    MyConsole.debug('sysContent:', sysContent);
 
     const usrContent = this.renderUserTemplate(statuses);
-    console.log('usrContent:', usrContent);
+    MyConsole.debug('usrContent:', usrContent);
 
     if ((sysContent + usrContent).trim() === '') {
       return { messages2send, usrContent };
@@ -340,7 +341,7 @@ class promptTemplate implements IPromptTemplateProps {
 // 							return '\n'.join(lines)`;
 
 // await window.executePython(pythonCode).then((result) => {
-//     console.log("The following Python code has been developed:\n```Python\n" + result + "\n```\n");
+//     MyConsole.debug("The following Python code has been developed:\n```Python\n" + result + "\n```\n");
 // });
 
 // const completePrompt = `

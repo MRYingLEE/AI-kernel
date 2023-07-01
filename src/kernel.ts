@@ -13,6 +13,7 @@ import {
   globalCodeActions
 } from './codeActions';
 import { promptTemplate, promptTemplates } from './promptTemplate';
+import { MyConsole } from './debugMode';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -22,12 +23,10 @@ import { promptTemplate, promptTemplates } from './promptTemplate';
  * A kernel that chats with OpenAI.
  */
 export class ChatKernel extends BaseKernel {
-  inDebug = false;
-
   action_debug(code: string): Promise<IActionResult> {
     if (code.trim() === '/debug:AILive.live') {
-      this.inDebug = !this.inDebug;
-      const mode = this.inDebug ? 'enabled' : 'disbaled';
+      MyConsole.inDebug = !MyConsole.inDebug;
+      const mode = MyConsole.inDebug ? 'enabled' : 'disbaled';
       return Promise.resolve({
         outputResult: '<p>**Now debug is ' + mode + '**</p>',
         outputFormat: 'text/markdown',
@@ -208,7 +207,7 @@ export class ChatKernel extends BaseKernel {
       messages2send.push({ role: 'user', content: pureMessage });
     } else {
       // The mentioned actions, which are critical to the following processing
-      console.table(actions);
+      MyConsole.table(actions);
       const p = promptTemplates[actions[0]].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
@@ -217,11 +216,11 @@ export class ChatKernel extends BaseKernel {
       // if some exception happened, we may give some default but simple processing
       messages2send.push({ role: 'user', content: usrContent });
     }
-    console.table(messages2send);
+    MyConsole.table(messages2send);
 
     try {
       let completion: any = null;
-      if (this.inDebug) {
+      if (MyConsole.inDebug) {
         completion = await OpenAIDriver.globalOpenAI.createChatCompletion({
           model: 'gpt-3.5-turbo-0613',
           messages: messages2send
@@ -235,7 +234,7 @@ export class ChatKernel extends BaseKernel {
         );
       }
 
-      console.log('completion.data', completion.data);
+      MyConsole.debug('completion.data', completion.data);
 
       const response = completion.data.choices[0].message?.content ?? '';
       //Todo: We should check the response carefully
@@ -263,7 +262,7 @@ export class ChatKernel extends BaseKernel {
         theTemplate.newSession = false;
       }
 
-      if (this.inDebug) {
+      if (MyConsole.inDebug) {
         return this.publishMarkDownMessage(
           '**Prompt in JSON:**</p><p>' +
             '```json\n' +

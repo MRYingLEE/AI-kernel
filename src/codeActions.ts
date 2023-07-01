@@ -41,6 +41,7 @@ import { OpenAIDriver } from './driver_openai';
 //Todo: to make sure Handlebars loaded at the beginning
 */
 import Handlebars from 'handlebars/lib/handlebars';
+import { MyConsole } from './debugMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
@@ -102,13 +103,13 @@ async function action_SetKey(code: string): Promise<IActionResult> {
       if (Handlebars) {
         const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
         welcome = welcomeTemplate1({ name: user.current_user.name });
-        console.log(welcome);
+        MyConsole.debug(welcome);
       }
       if (OpenAIDriver.refreshAPIKey(apiKey)) {
         // else {
         //   const Handlebars2 = await import('handlebars');
         //   const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
-        //   console.log(welcomeTemplate2({ name: user.current_user.name }));
+        //   MyConsole.log(welcomeTemplate2({ name: user.current_user.name }));
         // }
         try {
           const completion =
@@ -125,7 +126,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
                 }
               ]
             });
-          console.log('completion.data', completion.data);
+          MyConsole.debug('completion.data', completion.data);
         } catch (error: any) {
           return Promise.resolve({
             outputResult:

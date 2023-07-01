@@ -36,14 +36,14 @@ export function extractPersonAndMessage(
   return [persons, coreMessage];
 }
 
-//   console.log(extractPersonAndMessage("@Jack @Tom Please give me suggestions"));
+//   MyConsole.log(extractPersonAndMessage("@Jack @Tom Please give me suggestions"));
 //   // Output: ["@Jack","@Tom"], "Please give me suggestions"
 
-//   console.log(extractPersonAndMessage("@Jack Please give me suggestions @Tom "));
+//   MyConsole.log(extractPersonAndMessage("@Jack Please give me suggestions @Tom "));
 //   // Output: ["@Jack","@ Tom"], "Please give me suggestions"
 
-//   console.log(extractPersonAndMessage("@Jack @Tom Please give me suggestions"));
+//   MyConsole.log(extractPersonAndMessage("@Jack @Tom Please give me suggestions"));
 //   // Output: ["@Jack","@ Tom"], "Please give me suggestions"
 
-//   console.log(extractPersonAndMessage("@Jack @Tom Please use ‘@Linda’ to create a sentence"));
+//   MyConsole.log(extractPersonAndMessage("@Jack @Tom Please use ‘@Linda’ to create a sentence"));
 //   // Output: ["@Jack","@ Tom"], "Please use ‘@Linda’ to create a sentence"
