@@ -99,7 +99,7 @@ jobs:
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
       env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILearn }}
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILEARN }}
       with:
         source-directory: 'zip/'
         destination-github-username: 'MRYingLEE'
