@@ -200,7 +200,10 @@ export class ChatKernel extends BaseKernel {
       );
     }
 
-    const theTemplateName = actions[0].substring(1);
+    let theTemplateName = 'ai';
+    if (actions[0]) {
+      theTemplateName = actions[0].substring(1);
+    }
 
     let messages2send: ChatCompletionRequestMessage[] = [];
     let usrContent = '';
@@ -269,6 +272,27 @@ export class ChatKernel extends BaseKernel {
         theTemplate.newSession = false;
       }
 
+      let iconURL = '';
+
+      if (theTemplate.iconURL.trim().length > 0) {
+        iconURL = '![an icon](' + theTemplate.iconURL + ')';
+      }
+
+      let displayName = theTemplate.templateID.trim();
+
+      if (
+        theTemplate.templateDisplayName.trim().length > 0 &&
+        theTemplate.templateDisplayName.trim() !== theTemplate.templateID
+      ) {
+        displayName =
+          theTemplate.templateID.trim() +
+          '(' +
+          theTemplate.templateDisplayName.trim() +
+          ')';
+      }
+
+      // debugger();
+
       if (MyConsole.inDebug) {
         return this.publishMarkDownMessage(
           '**Prompt in JSON:**</p><p>' +
@@ -277,24 +301,16 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            theTemplate.templateID +
-            '(' +
-            theTemplate.templateDisplayName +
-            ')**' +
-            (theTemplate.iconURL?.length ?? 0 > 0)
-            ? '![an icon](' + theTemplate.iconURL + ')'
-            : '' + ':' + '</p><p>' + response || ''
+            displayName +
+            '**' +
+            iconURL +
+            ':' +
+            '</p><p>' +
+            response || ''
         );
       } else {
         return this.publishMarkDownMessage(
-          '**' +
-            theTemplate.templateID +
-            '(' +
-            theTemplate.templateDisplayName +
-            ')**' +
-            (theTemplate.iconURL?.length ?? 0 > 0)
-            ? '![an icon](' + theTemplate.iconURL + ')'
-            : '' + ':' + '</p><p>' + response || ''
+          '**' + displayName + '**' + iconURL + ':' + '</p><p>' + response || ''
         );
       }
     } catch (error: any) {

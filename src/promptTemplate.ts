@@ -149,7 +149,7 @@ class promptTemplate implements IPromptTemplateProps {
   // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
   withMemory: boolean; //false is the default //added by Ying
-  iconURL?: string;
+  iconURL: string;
 
   newSession: boolean; // Whether this template will start a new session. true is the default //added by Ying
 
@@ -344,7 +344,7 @@ class promptTemplate implements IPromptTemplateProps {
       const template = new promptTemplate(
         roleID,
         displayName,
-        roleDefine,
+        roleDefine + '\n{{ self_introduction }}',
         '{{cell_text}}',
         'Handlebars',
         true,

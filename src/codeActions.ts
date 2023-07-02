@@ -306,7 +306,7 @@ function action_defineAction(code: string): Promise<IActionResult> {
 }
 
 function action_defineUser(code: string): Promise<IActionResult> {
-  const prefix = '/user:';
+  const prefix = '/user';
 
   if (code.trim().toLowerCase().startsWith(prefix)) {
     const innerCode = code.trim().substring(prefix.length);
