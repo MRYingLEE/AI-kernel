@@ -172,7 +172,7 @@ export class ChatKernel extends BaseKernel {
       if (!promptTemplate.globalTemplates[theTemplateName]) {
         let errorMsg =
           'The action ' +
-          actions[0] +
+          theTemplateName +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
         for (const key in promptTemplate.globalTemplates) {
@@ -187,7 +187,7 @@ export class ChatKernel extends BaseKernel {
           promptTemplate.globalTemplates[theTemplateName].startNewSession();
           return this.publishMarkDownMessage(
             'The chat history with ' +
-              actions[0] +
+              theTemplateName +
               ' has been cleared. Now you have a new session with it.'
           );
         }
@@ -246,10 +246,10 @@ export class ChatKernel extends BaseKernel {
       const response = completion.data.choices[0].message?.content ?? '';
       //Todo: We should check the response carefully
 
-      let theTemplate = promptTemplate.globalTemplates['@ai'];
+      let theTemplate = promptTemplate.globalTemplates['ai'];
 
-      if (promptTemplate.globalTemplates[actions[0]]) {
-        theTemplate = promptTemplate.globalTemplates[actions[0]];
+      if (promptTemplate.globalTemplates[theTemplateName]) {
+        theTemplate = promptTemplate.globalTemplates[theTemplateName];
       }
       //To add the prompt message here
       theTemplate.addMessage(
