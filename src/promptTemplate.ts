@@ -332,7 +332,7 @@ class promptTemplate implements IPromptTemplateProps {
     return { messages2send, usrContent };
   }
 
-  static globalTemplates: { [id: string]: promptTemplate };
+  static globalTemplates: { [id: string]: promptTemplate } = {};
 
   static AddRole(
     roleID: string,
@@ -340,18 +340,22 @@ class promptTemplate implements IPromptTemplateProps {
     displayName: string,
     iconURL?: string
   ): boolean {
-    const template = new promptTemplate(
-      roleID,
-      displayName,
-      roleDefine,
-      '{{cell_text}}',
-      'Handlebars',
-      true,
-      iconURL
-    );
+    try {
+      const template = new promptTemplate(
+        roleID,
+        displayName,
+        roleDefine,
+        '{{cell_text}}',
+        'Handlebars',
+        true,
+        iconURL
+      );
 
-    promptTemplate.globalTemplates[roleID] = template;
-    return true;
+      promptTemplate.globalTemplates[roleID] = template;
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 
   static AddAction(
@@ -360,18 +364,21 @@ class promptTemplate implements IPromptTemplateProps {
     displayName: string,
     iconURL?: string
   ): boolean {
-    const template = new promptTemplate(
-      actionID,
-      displayName,
-      '',
-      actionDefine + '\n{{cell_text}}',
-      'Handlebars',
-      false,
-      iconURL
-    );
-
-    promptTemplate.globalTemplates[actionID] = template;
-    return true;
+    try {
+      const template = new promptTemplate(
+        actionID,
+        displayName,
+        '',
+        actionDefine + '\n{{cell_text}}',
+        'Handlebars',
+        false,
+        iconURL
+      );
+      promptTemplate.globalTemplates[actionID] = template;
+      return true;
+    } catch (error: any) {
+      return false;
+    }
   }
 }
 
