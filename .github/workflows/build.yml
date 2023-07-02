@@ -95,17 +95,17 @@ jobs:
           name: chatkernel-wheel
           path: chatkernel-wheel.zip
 
-    - name: Pushes test file
-      uses: antoineVIVIES/copy_file_to_another_repo_action@main
-      env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILEAR }}
-      with:
-        source_files: 'chatkernel-wheel.zip'
-        destination_repo: 'MRYingLEE/AILearn.live'
-        destination_folder: '/'
-        user_email: 'MRYingLEE@gmail.com'
-        user_name: 'MRYingLEE'
-        commit_message: 'A new version of Chat Kernel'
+    # - name: Pushes test file
+    #   uses: antoineVIVIES/copy_file_to_another_repo_action@main
+    #   env:
+    #     API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILEAR }}
+    #   with:
+    #     source_files: 'chatkernel-wheel.zip'
+    #     destination_repo: 'MRYingLEE/AILearn.live'
+    #     destination_folder: '/'
+    #     user_email: 'MRYingLEE@gmail.com'
+    #     user_name: 'MRYingLEE'
+    #     commit_message: 'A new version of Chat Kernel'
           
     - name: Clean up
       run: |

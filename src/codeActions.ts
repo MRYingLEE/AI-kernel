@@ -18,7 +18,7 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-// const template = promptTemplates[templateName];
+// const template = promptTemplate.globalTemplates[templateName];
 
 // if (focalcode_text.toLowerCase().startsWith('/clear')) {
 //   if (template !== null) {
@@ -32,7 +32,7 @@ method newCaht: to start a new chat template without history.
 // } else {
 //   return [];
 // }
-import { promptTemplates } from './promptTemplate';
+import { promptTemplate } from './promptTemplate';
 // import { globalOpenAI } from './driver_openai';
 import { user } from './user';
 // import { Configuration, OpenAIApi } from 'openai';
@@ -45,8 +45,8 @@ import { MyConsole } from './debugMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
-  for (const key in promptTemplates) {
-    if (!promptTemplates[key]) {
+  for (const key in promptTemplate.globalTemplates) {
+    if (!promptTemplate.globalTemplates[key]) {
       continue;
     }
     allActions += '\n' + key;
@@ -72,6 +72,14 @@ export class inChainedCodeAction {
     this.execute = execute;
     this.priority = priority;
     this.timestamp = Date.now();
+  }
+
+  static notProcessed(): Promise<IActionResult> {
+    return Promise.resolve({
+      outputResult: '',
+      outputFormat: 'text/markdown',
+      isProcessed: false
+    });
   }
 }
 
@@ -146,7 +154,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
         /*
                 Here, we try to compile all promptTamplests
                 */
-        for (const element of Object.values(promptTemplates)) {
+        for (const element of Object.values(promptTemplate.globalTemplates)) {
           try {
             element.f_sysTemplate = Handlebars.compile(
               element.systemMessageTemplate
@@ -181,11 +189,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
       }
     }
   }
-  return {
-    outputResult: '',
-    outputFormat: 'text/markdown',
-    isProcessed: false
-  };
+  return inChainedCodeAction.notProcessed();
 }
 
 function action_list(code: string): Promise<IActionResult> {
@@ -200,13 +204,99 @@ function action_list(code: string): Promise<IActionResult> {
       isProcessed: true
     });
   }
-  return Promise.resolve({
-    outputResult: '',
-    outputFormat: 'text/markdown',
-    isProcessed: false
-  });
+  return inChainedCodeAction.notProcessed();
+}
+
+function action_defineRole(code: string): Promise<IActionResult> {
+  const prefix = '/role:';
+
+  if (code.trim().toLowerCase().startsWith(prefix)) {
+    const innerCode = code.trim().substring(prefix.length);
+    const innerlines = innerCode.split('\n');
+
+    if (innerlines.length > 1) {
+      promptTemplate.AddRole(
+        innerlines[0],
+        innerlines.slice(1).join('\n'),
+        innerlines[0]
+      );
+
+      const allActions = getAllPromptTemplates();
+      return Promise.resolve({
+        outputResult:
+          '<p> The role ' +
+          innerlines[0] +
+          ' has been defined.</p>' +
+          '<p>FYI: The current list is as the following:</p><p>' +
+          allActions +
+          '</p>',
+        outputFormat: 'text/markdown',
+        isProcessed: true
+      });
+    }
+  }
+  return inChainedCodeAction.notProcessed();
+}
+
+function action_defineAction(code: string): Promise<IActionResult> {
+  const prefix = '/action:';
+
+  if (code.trim().toLowerCase().startsWith(prefix)) {
+    const innerCode = code.trim().substring(prefix.length);
+    const innerlines = innerCode.split('\n');
+
+    if (innerlines.length > 1) {
+      promptTemplate.AddRole(
+        innerlines[0],
+        innerlines.slice(1).join('\n'),
+        innerlines[0]
+      );
+
+      const allActions = getAllPromptTemplates();
+      return Promise.resolve({
+        outputResult:
+          '<p> The action ' +
+          innerlines[0] +
+          ' has been defined.</p>' +
+          '<p>FYI: The current list is as the following:</p><p>' +
+          allActions +
+          '</p>',
+        outputFormat: 'text/markdown',
+        isProcessed: true
+      });
+    }
+  }
+  return inChainedCodeAction.notProcessed();
+}
+
+function action_defineUser(code: string): Promise<IActionResult> {
+  const prefix = '/user:';
+
+  if (code.trim().toLowerCase().startsWith(prefix)) {
+    const innerCode = code.trim().substring(prefix.length);
+
+    if (user.fromJson(innerCode)) {
+      return Promise.resolve({
+        outputResult: '<p> The current user has been defined.</p>',
+        outputFormat: 'text/markdown',
+        isProcessed: true
+      });
+    } else {
+      return Promise.resolve({
+        outputResult:
+          '<p> The user define is invalid. Please check the JSON format in an online JSON viewer.</p>',
+        outputFormat: 'text/markdown',
+        isProcessed: true
+      });
+    }
+  }
+  return inChainedCodeAction.notProcessed();
 }
 
 globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));
-globalCodeActions.push(new inChainedCodeAction(action_list, 0));
+globalCodeActions.push(new inChainedCodeAction(action_list, 1));
+globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
+globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
+globalCodeActions.push(new inChainedCodeAction(action_defineAction, 4));
+
 globalSortedCodeActions();

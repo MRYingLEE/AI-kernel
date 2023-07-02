@@ -12,7 +12,7 @@ import {
   IActionResult,
   globalCodeActions
 } from './codeActions';
-import { promptTemplate, promptTemplates } from './promptTemplate';
+import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './debugMode';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
@@ -167,14 +167,14 @@ export class ChatKernel extends BaseKernel {
         '@ 2 or more actions are not supported so far!'
       ); // We support this feature in the long future.
     } else if (actions.length === 1) {
-      if (!promptTemplates[actions[0]]) {
+      if (!promptTemplate.globalTemplates[actions[0]]) {
         let errorMsg =
           'The action ' +
           actions[0] +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-        for (const key in promptTemplates) {
-          if (promptTemplates[key] === undefined) {
+        for (const key in promptTemplate.globalTemplates) {
+          if (promptTemplate.globalTemplates[key] === undefined) {
             continue;
           }
           errorMsg += '\n' + key;
@@ -182,7 +182,7 @@ export class ChatKernel extends BaseKernel {
         return this.publishMarkDownMessage(errorMsg);
       } else {
         if (pureMessage.trim().length === 0) {
-          promptTemplates[actions[0]].startNewSession();
+          promptTemplate.globalTemplates[actions[0]].startNewSession();
           return this.publishMarkDownMessage(
             'The chat history with ' +
               actions[0] +
@@ -208,7 +208,7 @@ export class ChatKernel extends BaseKernel {
     } else {
       // The mentioned actions, which are critical to the following processing
       MyConsole.table(actions);
-      const p = promptTemplates[actions[0]].buildMessages2send(statuses);
+      const p = promptTemplate.globalTemplates[actions[0]].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }
@@ -239,10 +239,10 @@ export class ChatKernel extends BaseKernel {
       const response = completion.data.choices[0].message?.content ?? '';
       //Todo: We should check the response carefully
 
-      let theTemplate = promptTemplates['@ai'];
+      let theTemplate = promptTemplate.globalTemplates['@ai'];
 
-      if (promptTemplates[actions[0]]) {
-        theTemplate = promptTemplates[actions[0]];
+      if (promptTemplate.globalTemplates[actions[0]]) {
+        theTemplate = promptTemplate.globalTemplates[actions[0]];
       }
       //To add the prompt message here
       theTemplate.addMessage(
@@ -270,14 +270,14 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            theTemplate.templateName.substring(1) +
+            theTemplate.templateID.substring(1) +
             ':**' +
             '</p><p>' +
             response || ''
         );
       } else {
         return this.publishMarkDownMessage(
-          '**' + theTemplate.templateName + ':**' + '</p><p>' + response || ''
+          '**' + theTemplate.templateID + ':**' + '</p><p>' + response || ''
         );
       }
     } catch (error: any) {

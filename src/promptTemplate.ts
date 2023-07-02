@@ -126,8 +126,8 @@ class message {
 }
 
 class promptTemplate implements IPromptTemplateProps {
-  templateName: string;
-  templateDescription: string;
+  templateID: string;
+  templateDisplayName: string;
 
   // To make code simple, there are 2 parts: system and user. But maybe we can use 1 later to follow Microsoft Guidance
   systemMessageTemplate: string;
@@ -164,8 +164,8 @@ class promptTemplate implements IPromptTemplateProps {
   static global_messages: message[] = [];
 
   constructor(
-    templateName: string,
-    templateDescription: string,
+    templateID: string,
+    templateDisplayName: string,
     systemMessageTemplate: string,
     userMessageTemplate: string,
     /* inputVariables: string[], messages: [message],*/ templateFormat?:
@@ -178,8 +178,8 @@ class promptTemplate implements IPromptTemplateProps {
     withMemory?: boolean //,
     // newSession?: boolean
   ) {
-    this.templateName = templateName;
-    this.templateDescription = templateDescription;
+    this.templateID = templateID;
+    this.templateDisplayName = templateDisplayName;
 
     this.systemMessageTemplate = systemMessageTemplate;
     this.userMessageTemplate = userMessageTemplate;
@@ -326,6 +326,44 @@ class promptTemplate implements IPromptTemplateProps {
     };
     messages2send.push(msg2send);
     return { messages2send, usrContent };
+  }
+
+  static globalTemplates: { [id: string]: promptTemplate };
+
+  static AddRole(
+    roleID: string,
+    roleDefine: string,
+    displayName: string
+  ): boolean {
+    const template = new promptTemplate(
+      roleID,
+      displayName,
+      roleDefine,
+      '{{cell_text}}',
+      'Handlebars',
+      true
+    );
+
+    promptTemplate.globalTemplates[roleID] = template;
+    return true;
+  }
+
+  static AddAction(
+    actionID: string,
+    actionDefine: string,
+    displayName: string
+  ): boolean {
+    const template = new promptTemplate(
+      actionID,
+      displayName,
+      '',
+      actionDefine + '\n{{cell_text}}',
+      'Handlebars',
+      false
+    );
+
+    promptTemplate.globalTemplates[actionID] = template;
+    return true;
   }
 }
 
@@ -507,21 +545,14 @@ class promptTemplate implements IPromptTemplateProps {
 
 const aiPrompt = `
 **Your name is AI and you are a good tutor. You are helping the user with their task.**
-
-Here are the requirements for being a good assistant:
-
-- Be polite and respectful in your response.
-- When providing code, make sure it is intelligent, correct, efficient, and readable.
-- If you are not sure about something, don't guess.
-- Keep your responses short and to the point.
-- Provide any code and completions formatted as markdown code blocks.
-
 Here is the task or question that the user is asking you:
-
-{{cell_text}}
-
-**AI: Happy to help, here is my response:**
 `;
+promptTemplate.AddAction('ai', aiPrompt, 'AI');
+
+const chatPrompt = `
+**Your name is AI and you are a good tutor. You are helping the user with their task.**
+`;
+promptTemplate.AddRole('chat', chatPrompt, 'Chat');
 
 // const pythonPromt = `
 // You are a data scientist.You are good at coding Pythonic style Python in Jupyter Notebook. When I give you a task, try to generate pure Python code to solve it.
@@ -536,171 +567,67 @@ Here is the task or question that the user is asking you:
 // `;
 
 const all2EnglishPrompt = `
-I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language, 
-translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more 
-beautiful and elegant, upper level English words and sentences. 
-Keep the meaning same, but make them more literary. 
-I want you to only reply the correction, the improvements and nothing else, do not write explanations. 
+I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more
+beautiful and elegant, upper level English words and sentences.
+Keep the meaning same, but make them more literary.
+I want you to only reply the correction, the improvements and nothing else, do not write explanations.
 Here is the sentence for you:
-{{cell_text}}
 `;
+promptTemplate.AddAction('2e', all2EnglishPrompt, 'to English');
 
 const all2ChinesePrompt = `
-I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language, 
-translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more 
-beautiful and elegant, upper level Chinese words and sentences. 
-Keep the meaning same, but make them more literary. 
-I want you to only reply the correction, the improvements and nothing else, do not write explanations. 
+I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more
+beautiful and elegant, upper level Chinese words and sentences.
+Keep the meaning same, but make them more literary.
+I want you to only reply the correction, the improvements and nothing else, do not write explanations.
 Here is the sentence for you:
-{{cell_text}}
 `;
+promptTemplate.AddAction('2c', all2ChinesePrompt, 'to Chinese');
+
+const all2MotherLanguagePrompt = `
+I want you to act as an translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+translate it and answer in the corrected and improved version of my text, in MY MOTHERLANGURAGE. I want you to replace my simplified A0-level words and sentenceswith more
+beautiful and elegant, upper level words and sentences.
+Keep the meaning same, but make them more literary.
+I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+Here is the sentence for you:
+`;
+promptTemplate.AddAction(
+  '2m',
+  all2MotherLanguagePrompt,
+  'to my mother language'
+);
 
 const refineryPrompt = `
-I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language, 
-correct it and explain the mistakes I made. 
+I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language,
+correct it and explain the mistakes I made.
 Here is the sentence for you:
-{{cell_text}}
 `;
+promptTemplate.AddAction('refine', refineryPrompt, 'Refine');
 
 const NewYorkGirlPrompt = `
-I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.
-{{self_introduction}}`;
+I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
+promptTemplate.AddAction('Ana', NewYorkGirlPrompt, 'Ana(US)');
 
 const LondonGirlPrompt = `
-I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.
-{{self_introduction}}`;
+I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
+promptTemplate.AddAction('Maisie', LondonGirlPrompt, 'Maisie(UK)');
 
 const HongKongBoyPrompt = `
-I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.
-{{self_introduction}}`;
-
-const JasonPrompt = `
-I want you to act as Jason, a friendly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.
-{{self_introduction}}`;
+I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
+promptTemplate.AddAction('Max', HongKongBoyPrompt, 'Max(HK)');
 
 const ZhuGeLiangPrompt = `
-我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。
-{{self_introduction}}`;
+我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
+promptTemplate.AddAction('諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
 
 const SunWuKongPrompt = `
-我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。
-{{self_introduction}}`;
-
-//templateName should be a valid Javascript variable name, also used in text. I.e. translator. So can be mentioned in a text with "@translator".
-
-const promptTemplates: { [id: string]: promptTemplate } = {
-  // "complete": new JupyterPromptTemplate([], completePrompt, "jinja2", true, "Code", "Code"),
-  // "explain": new JupyterPromptTemplate([], explainPrompt, "jinja2", true, "Code", "Markdown"),
-  // "format": new JupyterPromptTemplate([], formatPrompt, "jinja2", true, "Code", "Code"),
-  // "debug": new JupyterPromptTemplate([], debugPrompt, "jinja2", true, "Code", "Code"),
-  // "review": new JupyterPromptTemplate([], reviewPrompt, "jinja2", true, "Code", "Code"),
-  '@ai': new promptTemplate(
-    '@ai',
-    '',
-    '',
-    aiPrompt,
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  // "python helper": new JupyterPromptTemplate([], pythonPromt, "jinja2", true, "Cell", "Code"),
-  '@2e': new promptTemplate(
-    'to English',
-    '',
-    '',
-    all2EnglishPrompt,
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@2c': new promptTemplate(
-    'to Chinese',
-    '',
-    '',
-    all2ChinesePrompt,
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@refinery': new promptTemplate(
-    'refinery',
-    '',
-    '',
-    refineryPrompt,
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-
-  '@Ana': new promptTemplate(
-    '@Ana(NY)',
-    '',
-    NewYorkGirlPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@Maisie': new promptTemplate(
-    '@Maisie(London)',
-    '',
-    LondonGirlPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@Max': new promptTemplate(
-    '@Max(HK)',
-    '',
-    HongKongBoyPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-
-  '@Jason': new promptTemplate(
-    '@Jason(HK)',
-    '',
-    JasonPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@諸葛亮': new promptTemplate(
-    '@諸葛亮',
-    '',
-    ZhuGeLiangPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  ),
-  '@孫悟空': new promptTemplate(
-    '@孫悟空',
-    '',
-    SunWuKongPrompt,
-    '{{cell_text}}',
-    'Handlebars',
-    true
-    // 'Cell',
-    // 'Markdown',
-  )
-};
+我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
+promptTemplate.AddAction('孫悟空', SunWuKongPrompt, '孫悟空');
 
 export {
   ChatCompletionRequestMessage as ChatCompletionRequestMessage,
-  promptTemplates,
   promptTemplate
 };

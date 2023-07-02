@@ -99,4 +99,25 @@ export class user {
   static self_introduction(): string {
     return user.current_user.self_introduction();
   }
+
+  static fromJson(jsonString: string): boolean {
+    const obj = JSON.parse(jsonString);
+    // Create a new instance of the user class using the properties from the parsed JSON object
+    try {
+      const newUser = new user(
+        obj.name,
+        obj.age,
+        obj.gender,
+        obj.city,
+        obj.motherLanguage,
+        obj.englishLevel,
+        obj.school,
+        obj.other
+      );
+      user.current_user = newUser;
+      return true;
+    } catch (error: any) {
+      return false;
+    }
+  }
 }
