@@ -170,6 +170,9 @@ async function action_SetKey(code: string): Promise<IActionResult> {
         /*
                 Here, we try to compile all promptTamplests
                 */
+        if (Object.keys(promptTemplate.get_global_templates()).length === 0) {
+          promptTemplate.addDefaultTemplates();
+        }
         for (const element of Object.values(
           promptTemplate.get_global_templates()
         )) {

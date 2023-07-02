@@ -360,7 +360,7 @@ class promptTemplate implements IPromptTemplateProps {
   static _global_templates: { [id: string]: promptTemplate } = {};
 
   static get_global_templates(): { [id: string]: promptTemplate } {
-    if (Object.keys(this._global_templates).length === 0) {
+    if (Object.keys(promptTemplate._global_templates).length === 0) {
       promptTemplate.addDefaultTemplates();
     }
     return this._global_templates;
