@@ -167,7 +167,9 @@ export class ChatKernel extends BaseKernel {
         '@ 2 or more actions are not supported so far!'
       ); // We support this feature in the long future.
     } else if (actions.length === 1) {
-      if (!promptTemplate.globalTemplates[actions[0]]) {
+      const theTemplateName = actions[0].substring(1);
+
+      if (!promptTemplate.globalTemplates[theTemplateName]) {
         let errorMsg =
           'The action ' +
           actions[0] +
@@ -182,7 +184,7 @@ export class ChatKernel extends BaseKernel {
         return this.publishMarkDownMessage(errorMsg);
       } else {
         if (pureMessage.trim().length === 0) {
-          promptTemplate.globalTemplates[actions[0]].startNewSession();
+          promptTemplate.globalTemplates[theTemplateName].startNewSession();
           return this.publishMarkDownMessage(
             'The chat history with ' +
               actions[0] +
@@ -198,6 +200,8 @@ export class ChatKernel extends BaseKernel {
       );
     }
 
+    const theTemplateName = actions[0].substring(1);
+
     let messages2send: ChatCompletionRequestMessage[] = [];
     let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
@@ -208,7 +212,10 @@ export class ChatKernel extends BaseKernel {
     } else {
       // The mentioned actions, which are critical to the following processing
       MyConsole.table(actions);
-      const p = promptTemplate.globalTemplates[actions[0]].buildMessages2send(statuses);
+      const p =
+        promptTemplate.globalTemplates[theTemplateName].buildMessages2send(
+          statuses
+        );
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }
@@ -270,14 +277,24 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            theTemplate.templateID.substring(1) +
-            ':**' +
-            '</p><p>' +
-            response || ''
+            theTemplate.templateID +
+            '(' +
+            theTemplate.templateDisplayName +
+            ')**' +
+            (theTemplate.iconURL?.length ?? 0 > 0)
+            ? '![an icon](' + theTemplate.iconURL + ')'
+            : '' + ':' + '</p><p>' + response || ''
         );
       } else {
         return this.publishMarkDownMessage(
-          '**' + theTemplate.templateID + ':**' + '</p><p>' + response || ''
+          '**' +
+            theTemplate.templateID +
+            '(' +
+            theTemplate.templateDisplayName +
+            ')**' +
+            (theTemplate.iconURL?.length ?? 0 > 0)
+            ? '![an icon](' + theTemplate.iconURL + ')'
+            : '' + ':' + '</p><p>' + response || ''
         );
       }
     } catch (error: any) {

@@ -54,6 +54,22 @@ function getAllPromptTemplates() {
   return allActions;
 }
 
+function extractURLs(inputString: string): {
+  urls: RegExpMatchArray | null;
+  remainingPart: string;
+} {
+  // Define the regex pattern to match URLs
+  const urlPattern = /(https?:\/\/[^\s]+)/g;
+
+  // Use the match() method to find all URLs in the input string
+  const urls = inputString.match(urlPattern);
+
+  // Use the replace() method to remove the URLs from the input string
+  const remainingPart = inputString.replace(urlPattern, '');
+
+  return { urls, remainingPart }; // Fix: Change curly braces to square brackets for object property
+}
+
 export interface IActionResult {
   outputResult: string;
   outputFormat: string;
@@ -215,10 +231,20 @@ function action_defineRole(code: string): Promise<IActionResult> {
     const innerlines = innerCode.split('\n');
 
     if (innerlines.length > 1) {
+      const define = innerlines.slice(1).join('\n');
+      const { urls, remainingPart } = extractURLs(define);
+      let iconURL = '';
+      if (urls?.length ?? 0 > 0) {
+        if (urls) {
+          iconURL = urls[0];
+        }
+      }
+
       promptTemplate.AddRole(
         innerlines[0],
-        innerlines.slice(1).join('\n'),
-        innerlines[0]
+        remainingPart,
+        innerlines[0],
+        iconURL
       );
 
       const allActions = getAllPromptTemplates();
@@ -246,10 +272,20 @@ function action_defineAction(code: string): Promise<IActionResult> {
     const innerlines = innerCode.split('\n');
 
     if (innerlines.length > 1) {
+      const define = innerlines.slice(1).join('\n');
+      const { urls, remainingPart } = extractURLs(define);
+      let iconURL = '';
+      if (urls?.length ?? 0 > 0) {
+        if (urls) {
+          iconURL = urls[0];
+        }
+      }
+
       promptTemplate.AddRole(
         innerlines[0],
-        innerlines.slice(1).join('\n'),
-        innerlines[0]
+        remainingPart,
+        innerlines[0],
+        iconURL
       );
 
       const allActions = getAllPromptTemplates();

@@ -22,6 +22,7 @@ interface IPromptTemplateProps {
   // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
   withMemory: boolean; //false is the default //added by Ying
+  iconURL?: string;
 }
 
 function renderTemplate(
@@ -148,6 +149,7 @@ class promptTemplate implements IPromptTemplateProps {
   // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
   withMemory: boolean; //false is the default //added by Ying
+  iconURL?: string;
 
   newSession: boolean; // Whether this template will start a new session. true is the default //added by Ying
 
@@ -175,8 +177,9 @@ class promptTemplate implements IPromptTemplateProps {
     // validateTemplate?: boolean,
     // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
     // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
-    withMemory?: boolean //,
+    withMemory?: boolean, //,
     // newSession?: boolean
+    iconURL?: string
   ) {
     this.templateID = templateID;
     this.templateDisplayName = templateDisplayName;
@@ -192,6 +195,7 @@ class promptTemplate implements IPromptTemplateProps {
     // this.outputCellType = outputCellType;
     this.withMemory = withMemory ?? false;
     this.newSession = true; //newSession ?? true;
+    this.iconURL = iconURL ?? '';
 
     // this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
     // this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
@@ -333,7 +337,8 @@ class promptTemplate implements IPromptTemplateProps {
   static AddRole(
     roleID: string,
     roleDefine: string,
-    displayName: string
+    displayName: string,
+    iconURL?: string
   ): boolean {
     const template = new promptTemplate(
       roleID,
@@ -341,7 +346,8 @@ class promptTemplate implements IPromptTemplateProps {
       roleDefine,
       '{{cell_text}}',
       'Handlebars',
-      true
+      true,
+      iconURL
     );
 
     promptTemplate.globalTemplates[roleID] = template;
@@ -351,7 +357,8 @@ class promptTemplate implements IPromptTemplateProps {
   static AddAction(
     actionID: string,
     actionDefine: string,
-    displayName: string
+    displayName: string,
+    iconURL?: string
   ): boolean {
     const template = new promptTemplate(
       actionID,
@@ -359,7 +366,8 @@ class promptTemplate implements IPromptTemplateProps {
       '',
       actionDefine + '\n{{cell_text}}',
       'Handlebars',
-      false
+      false,
+      iconURL
     );
 
     promptTemplate.globalTemplates[actionID] = template;
