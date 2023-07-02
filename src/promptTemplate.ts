@@ -42,7 +42,7 @@ function renderTemplate(
       MyConsole.debug('content after f_userTemplate', content);
     } else {
       for (const key in new_statuses) {
-        content = content.replace('{{' + key + '}}', new_statuses[key]);
+        content = content.replace('{{ ' + key + ' }}', new_statuses[key]);
       }
     }
   } catch {
@@ -382,6 +382,22 @@ class promptTemplate implements IPromptTemplateProps {
         withMemory,
         iconURL
       );
+
+      try {
+        template.f_sysTemplate = Handlebars.compile(
+          template.systemMessageTemplate
+        );
+      } catch {
+        template.f_sysTemplate = undefined;
+      }
+
+      try {
+        template.f_userTemplate = Handlebars.compile(
+          template.userMessageTemplate
+        );
+      } catch {
+        template.f_userTemplate = undefined;
+      }
 
       MyConsole.debug('new template:', template);
 
