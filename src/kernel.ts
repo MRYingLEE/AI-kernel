@@ -272,24 +272,9 @@ export class ChatKernel extends BaseKernel {
         theTemplate.newSession = false;
       }
 
-      let iconURL = '';
+      const md_iconURL = theTemplate.get_Markdown_iconURL();
 
-      if (theTemplate.iconURL.trim().length > 0) {
-        iconURL = '![an icon](' + theTemplate.iconURL + ')';
-      }
-
-      let displayName = theTemplate.templateID.trim();
-
-      if (
-        theTemplate.templateDisplayName.trim().length > 0 &&
-        theTemplate.templateDisplayName.trim() !== theTemplate.templateID
-      ) {
-        displayName =
-          theTemplate.templateID.trim() +
-          '(' +
-          theTemplate.templateDisplayName.trim() +
-          ')';
-      }
+      const md_displayName = theTemplate.get_Markdown_DisplayName();
 
       // debugger();
 
@@ -301,16 +286,22 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            displayName +
+            md_displayName +
             '**' +
-            iconURL +
+            md_iconURL +
             ':' +
             '</p><p>' +
             response || ''
         );
       } else {
         return this.publishMarkDownMessage(
-          '**' + displayName + '**' + iconURL + ':' + '</p><p>' + response || ''
+          '**' +
+            md_displayName +
+            '**' +
+            md_iconURL +
+            ':' +
+            '</p><p>' +
+            response || ''
         );
       }
     } catch (error: any) {

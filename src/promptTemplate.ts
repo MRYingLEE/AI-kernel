@@ -200,6 +200,31 @@ class promptTemplate implements IPromptTemplateProps {
     // this.f_sysTemplate = Handlebars.compile(this.systemMessageTemplate);
     // this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
   }
+
+  get_Markdown_DisplayName(): string {
+    let md_displayName = this.templateID.trim();
+
+    if (
+      this.templateDisplayName.trim().length > 0 &&
+      this.templateDisplayName.trim() !== this.templateID
+    ) {
+      md_displayName =
+        this.templateID.trim() + '(' + this.templateDisplayName.trim() + ')';
+    }
+
+    return md_displayName;
+  }
+
+  get_Markdown_iconURL(): string {
+    let md_iconURL = '';
+
+    if (this.iconURL.trim().length > 0) {
+      md_iconURL =
+        '![' + this.get_Markdown_DisplayName + '](' + this.iconURL + ')';
+    }
+    return md_iconURL;
+  }
+
   //Todo: Should we support a global Message list directly?
   addMessage(
     Role: ChatCompletionRequestMessageRoleEnum, //'system' | 'user' | 'assistant',
@@ -339,7 +364,7 @@ class promptTemplate implements IPromptTemplateProps {
     roleDefine: string,
     displayName: string,
     iconURL?: string
-  ): boolean {
+  ): promptTemplate | undefined {
     try {
       const template = new promptTemplate(
         roleID,
@@ -352,9 +377,9 @@ class promptTemplate implements IPromptTemplateProps {
       );
 
       promptTemplate.globalTemplates[roleID] = template;
-      return true;
+      return template;
     } catch (error: any) {
-      return false;
+      return undefined;
     }
   }
 
@@ -363,7 +388,7 @@ class promptTemplate implements IPromptTemplateProps {
     actionDefine: string,
     displayName: string,
     iconURL?: string
-  ): boolean {
+  ): promptTemplate | undefined {
     try {
       const template = new promptTemplate(
         actionID,
@@ -375,273 +400,321 @@ class promptTemplate implements IPromptTemplateProps {
         iconURL
       );
       promptTemplate.globalTemplates[actionID] = template;
-      return true;
+      return template;
     } catch (error: any) {
-      return false;
+      return undefined;
+    }
+  }
+
+  // // Ying
+
+  // const pythonCode = `def get_df_defines():\n \
+  // 						  	lines=["import pandas as pd", ""]\n \
+  // 							dfs_only = {k: v for k, v in globals().items() if isinstance(v, pd.DataFrame)}\n \
+  // 							for df_name, df in dfs_only.items():\n \
+  // 								cols=','.join(['"'+c+'"' for c in df.columns])\n \
+  // 								dts=','.join(['"'+c+'" : "'+str(t)+'"' for c, t in zip(df.columns,df.dtypes)])\n \
+  // 								lines.append(df_name+'=pd.read_csv("'+df_name+'.csv", columns={'+cols+'}, dtype={'+ dts + '})')\n \
+  // 							return '\n'.join(lines)`;
+
+  // await window.executePython(pythonCode).then((result) => {
+  //     MyConsole.debug("The following Python code has been developed:\n```Python\n" + result + "\n```\n");
+  // });
+
+  // const completePrompt = `
+  // **Your name is AI and you are a coding assistant. You are helping the user complete the code they are trying to write.**
+
+  // Here are the requirements for completing the code:
+
+  // - Be polite and respectful in your response.
+  // - Only complete the code in the FOCAL CELL.
+  // - Do not repeat any code from the PREVIOUS CODE.
+  // - Only put the completed code in a function if the user explicitly asks you to, otherwise just complete the code in the FOCAL CELL.
+  // - Provide code that is intelligent, correct, efficient, and readable.
+  // - If you are not sure about something, don't guess.
+  // - Keep your responses short and to the point.
+  // - Provide your code and completions formatted as markdown code blocks.
+  // - Never refer to yourself as "AI", you are a coding assistant.
+  // - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
+  // - Briefly summarise the new code you wrote at the end of your response.
+
+  // *Focal cell:*
+
+  // \`\`\`
+  // {{focalcode_text}}
+  // \`\`\`
+
+  // **AI: Happy to complete the code for you, here it is:**
+  // `;
+
+  // const explainPrompt = `
+  // **Your name is AI and you are a coding assistant. You are helping the user understand the code in the FOCAL CELL by explaining it.**
+
+  // Here are the requirements for your explanation:
+
+  // - Be polite and respectful to the person who wrote the code.
+  // - Explain the code in the FOCAL CELL as clearly as possible.
+  // - If you are not sure about something, don't guess.
+  // - Keep your responses short and to the point.
+  // - Never refer to yourself as "AI", you are a coding assistant.
+  // - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
+  // - Use markdown to format your response where possible.
+  // - If reasonable, provide a line-by-line explanation of the code using markdown formatting and clearly labelled inline comments.
+
+  // **Here is the background information about the code:**
+
+  // *Current Python code:*
+
+  // \`\`\`
+  // {{fakecode_text}}
+  // \`\`\`
+
+  // *Focal cell:*
+
+  // \`\`\`
+  // {{focalcode_text}}
+  // \`\`\`
+
+  // *STDOUT of focal cell:*
+
+  // \`\`\`
+  // {{stdout_text}}
+  // \`\`\`
+
+  // *Result of focal cell:*
+
+  // \`\`\`
+  // {{result_text}}
+  // \`\`\`
+
+  // **AI: Happy to explain the code to you, here is my explanation:**
+  // `;
+
+  // const formatPrompt = `
+  // **Your name is AI and you are a coding assistant. You are helping the user to improve the code formatting of their FOCAL CELL.**
+
+  // Here are the requirements for improving the formatting of the code:
+
+  // - Be polite and respectful to the person who wrote the code.
+  // - Never alter the code itself, only improve the formatting.
+  // - Do not include import statements in your response, only the code itself.
+  // - Improvements that you need to make where possible:
+  //     - Add comments to explain what the code is doing.
+  //     - Improve the spacing of the code to make it easier to read.
+  //     - Add docstrings to functions and classes.
+  //     - Add type hints to variables and functions.
+  // - Only put the formatting code in a function if the original code was in a function, otherwise just improve the formatting of the code in the FOCAL CELL.
+  // - If you are not sure about something, don't guess.
+  // - Keep your responses short and to the point.
+  // - First respond by providing the code with improved formatting in a markdown code block.
+  // - Never refer to yourself as "AI", you are a coding assistant.
+  // - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
+  // - Briefly list the formatting improvements that you made at the end.
+
+  // **Here is the background information about the code:**
+
+  // *Focal cell:*
+
+  // \`\`\`
+  // {{focalcode_text}}
+  // \`\`\`
+
+  // **AI: Happy to improve the formatting of your code, here it is:**
+  // `;
+
+  // const debugPrompt = `
+  // **Your name is AI and you are a coding assistant. You are helping the user to debug a code issue in their FOCAL CELL.**
+
+  // Here are the requirements for debugging:
+
+  // - Be polite and respectful to the person who wrote the code.
+  // - Describe the problem in the FOCAL CELL as clearly as possible.
+  // - Explain why the code is not working and/or throwing an error.
+  // - Explain how to fix the problem.
+  // - If you are not sure about something, don't guess.
+  // - Keep your responses short and to the point.
+  // - Provide your explanation and solution formatted as markdown where possible.
+  // - Never refer to yourself as "AI", you are a coding assistant.
+  // - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
+
+  // **Here is the background information about the code:**
+
+  // *Focal cell:*
+
+  // \`\`\`
+  // {{focalcode_text}}
+  // \`\`\`
+
+  // *STDERR of focal cell:*
+
+  // \`\`\`
+  // {{stderr_text}}
+  // \`\`\`
+
+  // **AI: Sorry to hear you are experiencing problems, let me help you with that:**
+  // `;
+
+  // const reviewPrompt = `
+  // **Your name is AI and you are a code reviewer reviewing the code in the FOCAL CELL.**
+
+  // Here are the requirements for reviewing code:
+
+  // - Be constructive and suggest improvements where helpful.
+  // - Do not include compliments or summaries of the code.
+  // - Do not comment on code that is not in the focal cell.
+  // - You don't know the code that comes after the cell, so don't recommend anything regarding unused variables.
+  // - Ignore suggestions related to imports.
+  // - Try to keep your comments short and to the point.
+  // - When providing a suggestion in your list, reference the line(s) of code that you are referring to in a markdown code block right under each comment.
+  // - Do not end your response with the updated code.
+  // - If you are not sure about something, don't comment on it.
+  // - Provide your suggestions formatted as markdown where possible.
+  // - Never refer to yourself as "AI", you are a coding assistant.
+  // - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
+
+  // **Here is is the background information about the code:**
+
+  // *Focal cell:*
+  // \`\`\`
+  // {{focalcode_text}}
+  // \`\`\`
+
+  // **AI: Happy to review your code, here is a list with my suggestions and recommendations for your code. I will include a copy of the code I am referring to in a code block whenever possible.:**
+  // `;
+
+  static addDefaultTemplates(): void {
+    const aiPrompt = `
+    **Your name is AI and you are a good tutor. You are helping the user with their task.**
+    Here is the task or question that the user is asking you:
+    `;
+
+    let newTemplte = promptTemplate.AddAction('ai', aiPrompt, 'AI');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + 'AI' + ' failed.');
+    }
+
+    const chatPrompt = `
+    **Your name is AI and you are a good tutor. You are helping the user with their task.**
+    `;
+    newTemplte = promptTemplate.AddRole('chat', chatPrompt, 'Chat');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + 'Chat' + ' failed.');
+    }
+    // const pythonPromt = `
+    // You are a data scientist.You are good at coding Pythonic style Python in Jupyter Notebook. When I give you a task, try to generate pure Python code to solve it.
+    // You may add comments within code, but do not explain out of code.
+    // *Current Python code:*
+    // \`\`\`
+    // {{fakecode_text}}
+    // \`\`\`
+
+    // Here is the task or question that the user is asking you:
+    // {{cell_text}}
+    // `;
+
+    const all2EnglishPrompt = `
+    I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more
+    beautiful and elegant, upper level English words and sentences.
+    Keep the meaning same, but make them more literary.
+    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    Here is the sentence for you:
+    `;
+    newTemplte = promptTemplate.AddAction(
+      '2e',
+      all2EnglishPrompt,
+      'to English'
+    );
+    if (!newTemplte) {
+      console.error('The define of prompt template' + '2e' + ' failed.');
+    }
+
+    const all2ChinesePrompt = `
+    I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more
+    beautiful and elegant, upper level Chinese words and sentences.
+    Keep the meaning same, but make them more literary.
+    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    Here is the sentence for you:
+    `;
+    newTemplte = promptTemplate.AddAction(
+      '2c',
+      all2ChinesePrompt,
+      'to Chinese'
+    );
+    if (!newTemplte) {
+      console.error('The define of prompt template' + '2c' + ' failed.');
+    }
+
+    const all2MotherLanguagePrompt = `
+    I want you to act as an translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    translate it and answer in the corrected and improved version of my text, in MY MOTHERLANGURAGE. I want you to replace my simplified A0-level words and sentenceswith more
+    beautiful and elegant, upper level words and sentences.
+    Keep the meaning same, but make them more literary.
+    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    Here is the sentence for you:
+    `;
+    newTemplte = promptTemplate.AddAction(
+      '2m',
+      all2MotherLanguagePrompt,
+      'to my mother language'
+    );
+    if (!newTemplte) {
+      console.error('The define of prompt template' + '2m' + ' failed.');
+    }
+
+    const refineryPrompt = `
+    I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language,
+    correct it and explain the mistakes I made.
+    Here is the sentence for you:
+    `;
+    newTemplte = promptTemplate.AddAction('refine', refineryPrompt, 'Refine');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + 'Refine' + ' failed.');
+    }
+
+    const NewYorkGirlPrompt = `
+    I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
+    newTemplte = promptTemplate.AddRole('Ana', NewYorkGirlPrompt, 'Ana(US)');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + 'Ana(US)' + ' failed.');
+    }
+
+    const LondonGirlPrompt = `
+    I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
+    newTemplte = promptTemplate.AddRole(
+      'Maisie',
+      LondonGirlPrompt,
+      'Maisie(UK)'
+    );
+    if (!newTemplte) {
+      console.error(
+        'The define of prompt template' + 'Maisie(UK)' + ' failed.'
+      );
+    }
+
+    const HongKongBoyPrompt = `
+    I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
+    newTemplte = promptTemplate.AddRole('Max', HongKongBoyPrompt, 'Max(HK)');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + 'Max(HK)' + ' failed.');
+    }
+
+    const ZhuGeLiangPrompt = `
+    我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
+    newTemplte = promptTemplate.AddRole('諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + '諸葛亮' + ' failed.');
+    }
+
+    const SunWuKongPrompt = `
+    我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
+    newTemplte = promptTemplate.AddRole('孫悟空', SunWuKongPrompt, '孫悟空');
+    if (!newTemplte) {
+      console.error('The define of prompt template' + '孫悟空' + ' failed.');
     }
   }
 }
-
-// // Ying
-
-// const pythonCode = `def get_df_defines():\n \
-// 						  	lines=["import pandas as pd", ""]\n \
-// 							dfs_only = {k: v for k, v in globals().items() if isinstance(v, pd.DataFrame)}\n \
-// 							for df_name, df in dfs_only.items():\n \
-// 								cols=','.join(['"'+c+'"' for c in df.columns])\n \
-// 								dts=','.join(['"'+c+'" : "'+str(t)+'"' for c, t in zip(df.columns,df.dtypes)])\n \
-// 								lines.append(df_name+'=pd.read_csv("'+df_name+'.csv", columns={'+cols+'}, dtype={'+ dts + '})')\n \
-// 							return '\n'.join(lines)`;
-
-// await window.executePython(pythonCode).then((result) => {
-//     MyConsole.debug("The following Python code has been developed:\n```Python\n" + result + "\n```\n");
-// });
-
-// const completePrompt = `
-// **Your name is AI and you are a coding assistant. You are helping the user complete the code they are trying to write.**
-
-// Here are the requirements for completing the code:
-
-// - Be polite and respectful in your response.
-// - Only complete the code in the FOCAL CELL.
-// - Do not repeat any code from the PREVIOUS CODE.
-// - Only put the completed code in a function if the user explicitly asks you to, otherwise just complete the code in the FOCAL CELL.
-// - Provide code that is intelligent, correct, efficient, and readable.
-// - If you are not sure about something, don't guess.
-// - Keep your responses short and to the point.
-// - Provide your code and completions formatted as markdown code blocks.
-// - Never refer to yourself as "AI", you are a coding assistant.
-// - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
-// - Briefly summarise the new code you wrote at the end of your response.
-
-// *Focal cell:*
-
-// \`\`\`
-// {{focalcode_text}}
-// \`\`\`
-
-// **AI: Happy to complete the code for you, here it is:**
-// `;
-
-// const explainPrompt = `
-// **Your name is AI and you are a coding assistant. You are helping the user understand the code in the FOCAL CELL by explaining it.**
-
-// Here are the requirements for your explanation:
-
-// - Be polite and respectful to the person who wrote the code.
-// - Explain the code in the FOCAL CELL as clearly as possible.
-// - If you are not sure about something, don't guess.
-// - Keep your responses short and to the point.
-// - Never refer to yourself as "AI", you are a coding assistant.
-// - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
-// - Use markdown to format your response where possible.
-// - If reasonable, provide a line-by-line explanation of the code using markdown formatting and clearly labelled inline comments.
-
-// **Here is the background information about the code:**
-
-// *Current Python code:*
-
-// \`\`\`
-// {{fakecode_text}}
-// \`\`\`
-
-// *Focal cell:*
-
-// \`\`\`
-// {{focalcode_text}}
-// \`\`\`
-
-// *STDOUT of focal cell:*
-
-// \`\`\`
-// {{stdout_text}}
-// \`\`\`
-
-// *Result of focal cell:*
-
-// \`\`\`
-// {{result_text}}
-// \`\`\`
-
-// **AI: Happy to explain the code to you, here is my explanation:**
-// `;
-
-// const formatPrompt = `
-// **Your name is AI and you are a coding assistant. You are helping the user to improve the code formatting of their FOCAL CELL.**
-
-// Here are the requirements for improving the formatting of the code:
-
-// - Be polite and respectful to the person who wrote the code.
-// - Never alter the code itself, only improve the formatting.
-// - Do not include import statements in your response, only the code itself.
-// - Improvements that you need to make where possible:
-//     - Add comments to explain what the code is doing.
-//     - Improve the spacing of the code to make it easier to read.
-//     - Add docstrings to functions and classes.
-//     - Add type hints to variables and functions.
-// - Only put the formatting code in a function if the original code was in a function, otherwise just improve the formatting of the code in the FOCAL CELL.
-// - If you are not sure about something, don't guess.
-// - Keep your responses short and to the point.
-// - First respond by providing the code with improved formatting in a markdown code block.
-// - Never refer to yourself as "AI", you are a coding assistant.
-// - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
-// - Briefly list the formatting improvements that you made at the end.
-
-// **Here is the background information about the code:**
-
-// *Focal cell:*
-
-// \`\`\`
-// {{focalcode_text}}
-// \`\`\`
-
-// **AI: Happy to improve the formatting of your code, here it is:**
-// `;
-
-// const debugPrompt = `
-// **Your name is AI and you are a coding assistant. You are helping the user to debug a code issue in their FOCAL CELL.**
-
-// Here are the requirements for debugging:
-
-// - Be polite and respectful to the person who wrote the code.
-// - Describe the problem in the FOCAL CELL as clearly as possible.
-// - Explain why the code is not working and/or throwing an error.
-// - Explain how to fix the problem.
-// - If you are not sure about something, don't guess.
-// - Keep your responses short and to the point.
-// - Provide your explanation and solution formatted as markdown where possible.
-// - Never refer to yourself as "AI", you are a coding assistant.
-// - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
-
-// **Here is the background information about the code:**
-
-// *Focal cell:*
-
-// \`\`\`
-// {{focalcode_text}}
-// \`\`\`
-
-// *STDERR of focal cell:*
-
-// \`\`\`
-// {{stderr_text}}
-// \`\`\`
-
-// **AI: Sorry to hear you are experiencing problems, let me help you with that:**
-// `;
-
-// const reviewPrompt = `
-// **Your name is AI and you are a code reviewer reviewing the code in the FOCAL CELL.**
-
-// Here are the requirements for reviewing code:
-
-// - Be constructive and suggest improvements where helpful.
-// - Do not include compliments or summaries of the code.
-// - Do not comment on code that is not in the focal cell.
-// - You don't know the code that comes after the cell, so don't recommend anything regarding unused variables.
-// - Ignore suggestions related to imports.
-// - Try to keep your comments short and to the point.
-// - When providing a suggestion in your list, reference the line(s) of code that you are referring to in a markdown code block right under each comment.
-// - Do not end your response with the updated code.
-// - If you are not sure about something, don't comment on it.
-// - Provide your suggestions formatted as markdown where possible.
-// - Never refer to yourself as "AI", you are a coding assistant.
-// - Never ask the user for a follow up. Do not include pleasantries at the end of your response.
-
-// **Here is is the background information about the code:**
-
-// *Focal cell:*
-// \`\`\`
-// {{focalcode_text}}
-// \`\`\`
-
-// **AI: Happy to review your code, here is a list with my suggestions and recommendations for your code. I will include a copy of the code I am referring to in a code block whenever possible.:**
-// `;
-
-const aiPrompt = `
-**Your name is AI and you are a good tutor. You are helping the user with their task.**
-Here is the task or question that the user is asking you:
-`;
-promptTemplate.AddAction('ai', aiPrompt, 'AI');
-
-const chatPrompt = `
-**Your name is AI and you are a good tutor. You are helping the user with their task.**
-`;
-promptTemplate.AddRole('chat', chatPrompt, 'Chat');
-
-// const pythonPromt = `
-// You are a data scientist.You are good at coding Pythonic style Python in Jupyter Notebook. When I give you a task, try to generate pure Python code to solve it.
-// You may add comments within code, but do not explain out of code.
-// *Current Python code:*
-// \`\`\`
-// {{fakecode_text}}
-// \`\`\`
-
-// Here is the task or question that the user is asking you:
-// {{cell_text}}
-// `;
-
-const all2EnglishPrompt = `
-I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more
-beautiful and elegant, upper level English words and sentences.
-Keep the meaning same, but make them more literary.
-I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-Here is the sentence for you:
-`;
-promptTemplate.AddAction('2e', all2EnglishPrompt, 'to English');
-
-const all2ChinesePrompt = `
-I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more
-beautiful and elegant, upper level Chinese words and sentences.
-Keep the meaning same, but make them more literary.
-I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-Here is the sentence for you:
-`;
-promptTemplate.AddAction('2c', all2ChinesePrompt, 'to Chinese');
-
-const all2MotherLanguagePrompt = `
-I want you to act as an translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-translate it and answer in the corrected and improved version of my text, in MY MOTHERLANGURAGE. I want you to replace my simplified A0-level words and sentenceswith more
-beautiful and elegant, upper level words and sentences.
-Keep the meaning same, but make them more literary.
-I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-Here is the sentence for you:
-`;
-promptTemplate.AddAction(
-  '2m',
-  all2MotherLanguagePrompt,
-  'to my mother language'
-);
-
-const refineryPrompt = `
-I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language,
-correct it and explain the mistakes I made.
-Here is the sentence for you:
-`;
-promptTemplate.AddAction('refine', refineryPrompt, 'Refine');
-
-const NewYorkGirlPrompt = `
-I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
-promptTemplate.AddAction('Ana', NewYorkGirlPrompt, 'Ana(US)');
-
-const LondonGirlPrompt = `
-I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
-promptTemplate.AddAction('Maisie', LondonGirlPrompt, 'Maisie(UK)');
-
-const HongKongBoyPrompt = `
-I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
-promptTemplate.AddAction('Max', HongKongBoyPrompt, 'Max(HK)');
-
-const ZhuGeLiangPrompt = `
-我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
-promptTemplate.AddAction('諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
-
-const SunWuKongPrompt = `
-我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
-promptTemplate.AddAction('孫悟空', SunWuKongPrompt, '孫悟空');
-
 export {
   ChatCompletionRequestMessage as ChatCompletionRequestMessage,
   promptTemplate

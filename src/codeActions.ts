@@ -240,20 +240,30 @@ function action_defineRole(code: string): Promise<IActionResult> {
         }
       }
 
-      promptTemplate.AddRole(
+      const theTemplate = promptTemplate.AddRole(
         innerlines[0],
         remainingPart,
         innerlines[0],
         iconURL
       );
 
+      const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
+
+      const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
+
+      // debugger();
+
       const allActions = getAllPromptTemplates();
       return Promise.resolve({
         outputResult:
           '<p> The role ' +
           innerlines[0] +
-          ' has been defined.</p>' +
-          '<p>FYI: The current list is as the following:</p><p>' +
+          ' has been defined.</p><p>' +
+          '**' +
+          md_displayName +
+          '**' +
+          md_iconURL +
+          ':</p><p>FYI: The current list is as the following:</p><p>' +
           allActions +
           '</p>',
         outputFormat: 'text/markdown',
@@ -281,20 +291,30 @@ function action_defineAction(code: string): Promise<IActionResult> {
         }
       }
 
-      promptTemplate.AddRole(
+      const theTemplate = promptTemplate.AddRole(
         innerlines[0],
         remainingPart,
         innerlines[0],
         iconURL
       );
 
+      const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
+
+      const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
+
+      // debugger();
+
       const allActions = getAllPromptTemplates();
       return Promise.resolve({
         outputResult:
           '<p> The action ' +
           innerlines[0] +
-          ' has been defined.</p>' +
-          '<p>FYI: The current list is as the following:</p><p>' +
+          ' has been defined.</p><p>' +
+          '**' +
+          md_displayName +
+          '**' +
+          md_iconURL +
+          ':</p><p>FYI: The current list is as the following:</p><p>' +
           allActions +
           '</p>',
         outputFormat: 'text/markdown',
@@ -310,21 +330,24 @@ function action_defineUser(code: string): Promise<IActionResult> {
 
   if (code.trim().toLowerCase().startsWith(prefix)) {
     const innerCode = code.trim().substring(prefix.length);
-
-    if (user.fromJson(innerCode)) {
-      return Promise.resolve({
-        outputResult: '<p> The current user has been defined.</p>',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
-    } else {
-      return Promise.resolve({
-        outputResult:
-          '<p> The user define is invalid. Please check the JSON format in an online JSON viewer.</p>',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
+    try {
+      if (user.fromJson(innerCode)) {
+        return Promise.resolve({
+          outputResult: '<p> The current user has been defined.</p>',
+          outputFormat: 'text/markdown',
+          isProcessed: true
+        });
+      }
+    } catch (error: any) {
+      console.error(error);
     }
+
+    return Promise.resolve({
+      outputResult:
+        '<p> The user define is invalid. Please check the JSON format in an online JSON viewer.</p>',
+      outputFormat: 'text/markdown',
+      isProcessed: true
+    });
   }
   return inChainedCodeAction.notProcessed();
 }
