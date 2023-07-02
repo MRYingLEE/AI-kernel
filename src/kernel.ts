@@ -169,14 +169,14 @@ export class ChatKernel extends BaseKernel {
     } else if (actions.length === 1) {
       const theTemplateName = actions[0].substring(1);
 
-      if (!promptTemplate.globalTemplates[theTemplateName]) {
+      if (!promptTemplate.get_global_templates()[theTemplateName]) {
         let errorMsg =
           'The action ' +
           theTemplateName +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-        for (const key in promptTemplate.globalTemplates) {
-          if (promptTemplate.globalTemplates[key] === undefined) {
+        for (const key in promptTemplate.get_global_templates()) {
+          if (promptTemplate.get_global_templates()[key] === undefined) {
             continue;
           }
           errorMsg += '\n' + key;
@@ -184,7 +184,9 @@ export class ChatKernel extends BaseKernel {
         return this.publishMarkDownMessage(errorMsg);
       } else {
         if (pureMessage.trim().length === 0) {
-          promptTemplate.globalTemplates[theTemplateName].startNewSession();
+          promptTemplate
+            .get_global_templates()
+            [theTemplateName].startNewSession();
           return this.publishMarkDownMessage(
             'The chat history with ' +
               theTemplateName +
@@ -215,10 +217,9 @@ export class ChatKernel extends BaseKernel {
     } else {
       // The mentioned actions, which are critical to the following processing
       MyConsole.table(actions);
-      const p =
-        promptTemplate.globalTemplates[theTemplateName].buildMessages2send(
-          statuses
-        );
+      const p = promptTemplate
+        .get_global_templates()
+        [theTemplateName].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }
@@ -249,10 +250,10 @@ export class ChatKernel extends BaseKernel {
       const response = completion.data.choices[0].message?.content ?? '';
       //Todo: We should check the response carefully
 
-      let theTemplate = promptTemplate.globalTemplates['ai'];
+      let theTemplate = promptTemplate.get_global_templates()['ai'];
 
-      if (promptTemplate.globalTemplates[theTemplateName]) {
-        theTemplate = promptTemplate.globalTemplates[theTemplateName];
+      if (promptTemplate.get_global_templates()[theTemplateName]) {
+        theTemplate = promptTemplate.get_global_templates()[theTemplateName];
       }
       //To add the prompt message here
       theTemplate.addMessage(

@@ -220,7 +220,7 @@ class promptTemplate implements IPromptTemplateProps {
 
     if (this.iconURL.trim().length > 0) {
       md_iconURL =
-        '![' + this.get_Markdown_DisplayName + '](' + this.iconURL + ')';
+        '![' + this.get_Markdown_DisplayName() + '](' + this.iconURL + ')';
     }
     return md_iconURL;
   }
@@ -356,50 +356,39 @@ class promptTemplate implements IPromptTemplateProps {
     messages2send.push(msg2send);
     return { messages2send, usrContent };
   }
+  static _global_templates: { [id: string]: promptTemplate } = {};
 
-  static globalTemplates: { [id: string]: promptTemplate } = {};
+  static get_global_templates(): { [id: string]: promptTemplate } {
+    if (Object.keys(this._global_templates).length === 0) {
+      promptTemplate.addDefaultTemplates();
+    }
+    return this._global_templates;
+  }
 
-  static AddRole(
+  static AddTemplate(
     roleID: string,
     roleDefine: string,
     displayName: string,
+    withMemory: boolean,
     iconURL?: string
   ): promptTemplate | undefined {
     try {
       const template = new promptTemplate(
         roleID,
         displayName,
-        roleDefine + '\n{{ self_introduction }}',
+        '{{ self_introduction }}\n' + roleDefine,
         '{{cell_text}}',
         'Handlebars',
-        true,
+        withMemory,
         iconURL
       );
 
-      promptTemplate.globalTemplates[roleID] = template;
-      return template;
-    } catch (error: any) {
-      return undefined;
-    }
-  }
+      MyConsole.debug('new template:', template);
 
-  static AddAction(
-    actionID: string,
-    actionDefine: string,
-    displayName: string,
-    iconURL?: string
-  ): promptTemplate | undefined {
-    try {
-      const template = new promptTemplate(
-        actionID,
-        displayName,
-        '',
-        actionDefine + '\n{{cell_text}}',
-        'Handlebars',
-        false,
-        iconURL
-      );
-      promptTemplate.globalTemplates[actionID] = template;
+      promptTemplate._global_templates[roleID] = template;
+
+      MyConsole.table(promptTemplate._global_templates);
+
       return template;
     } catch (error: any) {
       return undefined;
@@ -588,7 +577,7 @@ class promptTemplate implements IPromptTemplateProps {
     Here is the task or question that the user is asking you:
     `;
 
-    let newTemplte = promptTemplate.AddAction('ai', aiPrompt, 'AI');
+    let newTemplte = promptTemplate.AddTemplate('ai', aiPrompt, 'AI', false);
     if (!newTemplte) {
       console.error('The define of prompt template' + 'AI' + ' failed.');
     }
@@ -596,7 +585,7 @@ class promptTemplate implements IPromptTemplateProps {
     const chatPrompt = `
     **Your name is AI and you are a good tutor. You are helping the user with their task.**
     `;
-    newTemplte = promptTemplate.AddRole('chat', chatPrompt, 'Chat');
+    newTemplte = promptTemplate.AddTemplate('chat', chatPrompt, 'Chat', true);
     if (!newTemplte) {
       console.error('The define of prompt template' + 'Chat' + ' failed.');
     }
@@ -620,10 +609,11 @@ class promptTemplate implements IPromptTemplateProps {
     I want you to only reply the correction, the improvements and nothing else, do not write explanations.
     Here is the sentence for you:
     `;
-    newTemplte = promptTemplate.AddAction(
+    newTemplte = promptTemplate.AddTemplate(
       '2e',
       all2EnglishPrompt,
-      'to English'
+      'to English',
+      false
     );
     if (!newTemplte) {
       console.error('The define of prompt template' + '2e' + ' failed.');
@@ -637,10 +627,11 @@ class promptTemplate implements IPromptTemplateProps {
     I want you to only reply the correction, the improvements and nothing else, do not write explanations.
     Here is the sentence for you:
     `;
-    newTemplte = promptTemplate.AddAction(
+    newTemplte = promptTemplate.AddTemplate(
       '2c',
       all2ChinesePrompt,
-      'to Chinese'
+      'to Chinese',
+      false
     );
     if (!newTemplte) {
       console.error('The define of prompt template' + '2c' + ' failed.');
@@ -654,10 +645,11 @@ class promptTemplate implements IPromptTemplateProps {
     I want you to only reply the correction, the improvements and nothing else, do not write explanations.
     Here is the sentence for you:
     `;
-    newTemplte = promptTemplate.AddAction(
+    newTemplte = promptTemplate.AddTemplate(
       '2m',
       all2MotherLanguagePrompt,
-      'to my mother language'
+      'to my mother language',
+      false
     );
     if (!newTemplte) {
       console.error('The define of prompt template' + '2m' + ' failed.');
@@ -668,24 +660,35 @@ class promptTemplate implements IPromptTemplateProps {
     correct it and explain the mistakes I made.
     Here is the sentence for you:
     `;
-    newTemplte = promptTemplate.AddAction('refine', refineryPrompt, 'Refine');
+    newTemplte = promptTemplate.AddTemplate(
+      'refine',
+      refineryPrompt,
+      'Refine',
+      false
+    );
     if (!newTemplte) {
       console.error('The define of prompt template' + 'Refine' + ' failed.');
     }
 
     const NewYorkGirlPrompt = `
     I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
-    newTemplte = promptTemplate.AddRole('Ana', NewYorkGirlPrompt, 'Ana(US)');
+    newTemplte = promptTemplate.AddTemplate(
+      'Ana',
+      NewYorkGirlPrompt,
+      'Ana(US)',
+      true
+    );
     if (!newTemplte) {
       console.error('The define of prompt template' + 'Ana(US)' + ' failed.');
     }
 
     const LondonGirlPrompt = `
     I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
-    newTemplte = promptTemplate.AddRole(
+    newTemplte = promptTemplate.AddTemplate(
       'Maisie',
       LondonGirlPrompt,
-      'Maisie(UK)'
+      'Maisie(UK)',
+      true
     );
     if (!newTemplte) {
       console.error(
@@ -695,21 +698,36 @@ class promptTemplate implements IPromptTemplateProps {
 
     const HongKongBoyPrompt = `
     I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
-    newTemplte = promptTemplate.AddRole('Max', HongKongBoyPrompt, 'Max(HK)');
+    newTemplte = promptTemplate.AddTemplate(
+      'Max',
+      HongKongBoyPrompt,
+      'Max(HK)',
+      true
+    );
     if (!newTemplte) {
       console.error('The define of prompt template' + 'Max(HK)' + ' failed.');
     }
 
     const ZhuGeLiangPrompt = `
     我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
-    newTemplte = promptTemplate.AddRole('諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
+    newTemplte = promptTemplate.AddTemplate(
+      '諸葛亮',
+      ZhuGeLiangPrompt,
+      '諸葛亮',
+      true
+    );
     if (!newTemplte) {
       console.error('The define of prompt template' + '諸葛亮' + ' failed.');
     }
 
     const SunWuKongPrompt = `
     我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
-    newTemplte = promptTemplate.AddRole('孫悟空', SunWuKongPrompt, '孫悟空');
+    newTemplte = promptTemplate.AddTemplate(
+      '孫悟空',
+      SunWuKongPrompt,
+      '孫悟空',
+      true
+    );
     if (!newTemplte) {
       console.error('The define of prompt template' + '孫悟空' + ' failed.');
     }

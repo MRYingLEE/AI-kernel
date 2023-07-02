@@ -18,7 +18,7 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-// const template = promptTemplate.globalTemplates[templateName];
+// const template = promptTemplate.get_global_templates()[templateName];
 
 // if (focalcode_text.toLowerCase().startsWith('/clear')) {
 //   if (template !== null) {
@@ -45,8 +45,8 @@ import { MyConsole } from './debugMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
-  for (const key in promptTemplate.globalTemplates) {
-    if (!promptTemplate.globalTemplates[key]) {
+  for (const key in promptTemplate.get_global_templates()) {
+    if (!promptTemplate.get_global_templates()[key]) {
       continue;
     }
     allActions += '\n' + key;
@@ -170,7 +170,9 @@ async function action_SetKey(code: string): Promise<IActionResult> {
         /*
                 Here, we try to compile all promptTamplests
                 */
-        for (const element of Object.values(promptTemplate.globalTemplates)) {
+        for (const element of Object.values(
+          promptTemplate.get_global_templates()
+        )) {
           try {
             element.f_sysTemplate = Handlebars.compile(
               element.systemMessageTemplate
@@ -223,9 +225,12 @@ function action_list(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
-function action_defineRole(code: string): Promise<IActionResult> {
-  const prefix = '/role:';
-
+function definePromptTemplate(
+  code: string,
+  prefix: string,
+  promptKind: string,
+  withMemory: boolean
+): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith(prefix)) {
     const innerCode = code.trim().substring(prefix.length);
     const innerlines = innerCode.split('\n');
@@ -234,37 +239,38 @@ function action_defineRole(code: string): Promise<IActionResult> {
       const define = innerlines.slice(1).join('\n');
       const { urls, remainingPart } = extractURLs(define);
       let iconURL = '';
-      if (urls?.length ?? 0 > 0) {
-        if (urls) {
+      if (urls) {
+        if (urls.length > 0) {
           iconURL = urls[0];
         }
       }
 
-      const theTemplate = promptTemplate.AddRole(
+      const theTemplate = promptTemplate.AddTemplate(
         innerlines[0],
         remainingPart,
         innerlines[0],
+        withMemory,
         iconURL
       );
-
+      // debugger;
       const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
 
       const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
 
-      // debugger();
-
-      const allActions = getAllPromptTemplates();
+      const allTemplates = getAllPromptTemplates();
       return Promise.resolve({
         outputResult:
-          '<p> The role ' +
+          '<p> The ' +
+          promptKind +
+          ' ' +
           innerlines[0] +
           ' has been defined.</p><p>' +
           '**' +
           md_displayName +
           '**' +
           md_iconURL +
-          ':</p><p>FYI: The current list is as the following:</p><p>' +
-          allActions +
+          ':</p><p>FYI: The current prompt templates (roles/actions) are as the following:</p><p>' +
+          allTemplates +
           '</p>',
         outputFormat: 'text/markdown',
         isProcessed: true
@@ -273,56 +279,20 @@ function action_defineRole(code: string): Promise<IActionResult> {
   }
   return inChainedCodeAction.notProcessed();
 }
+function action_defineRole(code: string): Promise<IActionResult> {
+  const prefix = '/role:';
+  const promptKind = 'role';
+  const withMemory = true;
+
+  return definePromptTemplate(code, prefix, promptKind, withMemory);
+}
 
 function action_defineAction(code: string): Promise<IActionResult> {
   const prefix = '/action:';
+  const promptKind = 'action';
+  const withMemory = false;
 
-  if (code.trim().toLowerCase().startsWith(prefix)) {
-    const innerCode = code.trim().substring(prefix.length);
-    const innerlines = innerCode.split('\n');
-
-    if (innerlines.length > 1) {
-      const define = innerlines.slice(1).join('\n');
-      const { urls, remainingPart } = extractURLs(define);
-      let iconURL = '';
-      if (urls?.length ?? 0 > 0) {
-        if (urls) {
-          iconURL = urls[0];
-        }
-      }
-
-      const theTemplate = promptTemplate.AddRole(
-        innerlines[0],
-        remainingPart,
-        innerlines[0],
-        iconURL
-      );
-
-      const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
-
-      const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
-
-      // debugger();
-
-      const allActions = getAllPromptTemplates();
-      return Promise.resolve({
-        outputResult:
-          '<p> The action ' +
-          innerlines[0] +
-          ' has been defined.</p><p>' +
-          '**' +
-          md_displayName +
-          '**' +
-          md_iconURL +
-          ':</p><p>FYI: The current list is as the following:</p><p>' +
-          allActions +
-          '</p>',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
-    }
-  }
-  return inChainedCodeAction.notProcessed();
+  return definePromptTemplate(code, prefix, promptKind, withMemory);
 }
 
 function action_defineUser(code: string): Promise<IActionResult> {
