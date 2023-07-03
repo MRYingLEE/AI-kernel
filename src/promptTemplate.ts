@@ -358,10 +358,12 @@ class promptTemplate implements IPromptTemplateProps {
     return { messages2send, usrContent };
   }
   static _global_templates: { [id: string]: promptTemplate } = {};
-
+  static _initialized = false;
   static get_global_templates(): { [id: string]: promptTemplate } {
-    if (Object.keys(promptTemplate._global_templates).length === 0) {
+    if (!promptTemplate._initialized) {
+      // to make sure it is initialized
       promptTemplate.addDefaultTemplates();
+      promptTemplate._initialized = true;
     }
     return this._global_templates;
   }
@@ -591,6 +593,10 @@ class promptTemplate implements IPromptTemplateProps {
   // `;
 
   static addDefaultTemplates(): void {
+    // To avoid duplicate
+    if (promptTemplate._initialized) {
+      return;
+    }
     const aiPrompt = `
     **Your name is AI and you are a good tutor. You are helping the user with their task.**
     Here is the task or question that the user is asking you:
@@ -749,6 +755,30 @@ class promptTemplate implements IPromptTemplateProps {
     );
     if (!newTemplte) {
       console.error('The define of prompt template' + '孫悟空' + ' failed.');
+    }
+
+    /*
+                Here, we try to compile all promptTamplests
+                */
+
+    for (const element of Object.values(
+      promptTemplate.get_global_templates()
+    )) {
+      try {
+        element.f_sysTemplate = Handlebars.compile(
+          element.systemMessageTemplate
+        );
+      } catch {
+        element.f_sysTemplate = undefined;
+      }
+
+      try {
+        element.f_userTemplate = Handlebars.compile(
+          element.userMessageTemplate
+        );
+      } catch {
+        element.f_userTemplate = undefined;
+      }
     }
   }
 }

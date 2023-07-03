@@ -66,7 +66,8 @@ export class ChatKernel extends BaseKernel {
       implementation_version: '0.1.0',
       language_info: {
         codemirror_mode: {
-          name: 'text/plain'
+          name: 'text/javascript', //'text/plain'-- To make sure wordwrap is enabled
+          lineWrapping: true
         },
         file_extension: '.txt',
         mimetype: 'text/plain',
@@ -237,6 +238,10 @@ export class ChatKernel extends BaseKernel {
           messages: messages2send
         });
       } else {
+        //Todo: 1. To add delay at the 1st fail.
+        //Todo: 2. extend the delay when the code is too old
+        //Todo: 3. log the retry times
+        //Todo: 4. extend delay after too much consumption
         completion = await backOff(() =>
           OpenAIDriver.globalOpenAI.createChatCompletion({
             model: 'gpt-3.5-turbo-0613',
