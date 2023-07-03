@@ -67,7 +67,8 @@ export class ChatKernel extends BaseKernel {
       language_info: {
         codemirror_mode: {
           name: 'text/javascript', //'text/plain'-- To make sure wordwrap is enabled
-          lineWrapping: true
+          lineWrapping: true,
+          spellcheck: true
         },
         file_extension: '.txt',
         mimetype: 'text/plain',

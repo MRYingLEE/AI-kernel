@@ -761,9 +761,7 @@ class promptTemplate implements IPromptTemplateProps {
                 Here, we try to compile all promptTamplests
                 */
 
-    for (const element of Object.values(
-      promptTemplate.get_global_templates()
-    )) {
+    for (const element of Object.values(promptTemplate._global_templates)) {
       try {
         element.f_sysTemplate = Handlebars.compile(
           element.systemMessageTemplate
