@@ -221,7 +221,12 @@ class promptTemplate implements IPromptTemplateProps {
 
     if (this.iconURL.trim().length > 0) {
       md_iconURL =
-        '![' + this.get_Markdown_DisplayName() + '](' + this.iconURL + ')';
+        // '![' + this.get_Markdown_DisplayName() + '](' + this.iconURL + ')';
+        '<img src="' +
+        this.iconURL +
+        '" alt="' +
+        this.get_Markdown_DisplayName() +
+        '">';
     }
     return md_iconURL;
   }

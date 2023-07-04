@@ -66,9 +66,9 @@ export class ChatKernel extends BaseKernel {
       implementation_version: '0.1.0',
       language_info: {
         codemirror_mode: {
-          name: 'text/javascript', //'text/plain'-- To make sure wordwrap is enabled
-          lineWrapping: true,
-          spellcheck: true
+          name: 'javascript' //, //'text/plain'-- To make sure wordwrap is enabled
+          // lineWrapping: true,
+          // spellcheck: true
         },
         file_extension: '.txt',
         mimetype: 'text/plain',
@@ -284,33 +284,27 @@ export class ChatKernel extends BaseKernel {
       const md_displayName = theTemplate.get_Markdown_DisplayName();
 
       // debugger();
+      let json_request = '';
 
       if (MyConsole.inDebug) {
-        return this.publishMarkDownMessage(
+        json_request =
           '**Prompt in JSON:**</p><p>' +
-            '```json\n' +
-            JSON.stringify(messages2send, null, 2) +
-            '\n```' +
-            '</p><p>' +
-            '**' +
-            md_iconURL +
-            '**' +
-            md_displayName +
-            ':' +
-            '</p><p>' +
-            response || ''
-        );
-      } else {
-        return this.publishMarkDownMessage(
-          '**' +
-            md_iconURL +
-            '**' +
-            md_displayName +
-            ':' +
-            '</p><p>' +
-            response || ''
-        );
+          '```json\n' +
+          JSON.stringify(messages2send, null, 2) +
+          '\n```';
       }
+
+      return this.publishMarkDownMessage(
+        json_request +
+          '</p><p>' +
+          '<table><tbody><tr><td align="left"><p><b>' +
+          md_displayName +
+          '</b>' +
+          md_iconURL +
+          '</p></td>' +
+          '<td align="left">' +
+          response || '' + '</td>' + '</tr></tbody></table>'
+      );
     } catch (error: any) {
       return this.publishMarkDownMessage(
         '<p>**Error during createChatCompletion**:' +

@@ -175,7 +175,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
             'OpenAI API Key (' +
             apiKey +
             ') has been assigned.</p>' +
-            '<p>FYI: The current list is as the following:</p><p>' +
+            '<p>FYI: The current available instructions/ roles / characters for AI is as the following:</p><p>' +
             allActions +
             '</p>',
           outputFormat: 'text/markdown',
