@@ -13,7 +13,7 @@ import {
   globalCodeActions
 } from './codeActions';
 import { promptTemplate } from './promptTemplate';
-import { MyConsole } from './debugMode';
+import { MyConsole } from './controlMode';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -293,9 +293,9 @@ export class ChatKernel extends BaseKernel {
             '\n```' +
             '</p><p>' +
             '**' +
-            md_displayName +
-            '**' +
             md_iconURL +
+            '**' +
+            md_displayName +
             ':' +
             '</p><p>' +
             response || ''
@@ -303,9 +303,9 @@ export class ChatKernel extends BaseKernel {
       } else {
         return this.publishMarkDownMessage(
           '**' +
-            md_displayName +
-            '**' +
             md_iconURL +
+            '**' +
+            md_displayName +
             ':' +
             '</p><p>' +
             response || ''

@@ -4,7 +4,7 @@ import {
   ChatCompletionRequestMessageRoleEnum
 } from 'openai';
 import { user } from './user';
-import { MyConsole } from './debugMode';
+import { MyConsole } from './controlMode';
 
 import Handlebars from 'handlebars/lib/handlebars';
 interface IPromptTemplateProps {

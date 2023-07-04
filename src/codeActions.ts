@@ -41,7 +41,7 @@ import { OpenAIDriver } from './driver_openai';
 //Todo: to make sure Handlebars loaded at the beginning
 */
 import Handlebars from 'handlebars/lib/handlebars';
-import { MyConsole } from './debugMode';
+import { MyConsole } from './controlMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
@@ -264,9 +264,9 @@ function action_defineRole(code: string): Promise<IActionResult> {
   return definePromptTemplate(code, prefix, promptKind, withMemory);
 }
 
-function action_defineAction(code: string): Promise<IActionResult> {
-  const prefix = '/action:';
-  const promptKind = 'action';
+function action_defineInstruction(code: string): Promise<IActionResult> {
+  const prefix = '/instruct:';
+  const promptKind = 'instruction';
   const withMemory = false;
 
   return definePromptTemplate(code, prefix, promptKind, withMemory);
@@ -303,6 +303,6 @@ globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));
 globalCodeActions.push(new inChainedCodeAction(action_list, 1));
 globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
 globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
-globalCodeActions.push(new inChainedCodeAction(action_defineAction, 4));
+globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 4));
 
 globalSortedCodeActions();
