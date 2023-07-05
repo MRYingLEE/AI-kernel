@@ -66,12 +66,12 @@ export class ChatKernel extends BaseKernel {
       implementation_version: '0.1.0',
       language_info: {
         codemirror_mode: {
-          name: 'javascript' //, //'text/plain'-- To make sure wordwrap is enabled
+          name: 'markdown' //javascript' //, //'text/plain'-- To make sure wordwrap is enabled
           // lineWrapping: true,
           // spellcheck: true
         },
         file_extension: '.txt',
-        mimetype: 'text/plain',
+        mimetype: 'text/x-markdown', // 'text/plain',
         name: 'chat',
         nbconvert_exporter: 'text',
         pygments_lexer: 'text',
