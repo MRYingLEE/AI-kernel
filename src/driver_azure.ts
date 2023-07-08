@@ -1,21 +1,20 @@
-// import { Exception } from 'handlebars';
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 class OpenAIDriver {
   /*
   We try to init OpenAIApi at the beginning
   */
-  static globalOpenAI: OpenAIApi;
+  static globalOpenAI: OpenAIClient;
   // constructor(apiKey = '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') {
   //   OpenAIDriver.refreshAPIKey(apiKey); // A bug! It is not called.
   // }
+
   static refreshAPIKey(apiKey: string): boolean {
-    const configuration = new Configuration({
-      apiKey: apiKey
-    });
-    delete configuration.baseOptions.headers['User-Agent'];
+    const configuration = new AzureKeyCredential(apiKey);
+    // delete configuration.baseOptions.headers['User-Agent'];
     // To make api can be used in browser instead of a server
-    OpenAIDriver.globalOpenAI = new OpenAIApi(configuration);
+    const endpoint = 'https://ailearn-live.openai.azure.com/';
+    OpenAIDriver.globalOpenAI = new OpenAIClient(endpoint, configuration);
     // Later, we may valid the apiKey
     return true;
   }
