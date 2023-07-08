@@ -33,10 +33,10 @@ method newCaht: to start a new chat template without history.
 //   return [];
 // }
 import { promptTemplate } from './promptTemplate';
-// import { globalOpenAI } from './driver_openai';
+// import { globalOpenAI } from './driver_azure';
 import { user } from './user';
 // import { Configuration, OpenAIApi } from 'openai';
-import { OpenAIDriver } from './driver_openai';
+import { OpenAIDriver } from './driver_azure';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -136,21 +136,20 @@ async function action_SetKey(code: string): Promise<IActionResult> {
         //   MyConsole.log(welcomeTemplate2({ name: user.current_user.name }));
         // }
         try {
-          const completion =
-            await OpenAIDriver.globalOpenAI.createChatCompletion({
-              model: 'gpt-3.5-turbo-0613',
-              messages: [
-                {
-                  role: 'system',
-                  content: 'You are a helpful assistant'
-                },
-                {
-                  role: 'user',
-                  content: user.self_introduction() + '\n Please say hello.'
-                }
-              ]
-            });
-          MyConsole.debug('completion.data', completion.data);
+          const completion = await OpenAIDriver.globalOpenAI.getChatCompletions(
+            'gpt-35-turbo',
+            [
+              {
+                role: 'system',
+                content: 'You are a helpful assistant'
+              },
+              {
+                role: 'user',
+                content: user.self_introduction() + '\n Please say hello.'
+              }
+            ]
+          );
+          MyConsole.debug('completion.data', completion.choices);
         } catch (error: any) {
           return Promise.resolve({
             outputResult:

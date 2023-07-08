@@ -5,8 +5,10 @@ import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 import { extractPersonAndMessage } from './chatSyntax';
 
 import { backOff } from 'exponential-backoff';
-import { OpenAIDriver } from './driver_openai';
-import { ChatCompletionRequestMessage } from 'openai';
+import { OpenAIDriver } from './driver_azure';
+// import { ChatCompletionRequestMessage } from 'openai';
+import { ChatMessage } from '@azure/openai';
+
 import {
   inChainedCodeAction,
   IActionResult,
@@ -209,7 +211,7 @@ export class ChatKernel extends BaseKernel {
       theTemplateName = actions[0].substring(1);
     }
 
-    let messages2send: ChatCompletionRequestMessage[] = [];
+    let messages2send: ChatMessage[] = [];
     let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
@@ -234,20 +236,20 @@ export class ChatKernel extends BaseKernel {
     try {
       let completion: any = null;
       if (MyConsole.inDebug) {
-        completion = await OpenAIDriver.globalOpenAI.createChatCompletion({
-          model: 'gpt-3.5-turbo-0613',
-          messages: messages2send
-        });
+        completion = await OpenAIDriver.globalOpenAI.getChatCompletions(
+          'gpt-35-turbo',
+          messages2send
+        );
       } else {
         //Todo: 1. To add delay at the 1st fail.
         //Todo: 2. extend the delay when the code is too old
         //Todo: 3. log the retry times
         //Todo: 4. extend delay after too much consumption
         completion = await backOff(() =>
-          OpenAIDriver.globalOpenAI.createChatCompletion({
-            model: 'gpt-3.5-turbo-0613',
-            messages: messages2send
-          })
+          OpenAIDriver.globalOpenAI.getChatCompletions(
+            'gpt-35-turbo',
+            messages2send
+          )
         );
       }
 
@@ -307,7 +309,7 @@ export class ChatKernel extends BaseKernel {
       );
     } catch (error: any) {
       return this.publishMarkDownMessage(
-        '<p>**Error during createChatCompletion**:' +
+        '<p>**Error during getChatCompletions**:' +
           error.message +
           '</p><p>**Stack trace**:' +
           error.stack +
