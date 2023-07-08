@@ -6,7 +6,7 @@ import { extractPersonAndMessage } from './chatSyntax';
 
 import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './driver_azure';
-// import { ChatCompletionRequestMessage } from 'openai';
+// import { ChatMessage } from 'openai';
 import { ChatMessage } from '@azure/openai';
 
 import {

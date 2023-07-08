@@ -1,8 +1,7 @@
 // The chat format terms are based on ones of ChatGPT
-import {
-  ChatCompletionRequestMessage,
-  ChatCompletionRequestMessageRoleEnum
-} from 'openai';
+
+import { ChatMessage } from '@azure/openai';
+
 import { user } from './user';
 import { MyConsole } from './controlMode';
 
@@ -57,7 +56,7 @@ function renderTemplate(
 class message {
   template: IPromptTemplateProps; // The prompt template
 
-  msg2send: ChatCompletionRequestMessage; // The real request message to OpenAI service
+  msg2send: ChatMessage; // The real request message to OpenAI service
   // The following section is degested from https://platform.openai.com/docs/api-reference/chat/create (as of June 25)
   /* 
   messages
@@ -92,7 +91,7 @@ class message {
 
   constructor(
     template: IPromptTemplateProps,
-    role: ChatCompletionRequestMessageRoleEnum, //system, user, assistant, or function
+    role: string, //system, user, assistant, or function
     content: string,
     name: string,
     timestamp: Date,
@@ -101,18 +100,11 @@ class message {
   ) {
     // A big supprise is that if the name is '', the request will fail.
     // So we have to make the following adjust following 1 week debugging
-    if (name.trim().length > 0) {
-      this.msg2send = {
-        role: role,
-        content: content,
-        name: name
-      };
-    } else {
-      this.msg2send = {
-        role: role,
-        content: content
-      };
-    }
+
+    this.msg2send = {
+      role: role,
+      content: content
+    };
 
     this.template = template;
 
@@ -233,7 +225,7 @@ class promptTemplate implements IPromptTemplateProps {
 
   //Todo: Should we support a global Message list directly?
   addMessage(
-    Role: ChatCompletionRequestMessageRoleEnum, //'system' | 'user' | 'assistant',
+    Role: string, //'system' | 'user' | 'assistant',
     content: string,
     name: string,
     tokenUsage = 0
@@ -265,10 +257,10 @@ class promptTemplate implements IPromptTemplateProps {
   }
 
   static MaxTokenLimit = 4097; // for GPT-3.5
-  getSessionHistory(currentToken: number): ChatCompletionRequestMessage[] {
+  getSessionHistory(currentToken: number): ChatMessage[] {
     //Todo: A lot of improvement here. 1. Token limit instead of char limit 2. Guarantee the pair of messages are added. 3. Avoid failed user message 4. Retry
 
-    const history: ChatCompletionRequestMessage[] = [];
+    const history: ChatMessage[] = [];
 
     let totalToken = currentToken;
 
@@ -328,14 +320,14 @@ class promptTemplate implements IPromptTemplateProps {
   }
 
   buildMessages2send(statuses: { [key: string]: string }): {
-    messages2send: ChatCompletionRequestMessage[]; //The Request Messages to be sent to ChatGPT
+    messages2send: ChatMessage[]; //The Request Messages to be sent to ChatGPT
     usrContent: string; //The logical user message for the current chat session
   } {
     // MyConsole.debug('statuses:', statuses);
     // MyConsole.debug('this.systemMessageTemplate:', this.systemMessageTemplate);
     // MyConsole.debug('this.userMessageTemplate:', this.userMessageTemplate);
 
-    let messages2send: ChatCompletionRequestMessage[] = [];
+    let messages2send: ChatMessage[] = [];
 
     const sysContent = this.renderSysTemplate(statuses);
     MyConsole.debug('sysContent:', sysContent);
@@ -356,7 +348,7 @@ class promptTemplate implements IPromptTemplateProps {
     }
 
     const msg2send = {
-      role: ChatCompletionRequestMessageRoleEnum.User,
+      role: 'user',
       content: sysContent + '\n' + usrContent
     };
     messages2send.push(msg2send);
@@ -785,7 +777,4 @@ class promptTemplate implements IPromptTemplateProps {
     }
   }
 }
-export {
-  ChatCompletionRequestMessage as ChatCompletionRequestMessage,
-  promptTemplate
-};
+export { ChatMessage as ChatMessage, promptTemplate };
