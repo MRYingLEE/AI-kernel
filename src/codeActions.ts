@@ -114,11 +114,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith('key=')) {
     const apiKey = code.trim().slice('key='.length);
     //The key should have a 20+ length. This one is of ying.li@AILean.live
-    if (
-      apiKey.trim().length ===
-        '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'.length &&
-      apiKey.trim().startsWith('sk-')
-    ) {
+    if (apiKey.trim().length === '644f0583d9464db18a2539ee9683a111'.length) {
       let welcome = 'Welcome';
       /**
        * Test Handlebars
@@ -136,19 +132,20 @@ async function action_SetKey(code: string): Promise<IActionResult> {
         //   MyConsole.log(welcomeTemplate2({ name: user.current_user.name }));
         // }
         try {
-          const completion = await OpenAIDriver.globalOpenAI.getChatCompletions(
-            'gpt-35-turbo',
-            [
-              {
-                role: 'system',
-                content: 'You are a helpful assistant'
-              },
-              {
-                role: 'user',
-                content: user.self_introduction() + '\n Please say hello.'
-              }
-            ]
-          );
+          const completion =
+            await OpenAIDriver.get_globalOpenAI().getChatCompletions(
+              'gpt-35-turbo',
+              [
+                {
+                  role: 'system',
+                  content: 'You are a helpful assistant'
+                },
+                {
+                  role: 'user',
+                  content: user.self_introduction() + '\n Please say hello.'
+                }
+              ]
+            );
           MyConsole.debug('completion.data', completion.choices);
         } catch (error: any) {
           return Promise.resolve({

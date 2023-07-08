@@ -236,7 +236,7 @@ export class ChatKernel extends BaseKernel {
     try {
       let completion: any = null;
       if (MyConsole.inDebug) {
-        completion = await OpenAIDriver.globalOpenAI.getChatCompletions(
+        completion = await OpenAIDriver.get_globalOpenAI().getChatCompletions(
           'gpt-35-turbo',
           messages2send
         );
@@ -246,7 +246,7 @@ export class ChatKernel extends BaseKernel {
         //Todo: 3. log the retry times
         //Todo: 4. extend delay after too much consumption
         completion = await backOff(() =>
-          OpenAIDriver.globalOpenAI.getChatCompletions(
+          OpenAIDriver.get_globalOpenAI().getChatCompletions(
             'gpt-35-turbo',
             messages2send
           )

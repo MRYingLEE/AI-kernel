@@ -8,6 +8,16 @@ class OpenAIDriver {
   // constructor(apiKey = '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') {
   //   OpenAIDriver.refreshAPIKey(apiKey); // A bug! It is not called.
   // }
+  static initialized = false;
+
+  static get_globalOpenAI(): OpenAIClient {
+    if (!OpenAIDriver.initialized) {
+      OpenAIDriver.refreshAPIKey('644f0583d9464db18a2539ee9683a111');
+      OpenAIDriver.initialized = true;
+    }
+
+    return this.globalOpenAI;
+  }
 
   static refreshAPIKey(apiKey: string): boolean {
     const configuration = new AzureKeyCredential(apiKey);
