@@ -253,9 +253,9 @@ export class ChatKernel extends BaseKernel {
         );
       }
 
-      MyConsole.debug('completion.data', completion.data);
+      MyConsole.table('completion.choices', completion.choices);
 
-      const response = completion.data.choices[0].message?.content ?? '';
+      const response = completion.choices[0].message?.content ?? '';
       //Todo: We should check the response carefully
 
       let theTemplate = promptTemplate.get_global_templates()['ai'];
@@ -268,14 +268,14 @@ export class ChatKernel extends BaseKernel {
         'user',
         usrContent,
         '',
-        completion.data.usage?.prompt_tokens || 0
+        completion.usage?.prompt_tokens || 0
       );
       //To add the completion message here
       theTemplate.addMessage(
         'assistant',
         response || '',
         '',
-        completion.data.usage?.completion_tokens || 0
+        completion.usage?.completion_tokens || 0
       );
       if (theTemplate.withMemory) {
         theTemplate.newSession = false;
