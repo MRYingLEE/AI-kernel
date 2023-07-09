@@ -281,6 +281,19 @@ export class ChatKernel extends BaseKernel {
         theTemplate.newSession = false;
       }
 
+      // To process error in completion
+      const error = completion.choices[0].finishReason;
+
+      if (error === 'tokenLimitReached') {
+        return this.publishMarkDownMessage(
+          'The token Limit Reached error happened. You may wait for a few seconds and try again.'
+        );
+      } else if (error === 'contentFiltered') {
+        return this.publishMarkDownMessage(
+          'The Content Filtered error happened in your input or the generated response. You may change your input and try again.'
+        );
+      }
+
       const md_iconURL = theTemplate.get_Markdown_iconURL();
 
       const md_displayName = theTemplate.get_Markdown_DisplayName();
