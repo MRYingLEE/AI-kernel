@@ -195,7 +195,7 @@ function msg(...args: string[]) {
 }
 
 function action_stream(code: string): Promise<IActionResult> {
-  if (code.trim().toLowerCase() === '/stream') {
+  if (code.trim().toLowerCase().startsWith('/stream')) {
     const value = code.trim().slice('/stream'.length);
     const delay = 5000;
     for (const char of value) {
