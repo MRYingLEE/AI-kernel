@@ -300,6 +300,6 @@ globalCodeActions.push(new inChainedCodeAction(action_list, 1));
 globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
 globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
 globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 4));
-globalCodeActions.push(new inChainedCodeAction(action_stream, 5));
+// globalCodeActions.push(new inChainedCodeAction(action_stream, 5));
 
 globalSortedCodeActions();
