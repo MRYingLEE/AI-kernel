@@ -183,36 +183,6 @@ async function action_SetKey(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
-function msg(...args: string[]) {
-  const bundle = {
-    name: 'stdout',
-    text: args.join(' ') + '\n'
-  };
-  postMessage({
-    type: 'stream',
-    bundle
-  });
-}
-
-function action_stream(code: string): Promise<IActionResult> {
-  if (code.trim().toLowerCase().startsWith('/stream')) {
-    const value = code.trim().slice('/stream'.length);
-    const delay = 5000;
-    for (const char of value) {
-      msg(char);
-      setTimeout(() => {
-        console.debug('done:', char);
-      }, delay);
-    }
-    return Promise.resolve({
-      outputResult: '\nStream is over.',
-      outputFormat: 'text/markdown',
-      isProcessed: true
-    });
-  }
-  return inChainedCodeAction.notProcessed();
-}
-
 function action_list(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase() === '/list') {
     const allActions = getAllPromptTemplates();
