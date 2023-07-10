@@ -25,44 +25,6 @@ import { MyConsole } from './controlMode';
  * A kernel that chats with OpenAI.
  */
 export class ChatKernel extends BaseKernel {
-  action_debug(code: string): Promise<IActionResult> {
-    if (code.trim() === '/debug:AILive.live') {
-      MyConsole.inDebug = !MyConsole.inDebug;
-      const mode = MyConsole.inDebug ? 'enabled' : 'disbaled';
-      return Promise.resolve({
-        outputResult: '<p>**Now debug is ' + mode + '**</p>',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
-    }
-    return Promise.resolve({
-      outputResult: '',
-      outputFormat: 'text/markdown',
-      isProcessed: false
-    });
-  }
-
-  action_stream(code: string): Promise<IActionResult> {
-    if (code.trim().toLowerCase().startsWith('/stream')) {
-      const value = code.trim().slice('/stream'.length);
-      const delay = 5000;
-      for (const char of value) {
-        this.stream(
-          { name: 'stdout', text: 'char: ' + char + '\n' },
-          this.parentHeader
-        );
-        setTimeout(() => {
-          console.debug('done:', char);
-        }, delay);
-      }
-      return Promise.resolve({
-        outputResult: '\nStream is over.',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
-    }
-    return inChainedCodeAction.notProcessed();
-  }
   /**
    * Instantiate a new JavaScriptKernel
    *
@@ -70,8 +32,6 @@ export class ChatKernel extends BaseKernel {
    */
   constructor(options: ChatKernel.IOptions) {
     super(options);
-    globalCodeActions.push(new inChainedCodeAction(this.action_stream, 998));
-    globalCodeActions.push(new inChainedCodeAction(this.action_debug, 999));
   }
 
   /**
@@ -177,6 +137,29 @@ export class ChatKernel extends BaseKernel {
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     const cell_text = content.code;
+
+    // action_stream(code: string): Promise<IActionResult> {
+    if (cell_text.trim().toLowerCase().startsWith('/stream')) {
+      const value = cell_text.trim().slice('/stream'.length);
+      const delay = 5000;
+      for (const char of value) {
+        this.stream(
+          { name: 'stdout', text: 'char: ' + char + '\n' },
+          this.parentHeader
+        );
+        setTimeout(() => {
+          console.debug('done:', char);
+        }, delay);
+      }
+      // return Promise.resolve({
+      //   outputResult: '\nStream is over.',
+      //   outputFormat: 'text/markdown',
+      //   isProcessed: true
+      // });
+      this.publishMessage('\nStream is over.', 'text/markdown');
+    }
+    // return inChainedCodeAction.notProcessed();
+    // }
 
     //To process in chaned actions in turn, ususally non-AI actions
 

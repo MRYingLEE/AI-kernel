@@ -295,11 +295,29 @@ function action_defineUser(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
+function action_debug(code: string): Promise<IActionResult> {
+  if (code.trim() === '/debug:AILive.live') {
+    MyConsole.inDebug = !MyConsole.inDebug;
+    const mode = MyConsole.inDebug ? 'enabled' : 'disbaled';
+    return Promise.resolve({
+      outputResult: '<p>**Now debug is ' + mode + '**</p>',
+      outputFormat: 'text/markdown',
+      isProcessed: true
+    });
+  }
+  return Promise.resolve({
+    outputResult: '',
+    outputFormat: 'text/markdown',
+    isProcessed: false
+  });
+}
+
 globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));
 globalCodeActions.push(new inChainedCodeAction(action_list, 1));
 globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
 globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
 globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 4));
+globalCodeActions.push(new inChainedCodeAction(action_debug, 5));
 // globalCodeActions.push(new inChainedCodeAction(action_stream, 5));
 
 globalSortedCodeActions();
