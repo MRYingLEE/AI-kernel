@@ -183,6 +183,36 @@ async function action_SetKey(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
+function msg(...args: string[]) {
+  const bundle = {
+    name: 'stdout',
+    text: args.join(' ') + '\n'
+  };
+  postMessage({
+    type: 'stream',
+    bundle
+  });
+}
+
+function action_stream(code: string): Promise<IActionResult> {
+  if (code.trim().toLowerCase() === '/stream') {
+    const value = code.trim().slice('/stream'.length);
+    const delay = 5000;
+    for (const char of value) {
+      msg(char);
+      setTimeout(() => {
+        console.debug('done:', char);
+      }, delay);
+    }
+    return Promise.resolve({
+      outputResult: '\nStream is over.',
+      outputFormat: 'text/markdown',
+      isProcessed: true
+    });
+  }
+  return inChainedCodeAction.notProcessed();
+}
+
 function action_list(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase() === '/list') {
     const allActions = getAllPromptTemplates();
@@ -300,5 +330,6 @@ globalCodeActions.push(new inChainedCodeAction(action_list, 1));
 globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
 globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
 globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 4));
+globalCodeActions.push(new inChainedCodeAction(action_stream, 5));
 
 globalSortedCodeActions();
