@@ -42,19 +42,15 @@ export class ChatKernel extends BaseKernel {
     });
   }
 
-  msg(...args: string[]): void {
-    this.stream(
-      { name: 'stdout', text: args.join(' ') + '\n' },
-      this.parentHeader
-    );
-  }
-
   action_stream(code: string): Promise<IActionResult> {
     if (code.trim().toLowerCase().startsWith('/stream')) {
       const value = code.trim().slice('/stream'.length);
       const delay = 5000;
       for (const char of value) {
-        this.msg(char);
+        this.stream(
+          { name: 'stdout', text: 'char: ' + char + '\n' },
+          this.parentHeader
+        );
         setTimeout(() => {
           console.debug('done:', char);
         }, delay);
