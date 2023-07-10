@@ -9,11 +9,7 @@ import { OpenAIDriver } from './driver_azure';
 // import { ChatMessage } from 'openai';
 import { ChatMessage } from '@azure/openai';
 
-import {
-  inChainedCodeAction,
-  IActionResult,
-  globalCodeActions
-} from './codeActions';
+import { globalCodeActions } from './codeActions';
 import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './controlMode';
 /*
