@@ -64,8 +64,10 @@ jobs:
         python -m build --wheel
         cp dist/*.whl .
         sudo apt-get install zip
-        zip -j aikernel-wheel.zip *.whl
-        
+        pwd
+        ls
+        zip -j aikernel.zip ./*.whl
+
         pip uninstall -y aikernel jupyterlab
         
     # - name: Stamp js sourcemaps
@@ -95,7 +97,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
           name: aikernel
-          path: aikernel-wheel.zip
+          path: aikernel.zip
 
     # - name: Pushes test file
     #   uses: antoineVIVIES/copy_file_to_another_repo_action@main
