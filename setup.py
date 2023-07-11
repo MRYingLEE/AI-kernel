@@ -1,5 +1,5 @@
 """
-jupyterlite_chat_kernel setup
+jupyterlite_ai_kernel setup
 """
 import json
 import sys
@@ -10,7 +10,7 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The name of the project
-name = "jupyterlite-chat-kernel"
+name = "jupyterlite-ai-kernel"
 
 lab_path = (HERE / name.replace("-", "_") / "labextension")
 
@@ -20,7 +20,7 @@ ensured_targets = [
     str(lab_path / "static/style.js")
 ]
 
-labext_name = "@jupyterlite/chat-kernel"
+labext_name = "@jupyterlite/ai-kernel"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path.relative_to(HERE)), "**"),

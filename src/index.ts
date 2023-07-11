@@ -8,20 +8,20 @@ import {
 
 import { IKernel, IKernelSpecs } from '@jupyterlite/kernel';
 
-import { ChatKernel } from './kernel';
+import { AIKernel } from './kernel';
 
 /**
- * A plugin to register the chat kernel.
+ * A plugin to register the ai kernel.
  */
 const kernel: JupyterLiteServerPlugin<void> = {
-  id: '@jupyterlite/chat-kernel:kernel',
+  id: '@jupyterlite/ai-kernel:kernel',
   autoStart: true,
   requires: [IKernelSpecs],
   activate: (app: JupyterLiteServer, kernelspecs: IKernelSpecs) => {
     kernelspecs.register({
       spec: {
-        name: 'chat',
-        display_name: 'Chat',
+        name: 'AI',
+        display_name: 'AI',
         language: 'text',
         argv: [],
         resources: {
@@ -30,7 +30,7 @@ const kernel: JupyterLiteServerPlugin<void> = {
         }
       },
       create: async (options: IKernel.IOptions): Promise<IKernel> => {
-        return new ChatKernel(options);
+        return new AIKernel(options);
       }
     });
   }

@@ -1,10 +1,10 @@
-# a mybinder.org-ready environment for demoing jupyterlite-chat-kernel
+# a mybinder.org-ready environment for demoing jupyterlite-ai-kernel
 # this environment may also be used locally on Linux/MacOS/Windows, e.g.
 #
 #   conda env update --file binder/environment.yml
-#   conda activate jupyterlite-chat-kernel-demo
+#   conda activate jupyterlite-ai-kernel-demo
 #
-name: jupyterlite-chat-kernel-demo
+name: jupyterlite-ai-kernel-demo
 
 channels:
   - conda-forge

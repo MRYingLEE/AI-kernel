@@ -20,13 +20,13 @@ import { MyConsole } from './controlMode';
 /**
  * A kernel that chats with OpenAI.
  */
-export class ChatKernel extends BaseKernel {
+export class AIKernel extends BaseKernel {
   /**
    * Instantiate a new JavaScriptKernel
    *
-   * @param options The instantiation options for a new ChatKernel
+   * @param options The instantiation options for a new aiKernel
    */
-  constructor(options: ChatKernel.IOptions) {
+  constructor(options: AIKernel.IOptions) {
     super(options);
   }
 
@@ -53,18 +53,18 @@ export class ChatKernel extends BaseKernel {
         },
         file_extension: '.txt',
         mimetype: 'text/x-markdown', // 'text/plain',
-        name: 'chat',
+        name: 'ai',
         nbconvert_exporter: 'text',
         pygments_lexer: 'text',
         version: 'es2017'
       },
       protocol_version: '5.3',
       status: 'ok',
-      banner: 'A chat kernel running in the browser',
+      banner: 'A ai kernel running in the browser',
       help_links: [
         {
-          text: 'Chat Kernel',
-          url: 'https://github.com/MRYingLEE/chat-kernel/'
+          text: 'AI Kernel',
+          url: 'https://github.com/MRYingLEE/ai-kernel/'
         }
       ]
     };
@@ -95,10 +95,10 @@ export class ChatKernel extends BaseKernel {
   `;
   static api_errors =
     '**The API errors of ChatGPT are listed here for your reference**:\n' +
-    ChatKernel.api_errors_en +
+    AIKernel.api_errors_en +
     '\n' +
     '**ChatGPT API 错误代码表供您参考**：\n' +
-    ChatKernel.api_errors_cn;
+    AIKernel.api_errors_cn;
 
   private publishMarkDownMessage(
     msg: string
@@ -336,7 +336,7 @@ export class ChatKernel extends BaseKernel {
           '</p><p>**Stack trace**:' +
           error.stack +
           '</p><p>' +
-          ChatKernel.api_errors +
+          AIKernel.api_errors +
           '</p>'
       );
     }
@@ -432,9 +432,9 @@ export class ChatKernel extends BaseKernel {
 /**
  * A namespace for JavaScriptKernel statics
  */
-namespace ChatKernel {
+namespace AIKernel {
   /**
-   * The instantiation options for a Chat kernel.
+   * The instantiation options for a AI kernel.
    */
   export type IOptions = IKernel.IOptions;
 }

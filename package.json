@@ -1,16 +1,16 @@
 {
-  "name": "@jupyterlite/chat-kernel",
+  "name": "@jupyterlite/ai-kernel",
   "version": "0.6.3",
-  "description": "An chat kernel for JupyterLite",
+  "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlite",
     "jupyterlite-extension"
   ],
-  "homepage": "https://github.com/MRYingLEE/chat-kernel",
+  "homepage": "https://github.com/MRYingLEE/ai-kernel",
   "bugs": {
-    "url": "https://github.com/MRYingLEE/chat-kernel/issues"
+    "url": "https://github.com/MRYingLEE/ai-kernel/issues"
   },
   "author": {
     "name": "Ying li",
@@ -25,7 +25,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MRYingLEE/chat-kernel.git"
+    "url": "https://github.com/MRYingLEE/AI-kernel.git"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
@@ -35,7 +35,7 @@
     "build:lib": "tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-    "clean:labextension": "rimraf jupyterlite_chat_kernel/labextension",
+    "clean:labextension": "rimraf jupyterlite_ai_kernel/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
@@ -67,7 +67,7 @@
     "npm-run-all": "^1.7.0",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.8"
+    "typescript": "^4.9.5"
   },
   "sideEffects": [
     "style/*.css",
@@ -79,7 +79,7 @@
   },
   "jupyterlab": {
     "extension": true,
-    "outputDir": "jupyterlite_chat_kernel/labextension",
+    "outputDir": "jupyterlite_ai_kernel/labextension",
     "sharedPackages": {
       "@jupyterlite/kernel": {
         "bundled": false,
