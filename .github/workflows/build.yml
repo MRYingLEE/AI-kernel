@@ -63,6 +63,8 @@ jobs:
         pip install build
         python -m build --wheel
         cp dist/*.whl .
+        sudo apt-get install zip
+        zip -j aikernel-wheel.zip *.whl
         
         pip uninstall -y aikernel jupyterlab
         
@@ -85,10 +87,10 @@ jobs:
 # #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
 #         # symbolServiceUrl: "https://dev.azure.com/" # optional, default is https://artifacts.dev.azure.com
     
-    - name: Zip fie
-      run: |
-          sudo apt-get install zip
-          zip -j aikernel-wheel.zip *.whl
+    # - name: Zip fie
+    #   run: |
+    #       sudo apt-get install zip
+    #       zip -j aikernel-wheel.zip *.whl
 
     - uses: actions/upload-artifact@v3
       with:
