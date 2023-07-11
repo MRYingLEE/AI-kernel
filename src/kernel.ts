@@ -140,10 +140,7 @@ export class ChatKernel extends BaseKernel {
       const delay = 5000;
       for (const char of value) {
         setTimeout(() => {
-          this.stream(
-            { name: 'stdout', text: 'char: ' + char + '\n' },
-            this.parentHeader
-          );
+          this.stream({ name: 'stdout', text: char }, this.parentHeader);
           console.debug('done:', char);
         }, delay);
       }
@@ -152,7 +149,7 @@ export class ChatKernel extends BaseKernel {
       //   outputFormat: 'text/markdown',
       //   isProcessed: true
       // });
-      this.publishMessage('\nStream is over.', 'text/markdown');
+      return this.publishMessage('\nStream is over.', 'text/markdown');
     }
     // return inChainedCodeAction.notProcessed();
     // }
@@ -235,6 +232,8 @@ export class ChatKernel extends BaseKernel {
     }
     MyConsole.table(messages2send);
 
+    const startTime = performance.now();
+
     try {
       let completion: any = null;
       if (MyConsole.inDebug) {
@@ -311,6 +310,14 @@ export class ChatKernel extends BaseKernel {
           '\n```';
       }
 
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+
+      let timepassed = '';
+      if (MyConsole.inDebug) {
+        timepassed = '\n(Execution time: ' + executionTime + ' milliseconds)';
+      }
+
       return this.publishMarkDownMessage(
         json_request +
           '</p><p>' +
@@ -320,7 +327,7 @@ export class ChatKernel extends BaseKernel {
           md_iconURL +
           '</p></td>' +
           '<td align="left">' +
-          response || '' + '</td>' + '</tr></tbody></table>'
+          response || '' + '</td>' + '</tr></tbody></table>' + timepassed
       );
     } catch (error: any) {
       return this.publishMarkDownMessage(
