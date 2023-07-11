@@ -139,11 +139,11 @@ export class ChatKernel extends BaseKernel {
       const value = cell_text.trim().slice('/stream'.length);
       const delay = 5000;
       for (const char of value) {
-        this.stream(
-          { name: 'stdout', text: 'char: ' + char + '\n' },
-          this.parentHeader
-        );
         setTimeout(() => {
+          this.stream(
+            { name: 'stdout', text: 'char: ' + char + '\n' },
+            this.parentHeader
+          );
           console.debug('done:', char);
         }, delay);
       }
