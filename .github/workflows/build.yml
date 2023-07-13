@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: main
+    branches: js-base
   pull_request:
     branches: '*'
 
