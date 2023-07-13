@@ -1,6 +1,6 @@
 import { KernelMessage } from '@jupyterlab/services';
 
-import { BaseKernel, IKernel } from '@jupyterlite/kernel';
+import { IKernel } from '@jupyterlite/kernel';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
@@ -12,7 +12,7 @@ import { ChatMessage } from '@azure/openai';
 import { globalCodeActions } from './codeActions';
 import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './controlMode';
-import { JavascriptKernel } from '@jupyterlite/javascript-kernel';
+import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -21,7 +21,7 @@ import { JavascriptKernel } from '@jupyterlite/javascript-kernel';
 /**
  * A kernel that chats with OpenAI.
  */
-export class AIKernel extends JavascriptKernel {
+export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Instantiate a new JavaScriptKernel
    *
@@ -135,23 +135,26 @@ export class AIKernel extends JavascriptKernel {
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     const cell_text = content.code;
 
-    // action_stream(code: string): Promise<IActionResult> {
-    if (cell_text.trim().toLowerCase().startsWith('/stream')) {
-      const value = cell_text.trim().slice('/stream'.length);
-      const delay = 5000;
-      for (const char of value) {
-        setTimeout(() => {
-          this.stream({ name: 'stdout', text: char }, this.parentHeader);
-          console.debug('done:', char);
-        }, delay);
-      }
-      // return Promise.resolve({
-      //   outputResult: '\nStream is over.',
-      //   outputFormat: 'text/markdown',
-      //   isProcessed: true
-      // });
-      return this.publishMessage('\nStream is over.', 'text/markdown');
-    }
+    // The stream test failed!
+
+    // // action_stream(code: string): Promise<IActionResult> {
+    // if (cell_text.trim().toLowerCase().startsWith('/stream')) {
+    //   const value = cell_text.trim().slice('/stream'.length);
+    //   const delay = 5000;
+    //   for (const char of value) {
+    //     setTimeout(() => {
+    //       this.stream({ name: 'stdout', text: char }, this.parentHeader);
+    //       console.debug('done:', char);
+    //     }, delay);
+    //   }
+
+    //   // return Promise.resolve({
+    //   //   outputResult: '\nStream is over.',
+    //   //   outputFormat: 'text/markdown',
+    //   //   isProcessed: true
+    //   // });
+    //   return this.publishMessage('\nStream is over.', 'text/markdown');
+    // }
     // return inChainedCodeAction.notProcessed();
     // }
 
