@@ -12,6 +12,7 @@ import { ChatMessage } from '@azure/openai';
 import { globalCodeActions } from './codeActions';
 import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './controlMode';
+import { JavascriptKernel } from '@jupyterlite/javascript-kernel';
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -20,7 +21,7 @@ import { MyConsole } from './controlMode';
 /**
  * A kernel that chats with OpenAI.
  */
-export class AIKernel extends BaseKernel {
+export class AIKernel extends JavascriptKernel {
   /**
    * Instantiate a new JavaScriptKernel
    *
