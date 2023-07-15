@@ -101,13 +101,15 @@ export class AIKernel extends BaseKernel {
     AIKernel.api_errors_cn;
 
   private publishMarkDownMessage(
-    msg: string
+    msg: string,
+    status: string
   ): KernelMessage.IExecuteReplyMsg['content'] {
-    return this.publishMessage(msg, 'text/markdown');
+    return this.publishMessage(msg, status, 'text/markdown');
   }
 
   private publishMessage(
     msg: string,
+    status: string,
     format: string //limited options later
   ): KernelMessage.IExecuteReplyMsg['content'] {
     this.publishExecuteResult({
@@ -119,7 +121,7 @@ export class AIKernel extends BaseKernel {
     });
 
     return {
-      status: 'ok',
+      status: status,
       execution_count: this.executionCount,
       user_expressions: {}
     };
@@ -149,7 +151,7 @@ export class AIKernel extends BaseKernel {
       //   outputFormat: 'text/markdown',
       //   isProcessed: true
       // });
-      return this.publishMessage('\nStream is over.', 'text/markdown');
+      return this.publishMessage('\nStream is over.', 'ok', 'text/markdown');
     }
     // return inChainedCodeAction.notProcessed();
     // }
@@ -167,7 +169,8 @@ export class AIKernel extends BaseKernel {
 
     if (actions.length > 1) {
       return this.publishMarkDownMessage(
-        '@ 2 or more actions are not supported so far!'
+        '@ 2 or more actions are not supported so far!',
+        'error'
       ); // We support this feature in the long future.
     } else if (actions.length === 1) {
       const theTemplateName = actions[0].substring(1);
@@ -184,7 +187,7 @@ export class AIKernel extends BaseKernel {
           }
           errorMsg += '\n' + key;
         }
-        return this.publishMarkDownMessage(errorMsg);
+        return this.publishMarkDownMessage(errorMsg, 'error');
       } else {
         if (pureMessage.trim().length === 0) {
           promptTemplate
@@ -193,7 +196,8 @@ export class AIKernel extends BaseKernel {
           return this.publishMarkDownMessage(
             'The chat history with ' +
               theTemplateName +
-              ' has been cleared. Now you have a new session with it.'
+              ' has been cleared. Now you have a new session with it.',
+            'ok'
           );
         }
       }
@@ -201,7 +205,9 @@ export class AIKernel extends BaseKernel {
 
     if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
       return this.publishMarkDownMessage(
-        'The maxinum of input should be half of ' + promptTemplate.MaxTokenLimit
+        'The maxinum of input should be half of ' +
+          promptTemplate.MaxTokenLimit,
+        'error'
       );
     }
 
@@ -287,11 +293,13 @@ export class AIKernel extends BaseKernel {
 
       if (error === 'tokenLimitReached') {
         return this.publishMarkDownMessage(
-          'The token Limit Reached error happened. You may wait for a few seconds and try again.'
+          'The token Limit Reached error happened. You may wait for a few seconds and try again.',
+          'error'
         );
       } else if (error === 'contentFiltered') {
         return this.publishMarkDownMessage(
-          'The Content Filtered error happened in your input or the generated response. You may change your input and try again.'
+          'The Content Filtered error happened in your input or the generated response. You may change your input and try again.',
+          'error'
         );
       }
 
@@ -327,7 +335,8 @@ export class AIKernel extends BaseKernel {
           md_iconURL +
           '</p></td>' +
           '<td align="left">' +
-          response || '' + '</td>' + '</tr></tbody></table>' + timepassed
+          response || '' + '</td>' + '</tr></tbody></table>' + timepassed,
+        'ok'
       );
     } catch (error: any) {
       return this.publishMarkDownMessage(
@@ -337,7 +346,8 @@ export class AIKernel extends BaseKernel {
           error.stack +
           '</p><p>' +
           AIKernel.api_errors +
-          '</p>'
+          '</p>',
+        'error'
       );
     }
   }
