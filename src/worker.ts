@@ -1,6 +1,6 @@
 import { IJavaScriptWorkerKernel } from './tokens';
 
-export class JavaScriptRemoteKernel {
+export class AIRemoteKernel {
   /**
    * Initialize the remote kernel.
    *
