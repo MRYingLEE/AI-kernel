@@ -1,6 +1,6 @@
 import { KernelMessage } from '@jupyterlab/services';
 
-import { BaseKernel, IKernel } from '@jupyterlite/kernel';
+import { IKernel } from '@jupyterlite/kernel';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
@@ -9,9 +9,16 @@ import { OpenAIDriver } from './driver_azure';
 // import { ChatMessage } from 'openai';
 import { ChatMessage } from '@azure/openai';
 
-import { globalCodeActions } from './codeActions';
+import {
+  globalCodeActions //,
+  // inChainedCodeAction,
+  // IActionResult
+} from './codeActions';
 import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './controlMode';
+import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
+// import { promisify } from 'util';
+
 /*
 //Todo: to make sure Handlebars loaded at the beginning
 */
@@ -20,7 +27,7 @@ import { MyConsole } from './controlMode';
 /**
  * A kernel that chats with OpenAI.
  */
-export class AIKernel extends BaseKernel {
+export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Instantiate a new JavaScriptKernel
    *
@@ -127,6 +134,12 @@ export class AIKernel extends BaseKernel {
     };
   }
 
+  async streamSync(ch: string, delay: number): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, delay));
+
+    await this.stream({ name: 'stdout', text: ch }, this.parentHeader);
+  }
+
   /**
    * Handle an `execute_request` message
    * @param msg The parent message.
@@ -136,16 +149,16 @@ export class AIKernel extends BaseKernel {
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
     const cell_text = content.code;
 
-    // action_stream(code: string): Promise<IActionResult> {
+    // The stream test failed!
+
+    // action_stream(cell_text: string): Promise < IActionResult > {
     if (cell_text.trim().toLowerCase().startsWith('/stream')) {
       const value = cell_text.trim().slice('/stream'.length);
       const delay = 5000;
-      for (const char of value) {
-        setTimeout(() => {
-          this.stream({ name: 'stdout', text: char }, this.parentHeader);
-          console.debug('done:', char);
-        }, delay);
+      for (const ch of value) {
+        await this.streamSync(ch, delay);
       }
+
       // return Promise.resolve({
       //   outputResult: '\nStream is over.',
       //   outputFormat: 'text/markdown',
@@ -153,7 +166,7 @@ export class AIKernel extends BaseKernel {
       // });
       return this.publishMessage('\nStream is over.', 'ok', 'text/markdown');
     }
-    // return inChainedCodeAction.notProcessed();
+    //   return inChainedCodeAction.notProcessed();
     // }
 
     //To process in chaned actions in turn, ususally non-AI actions
