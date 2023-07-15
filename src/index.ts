@@ -1,3 +1,5 @@
+// Copyright (c) Jupyter Development Team.
+// Distributed under the terms of the Modified BSD License.
 // Copyright (c) JupyterLite Contributors
 // Distributed under the terms of the Modified BSD License.
 
@@ -9,6 +11,7 @@ import {
 import { IKernel, IKernelSpecs } from '@jupyterlite/kernel';
 
 import { AIKernel } from './kernel';
+import { IOptions } from './kernel';
 
 /**
  * A plugin to register the ai kernel.
@@ -29,8 +32,8 @@ const kernel: JupyterLiteServerPlugin<void> = {
           'logo-64x64': ''
         }
       },
-      create: async (options: IKernel.IOptions): Promise<IKernel> => {
-        return new AIKernel(options);
+      create: async (options: IOptions): Promise<IKernel> => {
+        return new AIKernel(options as IOptions);
       }
     });
   }
@@ -39,3 +42,6 @@ const kernel: JupyterLiteServerPlugin<void> = {
 const plugins: JupyterLiteServerPlugin<any>[] = [kernel];
 
 export default plugins;
+
+export * from './kernel';
+export * from './tokens';

@@ -24,5 +24,5 @@
     // "inlineSourceMap": false,
     // "sourceRoot": "./src"
   },
-  "include": ["src/*","src/types/*"]
+  "include": ["src/*","src/types/*", "src/Tobedeleted/index.ts", "src/Tobedeleted/worker.ts", "src/Tobedeleted/kernel.ts"]
 }

@@ -1,4 +1,4 @@
-import { IJavaScriptWorkerKernel } from './tokens';
+import { IAIWorkerKernel } from './tokens';
 
 export class AIRemoteKernel {
   /**
@@ -6,7 +6,7 @@ export class AIRemoteKernel {
    *
    * @param options The options for the kernel.
    */
-  async initialize(options: IJavaScriptWorkerKernel.IOptions) {
+  async initialize(options: IAIWorkerKernel.IOptions) {
     console.log = function (...args) {
       const bundle = {
         name: 'stdout',
