@@ -57,7 +57,7 @@ export class AIKernel extends BaseKernel implements IKernel {
    */
   async kernelInfoRequest(): Promise<KernelMessage.IInfoReplyMsg['content']> {
     const content: KernelMessage.IInfoReply = {
-      implementation: 'AI',
+      implementation: 'Text',
       implementation_version: '1.0.0',
       language_info: {
         codemirror_mode: {
@@ -65,11 +65,11 @@ export class AIKernel extends BaseKernel implements IKernel {
           // lineWrapping: true,
           // spellcheck: true
         },
-        file_extension: '.js',
+        file_extension: '.txt',
         mimetype: 'text/x-markdown',
         name: 'AI',
-        nbconvert_exporter: 'AI',
-        pygments_lexer: 'AI',
+        nbconvert_exporter: 'Text',
+        pygments_lexer: 'Text',
         version: 'es2017'
       },
       protocol_version: '5.3',
@@ -78,7 +78,7 @@ export class AIKernel extends BaseKernel implements IKernel {
       help_links: [
         {
           text: 'AI Kernel',
-          url: 'https://github.com/MRYingLEE/ai-kernel/'
+          url: 'https://github.com/MRYingLEE/AI-kernel/'
         }
       ]
     };

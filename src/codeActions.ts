@@ -114,7 +114,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith('key=')) {
     const apiKey = code.trim().slice('key='.length);
     //The key should have a 20+ length. This one is of ying.li@AILean.live
-    if (apiKey.trim().length === '644f0583d9464db18a2539ee9683a111'.length) {
+    if (apiKey.trim().length === '644f0583d9464db18a2539ee9683a222'.length) {
       let welcome = 'Welcome';
       /**
        * Test Handlebars
@@ -296,7 +296,7 @@ function action_defineUser(code: string): Promise<IActionResult> {
 }
 
 function action_debug(code: string): Promise<IActionResult> {
-  if (code.trim() === '/debug:AILive.live') {
+  if (code.trim() === '/debug:AILearn.live') {
     MyConsole.inDebug = !MyConsole.inDebug;
     const mode = MyConsole.inDebug ? 'enabled' : 'disbaled';
     return Promise.resolve({
