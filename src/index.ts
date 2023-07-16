@@ -24,7 +24,7 @@ const kernel: JupyterLiteServerPlugin<void> = {
       spec: {
         name: 'AI',
         display_name: 'AI',
-        language: 'text',
+        language: 'JavaScript',
         argv: [],
         resources: {
           'logo-32x32': '',

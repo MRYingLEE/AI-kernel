@@ -58,7 +58,7 @@ export class AIKernel extends BaseKernel implements IKernel {
    */
   async kernelInfoRequest(): Promise<KernelMessage.IInfoReplyMsg['content']> {
     const content: KernelMessage.IInfoReply = {
-      implementation: 'Text',
+      implementation: 'JavaScript',
       implementation_version: '1.0.0',
       language_info: {
         codemirror_mode: {

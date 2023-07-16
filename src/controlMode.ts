@@ -7,7 +7,7 @@ export class MyConsole {
   // }
   static debug(...data: any[]): void {
     if (MyConsole.inDebug) {
-      console.debug(data);
+      console.info(data);
     }
   }
   static table(tabularData?: any, properties?: string[] | undefined): void {
