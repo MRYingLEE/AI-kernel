@@ -5,6 +5,7 @@ include package.json
 include install.json
 include ts*.json
 include yarn.lock
+include *.js
 recursive-include icons *.png
 
 graft jupyterlite_ai_kernel/labextension
