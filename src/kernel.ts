@@ -215,7 +215,7 @@ export class AIKernel extends BaseKernel implements IKernel {
     if (!msg.type) {
       return;
     }
-
+    MyConsole.debug('Got from Worker:', msg);
     const parentHeader = msg.parentHeader || this.parentHeader;
 
     switch (msg.type) {

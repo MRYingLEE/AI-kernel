@@ -50,6 +50,7 @@ export class AIRemoteKernel {
    */
   async execute(content: any, parent: any) {
     const { code } = content;
+    MyConsole.debug('code:', code);
     try {
       const js_prefix = '%%js';
 
@@ -58,6 +59,7 @@ export class AIRemoteKernel {
         const js_code = code.slice(js_prefix.length);
         result = self.eval(js_code);
       } else {
+        MyConsole.debug('chat:', code);
         const result = await this.chatCompletion_sync(content);
         return result;
       }
@@ -168,6 +170,8 @@ export class AIRemoteKernel {
   async chatCompletion_sync(cell_text: string) {
     const [actions, pureMessage] = extractPersonAndMessage(cell_text);
 
+    MyConsole.debug('actions:', actions);
+    MyConsole.debug('actions:', pureMessage);
     if (actions.length > 1) {
       return this.publish_execute_error(
         '@ 2 or more actions are not supported so far!'
