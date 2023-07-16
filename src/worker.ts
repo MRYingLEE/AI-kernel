@@ -51,12 +51,14 @@ export class AIRemoteKernel {
   async execute(content: any, parent: any) {
     const { code } = content;
     MyConsole.debug('code:', code);
+
     try {
       const js_prefix = '%%js';
 
-      let result = undefined;
+      let result;
       if (code.startsWith(js_prefix)) {
         const js_code = code.slice(js_prefix.length);
+        console.log('js_code', js_code);
         result = self.eval(js_code);
       } else {
         MyConsole.debug('chat:', code);
