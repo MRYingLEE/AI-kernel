@@ -355,7 +355,7 @@ export class AIKernel extends BaseKernel implements IKernel {
  */
 namespace AIKernel {
   /**
-   * The instantiation options for a AI kernel.
+   * The instantiation options for an AI kernel.
    */
   export type IOptions = IKernel.IOptions;
 }
