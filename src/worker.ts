@@ -53,7 +53,17 @@ export class AIRemoteKernel {
   async execute(content: any, parent: any) {
     const { code } = content;
     try {
-      const result = self.eval(code);
+      const js_prefix = '%%js';
+
+      let result = undefined;
+      if (code.startsWith(js_prefix)) {
+        const js_code = code.slice(js_prefix.length);
+        result = self.eval(js_code);
+      } else {
+        const result = await this.chatCompletion_sync(content);
+        return result;
+      }
+
       this._executionCount++;
 
       const bundle = {

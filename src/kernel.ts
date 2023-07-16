@@ -8,29 +8,29 @@ import { IRemoteAIWorkerKernel } from './tokens';
 
 import { KernelMessage } from '@jupyterlab/services';
 
-import { IKernel } from '@jupyterlite/kernel';
+import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
 import {
   globalCodeActions,
   inChainedCodeAction,
   IActionResult
 } from './codeActions';
-import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
+
 /**
  * A kernel that executes code in an IFrame.
  */
-export class AIKernel extends JavaScriptKernel implements IKernel {
+export class AIKernel extends BaseKernel implements IKernel {
   /**
    * Instantiate a new AIKernel
    *
    * @param options The instantiation options for a new AIKernel
    */
-  constructor(options: IOptions) {
+  constructor(options: AIKernel.IOptions) {
     super(options);
-    this._worker_AI = this.initWorker(options); // We may support many workers!
-    this._worker_AI.onmessage = e => this._processWorkerMessage_AI(e.data);
-    this.remoteKernel_AI = this.initRemote(options);
-    this._ready_AI.resolve();
+    this._worker = this.initWorker(options);
+    this._worker.onmessage = e => this._processWorkerMessage(e.data);
+    this.remoteKernel = this.initRemote(options);
+    this._ready.resolve();
   }
 
   /**
@@ -40,9 +40,16 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     if (this.isDisposed) {
       return;
     }
-    this._worker_AI.terminate();
-    (this._worker_AI as any) = null;
+    this._worker.terminate();
+    (this._worker as any) = null;
     super.dispose();
+  }
+
+  /**
+   * A promise that is fulfilled when the kernel is ready.
+   */
+  get ready(): Promise<void> {
+    return this._ready.promise;
   }
 
   /**
@@ -86,18 +93,18 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   async completeRequest(
     content: KernelMessage.ICompleteRequestMsg['content']
   ): Promise<KernelMessage.ICompleteReplyMsg['content']> {
-    return await this.remoteKernel_AI.complete(content, this.parent);
+    return await this.remoteKernel.complete(content, this.parent);
   }
 
   /**
    * Handle an `inspect_request` message.
    *
-   * @param _content - The content of the request.
+   * @param content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async inspectRequest(
-    _content: KernelMessage.IInspectRequestMsg['content']
+    content: KernelMessage.IInspectRequestMsg['content']
   ): Promise<KernelMessage.IInspectReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -105,12 +112,12 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Handle an `is_complete_request` message.
    *
-   * @param _content - The content of the request.
+   * @param content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async isCompleteRequest(
-    _content: KernelMessage.IIsCompleteRequestMsg['content']
+    content: KernelMessage.IIsCompleteRequestMsg['content']
   ): Promise<KernelMessage.IIsCompleteReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -118,12 +125,12 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Handle a `comm_info_request` message.
    *
-   * @param _content - The content of the request.
+   * @param content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async commInfoRequest(
-    _content: KernelMessage.ICommInfoRequestMsg['content']
+    content: KernelMessage.ICommInfoRequestMsg['content']
   ): Promise<KernelMessage.ICommInfoReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -131,27 +138,27 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Send an `input_reply` message.
    *
-   * @param _content - The content of the reply.
+   * @param content - The content of the reply.
    */
-  inputReply(_content: KernelMessage.IInputReplyMsg['content']): void {
+  inputReply(content: KernelMessage.IInputReplyMsg['content']): void {
     throw new Error('Not implemented');
   }
 
   /**
    * Send an `comm_open` message.
    *
-   * @param _msg - The comm_open message.
+   * @param msg - The comm_open message.
    */
-  async commOpen(_msg: KernelMessage.ICommOpenMsg): Promise<void> {
+  async commOpen(msg: KernelMessage.ICommOpenMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
   /**
    * Send an `comm_msg` message.
    *
-   * @param _msg - The comm_msg message.
+   * @param msg - The comm_msg message.
    */
-  async commMsg(_msg: KernelMessage.ICommMsgMsg): Promise<void> {
+  async commMsg(msg: KernelMessage.ICommMsgMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -160,7 +167,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
    *
    * @param close - The comm_close message.
    */
-  async commClose(_msg: KernelMessage.ICommCloseMsg): Promise<void> {
+  async commClose(msg: KernelMessage.ICommCloseMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -172,7 +179,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
    * Subclasses must implement this typographically almost _exactly_ for
    * webpack to find it.
    */
-  protected initWorker(_options: IOptions): Worker {
+  protected initWorker(options: AIKernel.IOptions): Worker {
     return new Worker(new URL('./comlink.worker.js', import.meta.url), {
       type: 'module'
     });
@@ -181,11 +188,11 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Initialize the remote kernel.
    *
-   * @param _options The options for the remote kernel.
+   * @param options The options for the remote kernel.
    * @returns The initialized remote kernel.
    */
-  protected initRemote(_options: IOptions): IRemoteAIWorkerKernel {
-    const remote: IRemoteAIWorkerKernel = wrap(this._worker_AI);
+  protected initRemote(options: AIKernel.IOptions): IRemoteAIWorkerKernel {
+    const remote: IRemoteAIWorkerKernel = wrap(this._worker);
     remote.initialize({ baseUrl: PageConfig.getBaseUrl() });
     return remote;
   }
@@ -195,7 +202,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
    *
    * @param msg The worker message to process.
    */
-  private _processWorkerMessage_AI(msg: any): void {
+  private _processWorkerMessage(msg: any): void {
     if (!msg.type) {
       return;
     }
@@ -257,10 +264,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     }
   }
 
-  protected remoteKernel_AI: IRemoteAIWorkerKernel;
+  protected remoteKernel: IRemoteAIWorkerKernel;
 
-  private _worker_AI: Worker;
-  private _ready_AI = new PromiseDelegate<void>();
+  private _worker: Worker;
+  private _ready = new PromiseDelegate<void>();
 
   private publishMessage(
     msg: string,
@@ -337,33 +344,18 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       );
     }
 
-    const js_prefix = '%%js';
-
-    if (cell_text.startsWith(js_prefix)) {
-      const js_code = cell_text.slice(js_prefix.length);
-      content.code = js_code;
-      return super.executeRequest(content);
-    } else {
-      // // const result = await this.RemoteKernel_AI.execute(content, this.parent);
-      // const result = await this.chatCompletion_sync(cell_text);
-      // result.execution_count = this.executionCount;
-      // return result;
-
-      const result = await this.remoteKernel_AI.execute(content, this.parent);
-      result.execution_count = this.executionCount;
-      return result;
-    }
+    const result = await this.remoteKernel.execute(content, this.parent);
+    result.execution_count = this.executionCount;
+    return result;
   }
 }
 
 /**
  * A namespace for AIKernel statics
  */
-export type IOptions = IKernel.IOptions;
-
-// export namespace AIKernel {
-//   /**
-//    * The instantiation options for a AI kernel.
-//    */
-//   export type IOptions = IKernel.IOptions;
-// }
+namespace AIKernel {
+  /**
+   * The instantiation options for a AI kernel.
+   */
+  export type IOptions = IKernel.IOptions;
+}

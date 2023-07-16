@@ -11,7 +11,6 @@ import {
 import { IKernel, IKernelSpecs } from '@jupyterlite/kernel';
 
 import { AIKernel } from './kernel';
-import { IOptions } from './kernel';
 
 /**
  * A plugin to register the ai kernel.
@@ -32,8 +31,8 @@ const kernel: JupyterLiteServerPlugin<void> = {
           'logo-64x64': ''
         }
       },
-      create: async (options: IOptions): Promise<IKernel> => {
-        return new AIKernel(options as IOptions);
+      create: async (options: IKernel.IOptions): Promise<IKernel> => {
+        return new AIKernel(options);
       }
     });
   }
