@@ -345,17 +345,17 @@ export class AIKernel extends BaseKernel implements IKernel {
     const cell_text = content.code;
     const action_result = await this.process_actions(cell_text);
 
-    if (action_result.isProcessed) {
+    if (!action_result.isProcessed) {
+      const result = await this.remoteKernel.execute(content, this.parent);
+      result.execution_count = this.executionCount;
+      return result;
+    } else {
       return this.publishMessage(
         action_result.outputResult,
         // 'ok',
         action_result.outputFormat
       );
     }
-
-    const result = await this.remoteKernel.execute(content, this.parent);
-    result.execution_count = this.executionCount;
-    return result;
   }
 }
 

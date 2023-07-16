@@ -1,5 +1,5 @@
 export class MyConsole {
-  static inDebug = false;
+  static inDebug = true; //for temp
   // static log(...data: any[]): void {
   //   if (MyConsole.inDebug) {
   //     console.log(data);
