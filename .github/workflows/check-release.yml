@@ -15,29 +15,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-node@v3.7
         with:
-          python-version: 3.9
+          python-version: 3.10
           architecture: 'x64'
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.7
         with:
-          node-version: '14.x'
+          node-version: '16.x'
       - name: Get pip cache dir
         id: pip-cache
         run: |
           echo "::set-output name=dir::$(pip cache dir)"
       - name: Cache pip
-        uses: actions/cache@v1
+        uses: actions/cache@v1.2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Cache checked links
-        uses: actions/cache@v2
+        uses: actions/cache@v1.2
         with:
           path: ~/.cache/pytest-link-check
           key: ${{ runner.os }}-linkcheck-${{ hashFiles('**/.md') }}-md-links
