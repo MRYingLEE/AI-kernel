@@ -9,8 +9,6 @@ import { ChatMessage } from '@azure/openai';
 import { promptTemplate } from './promptTemplate';
 import { MyConsole } from './controlMode';
 
-import { KernelMessage } from '@jupyterlab/services';
-
 export class AIRemoteKernel {
   /**
    * Initialize the remote kernel.
@@ -127,37 +125,52 @@ export class AIRemoteKernel {
 
   private _executionCount = 0;
 
-  publishMarkDownMessage(msg: string, status: 'error' | 'ok' | 'abort') {
-    return this.publishMessage(msg, 'text/markdown');
+  publish_execute_result(result: string) {
+    const bundle = {
+      data: {
+        'text/Markdown': result
+      },
+      metadata: {},
+      execution_count: this._executionCount
+    };
+
+    postMessage({
+      bundle,
+      type: 'execute_result'
+    });
+
+    return {
+      status: 'ok',
+      user_expressions: {}
+    };
   }
 
-  publishMessage(
-    msg: string,
-    // _status: 'error' | 'ok' | 'abort',
-    format: string //limited options later
-  ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    // this.publishExecuteResult({
-    //   execution_count: this._executionCount,
-    //   data: {
-    //     [format]: msg
-    //   },
-    //   metadata: {}
-    // });
+  publish_execute_error(result: string) {
+    const bundle = {
+      data: {
+        'text/Markdown': result
+      },
+      metadata: {},
+      execution_count: this._executionCount
+    };
 
-    return Promise.resolve({
-      status: 'ok',
-      execution_count: this._executionCount,
-      user_expressions: {}
+    postMessage({
+      bundle,
+      type: 'execute_error'
     });
+
+    return {
+      status: 'error',
+      user_expressions: {}
+    };
   }
 
   async chatCompletion_sync(cell_text: string) {
     const [actions, pureMessage] = extractPersonAndMessage(cell_text);
 
     if (actions.length > 1) {
-      return this.publishMarkDownMessage(
-        '@ 2 or more actions are not supported so far!',
-        'error'
+      return this.publish_execute_error(
+        '@ 2 or more actions are not supported so far!'
       ); // We support this feature in the long future.
     } else if (actions.length === 1) {
       const theTemplateName = actions[0].substring(1);
@@ -174,27 +187,24 @@ export class AIRemoteKernel {
           }
           errorMsg += '\n' + key;
         }
-        return this.publishMarkDownMessage(errorMsg, 'error');
+        return this.publish_execute_error(errorMsg);
       } else {
         if (pureMessage.trim().length === 0) {
           promptTemplate
             .get_global_templates()
-            [theTemplateName].startNewSession();
-          return this.publishMarkDownMessage(
+          [theTemplateName].startNewSession();
+          return this.publish_execute_result(
             'The chat history with ' +
-              theTemplateName +
-              ' has been cleared. Now you have a new session with it.',
-            'ok'
+            theTemplateName +
+            ' has been cleared. Now you have a new session with it.'
           );
         }
       }
     }
 
     if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
-      return this.publishMarkDownMessage(
-        'The maxinum of input should be half of ' +
-          promptTemplate.MaxTokenLimit,
-        'error'
+      return this.publish_execute_error(
+        'The maxinum of input should be half of ' + promptTemplate.MaxTokenLimit
       );
     }
 
@@ -215,7 +225,7 @@ export class AIRemoteKernel {
       MyConsole.table(actions);
       const p = promptTemplate
         .get_global_templates()
-        [theTemplateName].buildMessages2send(statuses);
+      [theTemplateName].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }
@@ -279,14 +289,12 @@ export class AIRemoteKernel {
       const error = completion.choices[0].finishReason;
 
       if (error === 'tokenLimitReached') {
-        return this.publishMarkDownMessage(
-          'The token Limit Reached error happened. You may wait for a few seconds and try again.',
-          'error'
+        return this.publish_execute_error(
+          'The token Limit Reached error happened. You may wait for a few seconds and try again.'
         );
       } else if (error === 'contentFiltered') {
-        return this.publishMarkDownMessage(
-          'The Content Filtered error happened in your input or the generated response. You may change your input and try again.',
-          'error'
+        return this.publish_execute_error(
+          'The Content Filtered error happened in your input or the generated response. You may change your input and try again.'
         );
       }
 
@@ -313,28 +321,26 @@ export class AIRemoteKernel {
         timepassed = '\n(Execution time: ' + executionTime + ' milliseconds)';
       }
 
-      return this.publishMarkDownMessage(
+      return this.publish_execute_result(
         json_request +
-          '</p><p>' +
-          '<table><tbody><tr><td align="left"><p><b>' +
-          md_displayName +
-          '</b>' +
-          md_iconURL +
-          '</p></td>' +
-          '<td align="left">' +
-          response || '' + '</td>' + '</tr></tbody></table>' + timepassed,
-        'ok'
+        '</p><p>' +
+        '<table><tbody><tr><td align="left"><p><b>' +
+        md_displayName +
+        '</b>' +
+        md_iconURL +
+        '</p></td>' +
+        '<td align="left">' +
+        response || '' + '</td>' + '</tr></tbody></table>' + timepassed
       );
     } catch (error: any) {
-      return this.publishMarkDownMessage(
+      return this.publish_execute_error(
         '<p>**Error during getChatCompletions**:' +
-          error.message +
-          '</p><p>**Stack trace**:' +
-          error.stack +
-          '</p><p>' +
-          // AIKernel.api_errors +
-          '</p>',
-        'error'
+        error.message +
+        '</p><p>**Stack trace**:' +
+        error.stack +
+        '</p><p>' +
+        // AIKernel.api_errors +
+        '</p>'
       );
     }
   }
