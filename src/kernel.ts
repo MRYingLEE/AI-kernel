@@ -15,6 +15,7 @@ import {
   inChainedCodeAction,
   IActionResult
 } from './codeActions';
+import { MyConsole } from './controlMode';
 
 /**
  * A kernel that executes code in an IFrame.
@@ -180,6 +181,7 @@ export class AIKernel extends BaseKernel implements IKernel {
    * webpack to find it.
    */
   protected initWorker(options: AIKernel.IOptions): Worker {
+    MyConsole.debug('url', import.meta.url);
     return new Worker(new URL('./comlink.worker.js', import.meta.url), {
       type: 'module'
     });
@@ -193,7 +195,14 @@ export class AIKernel extends BaseKernel implements IKernel {
    */
   protected initRemote(options: AIKernel.IOptions): IRemoteAIWorkerKernel {
     const remote: IRemoteAIWorkerKernel = wrap(this._worker);
-    remote.initialize({ baseUrl: PageConfig.getBaseUrl() });
+    MyConsole.debug('before:', PageConfig.getBaseUrl());
+    if (remote) {
+      remote.initialize({ baseUrl: PageConfig.getBaseUrl() });
+    } else {
+      MyConsole.debug('remote is null.');
+    }
+
+    MyConsole.debug('After:', PageConfig.getBaseUrl());
     return remote;
   }
 
