@@ -5,7 +5,6 @@ include package.json
 include install.json
 include ts*.json
 include yarn.lock
-include *.js
 recursive-include icons *.png
 
 graft jupyterlite_ai_kernel/labextension
@@ -16,6 +15,7 @@ graft style
 prune **/node_modules
 prune lib
 prune binder
+include *.js
 
 # Patterns to exclude from any directory
 global-exclude *~
