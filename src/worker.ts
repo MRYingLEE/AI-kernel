@@ -192,11 +192,11 @@ export class AIRemoteKernel {
         if (pureMessage.trim().length === 0) {
           promptTemplate
             .get_global_templates()
-          [theTemplateName].startNewSession();
+            [theTemplateName].startNewSession();
           return this.publish_execute_result(
             'The chat history with ' +
-            theTemplateName +
-            ' has been cleared. Now you have a new session with it.'
+              theTemplateName +
+              ' has been cleared. Now you have a new session with it.'
           );
         }
       }
@@ -225,7 +225,7 @@ export class AIRemoteKernel {
       MyConsole.table(actions);
       const p = promptTemplate
         .get_global_templates()
-      [theTemplateName].buildMessages2send(statuses);
+        [theTemplateName].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }
@@ -323,24 +323,24 @@ export class AIRemoteKernel {
 
       return this.publish_execute_result(
         json_request +
-        '</p><p>' +
-        '<table><tbody><tr><td align="left"><p><b>' +
-        md_displayName +
-        '</b>' +
-        md_iconURL +
-        '</p></td>' +
-        '<td align="left">' +
-        response || '' + '</td>' + '</tr></tbody></table>' + timepassed
+          '</p><p>' +
+          '<table><tbody><tr><td align="left"><p><b>' +
+          md_displayName +
+          '</b>' +
+          md_iconURL +
+          '</p></td>' +
+          '<td align="left">' +
+          response || '' + '</td>' + '</tr></tbody></table>' + timepassed
       );
     } catch (error: any) {
       return this.publish_execute_error(
         '<p>**Error during getChatCompletions**:' +
-        error.message +
-        '</p><p>**Stack trace**:' +
-        error.stack +
-        '</p><p>' +
-        // AIKernel.api_errors +
-        '</p>'
+          error.message +
+          '</p><p>**Stack trace**:' +
+          error.stack +
+          '</p><p>' +
+          // AIKernel.api_errors +
+          '</p>'
       );
     }
   }
