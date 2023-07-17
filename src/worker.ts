@@ -16,32 +16,36 @@ export class AIRemoteKernel {
    * @param options The options for the kernel.
    */
   async initialize(options: IAIWorkerKernel.IOptions) {
-    console.log = function (...args) {
-      const bundle = {
-        name: 'stdout',
-        text: args.join(' ') + '\n'
-      };
-      postMessage({
-        type: 'stream',
-        bundle
-      });
-    };
-    console.info = console.log;
+    // console.log = function (...args) {
+    //   const bundle = {
+    //     name: 'stdout',
+    //     text: args.join(' ') + '\n'
+    //   };
+    //   postMessage({
+    //     type: 'stream',
+    //     bundle
+    //   });
+    // };
+    // console.info = console.log;
 
-    console.error = function (...args) {
-      const bundle = {
-        name: 'stderr',
-        text: args.join(' ') + '\n'
-      };
-      postMessage({
-        type: 'stream',
-        bundle
-      });
-    };
-    console.warn = console.error;
+    // console.error = function (...args) {
+    //   const bundle = {
+    //     name: 'stderr',
+    //     text: args.join(' ') + '\n'
+    //   };
+    //   postMessage({
+    //     type: 'stream',
+    //     bundle
+    //   });
+    // };
+    // console.warn = console.error;
 
     self.onerror = function (message, source, lineno, colno, error) {
       console.error(message);
+    };
+
+    self.onmessageerror = function (e) {
+      console.log('Message error: ', e);
     };
   }
 
@@ -50,7 +54,7 @@ export class AIRemoteKernel {
    */
   async execute(content: any, parent: any) {
     const { code } = content;
-    MyConsole.debug('code:', code);
+    console.log('code:', code);
 
     try {
       const js_prefix = '%%js';
@@ -61,9 +65,8 @@ export class AIRemoteKernel {
         console.log('js_code', js_code);
         result = self.eval(js_code);
       } else {
-        MyConsole.debug('chat:', code);
-        const result = await this.chatCompletion_sync(content);
-        return result;
+        console.log('chat:', code);
+        result = await this.chatCompletion_sync(content);
       }
 
       this._executionCount++;
