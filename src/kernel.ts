@@ -177,7 +177,7 @@ export class AIKernel extends BaseKernel implements IKernel {
    */
   protected initWorker(options: AIKernel.IOptions): Worker {
     MyConsole.debug('url', import.meta.url);
-    return new Worker(new URL('./comlink.worker.js', import.meta.url), {
+    return new Worker(new URL('./common/comlink.worker.js', import.meta.url), {
       type: 'module'
     });
   }
