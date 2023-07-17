@@ -6,7 +6,7 @@
  */
 import { expose } from 'comlink';
 
-import { AIRemoteKernel } from '../worker';
+import { AIRemoteKernel } from './worker';
 
 const worker = new AIRemoteKernel();
 
