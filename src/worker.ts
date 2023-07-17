@@ -57,17 +57,19 @@ export class AIRemoteKernel {
     console.log('code:', code);
 
     try {
-      const js_prefix = '%%js';
+      // const js_prefix = '%%js';
 
-      let result;
-      if (code.startsWith(js_prefix)) {
-        const js_code = code.slice(js_prefix.length);
-        console.log('js_code', js_code);
-        result = self.eval(js_code);
-      } else {
-        console.log('chat:', code);
-        result = await this.chatCompletion_sync(content);
-      }
+      // let result;
+      // if (code.startsWith(js_prefix)) {
+      //   const js_code = code.slice(js_prefix.length);
+      //   console.log('js_code', js_code);
+      //   result = self.eval(js_code);
+      // } else {
+      //   console.log('chat:', code);
+      //   result = await this.chatCompletion_sync(content);
+      // }
+
+      const result = 'Communication is good.\n' + code;
 
       this._executionCount++;
 
