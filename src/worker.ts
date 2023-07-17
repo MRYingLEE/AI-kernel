@@ -54,19 +54,19 @@ export class AIRemoteKernel {
   async execute(content: any, parent: any) {
     const { code } = content;
     try {
-      const result = await self.eval(code);
+      // const result = await self.eval(code);
 
-      // const js_prefix = '%%js';
+      const js_prefix = '%%js';
 
-      // let result;
-      // if (code.startsWith(js_prefix)) {
-      //   const js_code = code.slice(js_prefix.length);
-      //   console.log('js_code', js_code);
-      //   result = await self.eval(js_code);
-      // } else {
-      //   console.log('chat:', code);
-      //   result = await this.chatCompletion_sync(content);
-      // }
+      let result;
+      if (code.startsWith(js_prefix)) {
+        const js_code = code.slice(js_prefix.length);
+        console.log('js_code', js_code);
+        result = await self.eval(js_code);
+      } else {
+        console.log('chat:', code);
+        result = await this.chatCompletion_sync(content);
+      }
 
       this._executionCount++;
 
@@ -131,7 +131,7 @@ export class AIRemoteKernel {
 
   private _executionCount = 0;
 
-  publish_execute_result(result: string) {
+  private publish_execute_result(result: string) {
     const bundle = {
       data: {
         'text/plain': result
@@ -151,7 +151,7 @@ export class AIRemoteKernel {
     };
   }
 
-  publish_execute_error(result: string) {
+  private publish_execute_error(result: string) {
     const bundle = {
       data: {
         'text/plain': result
@@ -171,7 +171,7 @@ export class AIRemoteKernel {
     };
   }
 
-  async chatCompletion_sync(cell_text: string) {
+  private async chatCompletion_sync(cell_text: string) {
     const [actions, pureMessage] = extractPersonAndMessage(cell_text);
 
     MyConsole.debug('actions:', actions);
