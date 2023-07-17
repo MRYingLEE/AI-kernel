@@ -41,7 +41,7 @@ import { OpenAIDriver } from './driver_azure';
 //Todo: to make sure Handlebars loaded at the beginning
 */
 import Handlebars from 'handlebars/lib/handlebars';
-import { MyConsole } from './controlMode';
+import { MyConsole } from './controlMode_Worker';
 
 function getAllPromptTemplates() {
   let allActions = '';
@@ -282,7 +282,7 @@ function action_defineUser(code: string): Promise<IActionResult> {
         });
       }
     } catch (error: any) {
-      console.error(error);
+      MyConsole.error(error);
     }
 
     return Promise.resolve({

@@ -16,6 +16,8 @@ prune **/node_modules
 prune lib
 prune binder
 include *.js
+include src/common/*.js
+include src/worker_AI/*.js
 
 # Patterns to exclude from any directory
 global-exclude *~

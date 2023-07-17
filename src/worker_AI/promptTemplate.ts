@@ -3,7 +3,7 @@
 import { ChatMessage } from '@azure/openai';
 
 import { user } from './user';
-import { MyConsole } from './controlMode';
+import { MyConsole } from './controlMode_Worker';
 
 import Handlebars from 'handlebars/lib/handlebars';
 interface IPromptTemplateProps {

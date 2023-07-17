@@ -43,4 +43,4 @@ const plugins: JupyterLiteServerPlugin<any>[] = [kernel];
 export default plugins;
 
 export * from './kernel';
-export * from './tokens';
+export * from './common/tokens';

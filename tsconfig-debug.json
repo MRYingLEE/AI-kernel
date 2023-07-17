@@ -19,10 +19,10 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "ES2019",//Align with Jupyterlite
-    "types": [] //,
-    // "sourceMap": false //true,
-    // "inlineSourceMap": false,
+    "types": [] ,
+    "sourceMap": true,
+    "inlineSourceMap": false,
     // "sourceRoot": "./src"
   },
-  "include": ["src/*","src/types/*", "*.js", "src/common/*.ts", "src/worker_AI/*.ts", "src/UI/tts.tsx"]
+  "include": ["src/*","src/types/*", "*.js"]
 }

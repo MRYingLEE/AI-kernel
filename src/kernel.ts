@@ -4,17 +4,12 @@ import { PromiseDelegate } from '@lumino/coreutils';
 
 import { wrap } from 'comlink';
 
-import { IRemoteAIWorkerKernel } from './tokens';
+import { IRemoteAIWorkerKernel } from './common/tokens';
 
 import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
-import {
-  globalCodeActions,
-  inChainedCodeAction,
-  IActionResult
-} from './codeActions';
 import { MyConsole } from './controlMode';
 
 /**
@@ -278,62 +273,6 @@ export class AIKernel extends BaseKernel implements IKernel {
   private _worker: Worker;
   private _ready = new PromiseDelegate<void>();
 
-  private publishMessage(
-    msg: string,
-    // _status: 'error' | 'ok' | 'abort',
-    format: string //limited options later
-  ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    this.publishExecuteResult({
-      execution_count: this.executionCount,
-      data: {
-        [format]: msg
-      },
-      metadata: {}
-    });
-
-    return Promise.resolve({
-      status: 'ok',
-      execution_count: this.executionCount,
-      user_expressions: {}
-    });
-  }
-
-  async streamSync(ch: string, delay: number): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, delay));
-
-    await this.stream({ name: 'stdout', text: ch }, this.parentHeader);
-  }
-
-  async process_actions(cell_text: string): Promise<IActionResult> {
-    // The stream test failed!
-
-    // action_stream(cell_text: string): Promise < IActionResult > {
-    if (cell_text.trim().toLowerCase().startsWith('/stream')) {
-      const value = cell_text.trim().slice('/stream'.length);
-      const delay = 5000;
-      for (const ch of value) {
-        await this.streamSync(ch, delay);
-      }
-
-      return Promise.resolve({
-        outputResult: '<p>FYI: Stream is over.</p><p>',
-        outputFormat: 'text/markdown',
-        isProcessed: true
-      });
-    }
-
-    //To process in chaned actions in turn, ususally non-AI actions
-
-    for (let i = 0; i < globalCodeActions.length; i++) {
-      const result = await globalCodeActions[i].execute(cell_text);
-      if (result.isProcessed) {
-        return result;
-      }
-    }
-
-    return inChainedCodeAction.notProcessed();
-  }
-
   /**
    * Handle an `execute_request` message
    *
@@ -342,20 +281,9 @@ export class AIKernel extends BaseKernel implements IKernel {
   async executeRequest(
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    const cell_text = content.code;
-    const action_result = await this.process_actions(cell_text);
-
-    if (!action_result.isProcessed) {
-      const result = await this.remoteKernel.execute(content, this.parent);
-      result.execution_count = this.executionCount;
-      return result;
-    } else {
-      return this.publishMessage(
-        action_result.outputResult,
-        // 'ok',
-        action_result.outputFormat
-      );
-    }
+    const result = await this.remoteKernel.execute(content, this.parent);
+    result.execution_count = this.executionCount;
+    return result;
   }
 }
 
