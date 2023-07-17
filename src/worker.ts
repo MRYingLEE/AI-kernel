@@ -42,7 +42,7 @@ export class AIRemoteKernel {
   async execute(content: any, parent: any) {
     const { code } = content;
     try {
-      const result = self.eval(code);
+      const result = await self.eval(code);
       this._executionCount++;
 
       const bundle = {
