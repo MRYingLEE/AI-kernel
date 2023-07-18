@@ -22,6 +22,7 @@ export class AIRemoteKernel {
    * @param options The options for the kernel.
    */
   async initialize(options: IAIWorkerKernel.IOptions) {
+    MyConsole.inDebug = true;
     MyConsole.log = function (...args) {
       const bundle = {
         name: 'stdout',
@@ -152,6 +153,9 @@ export class AIRemoteKernel {
       cell_text: string,
       executionCount: number
     ) {
+      if (MyConsole.inDebug) {
+        return cell_text;
+      }
       const [actions, pureMessage] = extractPersonAndMessage(cell_text);
 
       MyConsole.debug('actions:', actions);
@@ -342,6 +346,9 @@ export class AIRemoteKernel {
     }
 
     const { code } = content;
+
+    this._executionCount++;
+
     try {
       // const result = await self.eval(code);
 
@@ -360,6 +367,9 @@ export class AIRemoteKernel {
         if (!action_result.isProcessed) {
           // const result = await this.remoteKernel.execute(content, this.parent);
           result = await chatCompletion_sync(content, this._executionCount);
+          if (!(typeof result === 'string')) {
+            return result;
+          }
         } else {
           return publish_execute_result(
             action_result.outputResult,
@@ -372,8 +382,6 @@ export class AIRemoteKernel {
 
         // result = code;
       }
-
-      this._executionCount++;
 
       const bundle = {
         data: {
