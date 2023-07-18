@@ -105,6 +105,29 @@ export class AIRemoteKernel {
   //     user_expressions: {}
   //   };
   // }
+  private stream_inline(...args: string[]): void {
+    const bundle = {
+      name: 'stdout',
+      text: args.join(' ')
+    };
+    postMessage({
+      type: 'stream',
+      bundle
+    });
+  }
+
+  async charbychar(char: string, delay: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          this.stream_inline(char);
+          resolve(1);
+        } catch (error) {
+          reject(error);
+        }
+      }, delay);
+    });
+  }
   /**
    * Execute code in the worker kernel.
    */
@@ -369,13 +392,7 @@ export class AIRemoteKernel {
 
         for (const char of cell_text) {
           try {
-            await setTimeout(() => {
-              try {
-                console.log(char);
-              } catch (error) {
-                console.log('error!');
-              }
-            }, delay);
+            await this.charbychar(char, delay);
           } catch (error) {
             console.error(error);
           }
