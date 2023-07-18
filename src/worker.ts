@@ -7,13 +7,13 @@ import { IAIWorkerKernel } from './common/tokens';
 // import { ChatMessage } from '@azure/openai';
 
 // import { promptTemplate } from './worker_AI/promptTemplate';
-import { MyConsole } from './worker_AI/controlMode_Worker';
+// import { MyConsole } from './worker_AI/controlMode_Worker';
 
-import {
-  globalCodeActions,
-  inChainedCodeAction,
-  IActionResult
-} from './worker_AI/codeActions';
+// import {
+//   globalCodeActions,
+//   inChainedCodeAction,
+//   IActionResult
+// } from './worker_AI/codeActions';
 
 export class AIRemoteKernel {
   /**
@@ -22,8 +22,8 @@ export class AIRemoteKernel {
    * @param options The options for the kernel.
    */
   async initialize(options: IAIWorkerKernel.IOptions) {
-    MyConsole.inDebug = true;
-    MyConsole.log = function (...args) {
+    // MyConsole.inDebug = true;
+    console.log = function (...args) {
       const bundle = {
         name: 'stdout',
         text: args.join(' ') + '\n'
@@ -33,9 +33,9 @@ export class AIRemoteKernel {
         bundle
       });
     };
-    MyConsole.info = MyConsole.log;
+    console.info = console.log;
 
-    MyConsole.error = function (...args) {
+    console.error = function (...args) {
       const bundle = {
         name: 'stderr',
         text: args.join(' ') + '\n'
@@ -45,65 +45,65 @@ export class AIRemoteKernel {
         bundle
       });
     };
-    MyConsole.warn = MyConsole.error;
+    console.warn = console.error;
 
     self.onerror = function (message, source, lineno, colno, error) {
-      MyConsole.error(message);
+      console.error(message);
     };
     self.onmessageerror = function (e) {
-      MyConsole.error('Message error: ', e);
+      console.error('Message error: ', e);
     };
   }
 
-  async process_actions(cell_text: string): Promise<IActionResult> {
-    // The stream test failed!
+  // async process_actions(cell_text: string): Promise<IActionResult> {
+  //   // The stream test failed!
 
-    // // action_stream(cell_text: string): Promise < IActionResult > {
-    // if (cell_text.trim().toLowerCase().startsWith('/stream')) {
-    //   const value = cell_text.trim().slice('/stream'.length);
-    //   const delay = 5000;
-    //   for (const ch of value) {
-    //     await this.streamSync(ch, delay);
-    //   }
+  //   // // action_stream(cell_text: string): Promise < IActionResult > {
+  //   // if (cell_text.trim().toLowerCase().startsWith('/stream')) {
+  //   //   const value = cell_text.trim().slice('/stream'.length);
+  //   //   const delay = 5000;
+  //   //   for (const ch of value) {
+  //   //     await this.streamSync(ch, delay);
+  //   //   }
 
-    //   return Promise.resolve({
-    //     outputResult: '<p>FYI: Stream is over.</p><p>',
-    //     outputFormat: 'text/markdown',
-    //     isProcessed: true
-    //   });
-    // }
+  //   //   return Promise.resolve({
+  //   //     outputResult: '<p>FYI: Stream is over.</p><p>',
+  //   //     outputFormat: 'text/markdown',
+  //   //     isProcessed: true
+  //   //   });
+  //   // }
 
-    //To process in chaned actions in turn, ususally non-AI actions
+  //   //To process in chaned actions in turn, ususally non-AI actions
 
-    for (let i = 0; i < globalCodeActions.length; i++) {
-      const result = await globalCodeActions[i].execute(cell_text);
-      if (result.isProcessed) {
-        return result;
-      }
-    }
+  //   for (let i = 0; i < globalCodeActions.length; i++) {
+  //     const result = await globalCodeActions[i].execute(cell_text);
+  //     if (result.isProcessed) {
+  //       return result;
+  //     }
+  //   }
 
-    return inChainedCodeAction.notProcessed();
-  }
+  //   return inChainedCodeAction.notProcessed();
+  // }
 
-  private publish_execute_result(result: string) {
-    const bundle = {
-      data: {
-        'text/plain': result
-      },
-      metadata: {},
-      execution_count: this._executionCount
-    };
+  // private publish_execute_result(result: string) {
+  //   const bundle = {
+  //     data: {
+  //       'text/plain': result
+  //     },
+  //     metadata: {},
+  //     execution_count: this._executionCount
+  //   };
 
-    postMessage({
-      bundle,
-      type: 'execute_result'
-    });
+  //   postMessage({
+  //     bundle,
+  //     type: 'execute_result'
+  //   });
 
-    return {
-      status: 'ok',
-      user_expressions: {}
-    };
-  }
+  //   return {
+  //     status: 'ok',
+  //     user_expressions: {}
+  //   };
+  // }
   /**
    * Execute code in the worker kernel.
    */
@@ -363,42 +363,43 @@ export class AIRemoteKernel {
       } else {
         // MyConsole.log('chat:', code);
         const cell_text = content.code;
-        const action_result = await this.process_actions(cell_text);
+        result = cell_text;
+        // const action_result = await this.process_actions(cell_text);
 
-        if (!action_result.isProcessed) {
-          // const result = await this.remoteKernel.execute(content, this.parent);
-          // result = await chatCompletion_sync(content, this._executionCount);
-          result = cell_text;
-          if (!(typeof result === 'string')) {
-            return result;
-          }
-        } else {
-          return this.publish_execute_result(action_result.outputResult);
-          // 'ok',
-          // action_result.outputFormat
-          // );
-        }
+        // if (!action_result.isProcessed) {
+        //   // const result = await this.remoteKernel.execute(content, this.parent);
+        //   // result = await chatCompletion_sync(content, this._executionCount);
+        //   result = cell_text;
+        //   if (!(typeof result === 'string')) {
+        //     return result;
+        //   }
+        // } else {
+        //   return this.publish_execute_result(action_result.outputResult);
+        //   // 'ok',
+        //   // action_result.outputFormat
+        //   // );
+        // }
 
         // result = code;
       }
 
-      return this.publish_execute_result(result);
-      // const bundle = {
-      //   data: {
-      //     'text/plain': result
-      //   },
-      //   metadata: {},
-      //   execution_count: this._executionCount
-      // };
-      // postMessage({
-      //   bundle,
-      //   type: 'execute_result'
-      // });
+      // return this.publish_execute_result(result);
+      const bundle = {
+        data: {
+          'text/plain': result
+        },
+        metadata: {},
+        execution_count: this._executionCount
+      };
+      postMessage({
+        bundle,
+        type: 'execute_result'
+      });
 
-      // return {
-      //   status: 'ok',
-      //   user_expressions: {}
-      // };
+      return {
+        status: 'ok',
+        user_expressions: {}
+      };
     } catch (e) {
       const { name, stack, message } = e as any as Error;
       const bundle = {
