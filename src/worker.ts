@@ -14,6 +14,7 @@ import { IAIWorkerKernel } from './common/tokens';
 //   inChainedCodeAction,
 //   IActionResult
 // } from './worker_AI/codeActions';
+import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 export class AIRemoteKernel {
   /**
@@ -363,7 +364,50 @@ export class AIRemoteKernel {
       } else {
         // MyConsole.log('chat:', code);
         const cell_text = content.code;
-        result = cell_text;
+
+        // client setup
+        const endpoint = 'https://ailearn-live.openai.azure.com/';
+        const azureApiKey = '644f0583d9464db18a2539ee9683a111';
+
+        const messages = [{ role: 'user', content: cell_text }];
+
+        const client = new OpenAIClient(
+          endpoint,
+          new AzureKeyCredential(azureApiKey)
+        );
+        const deploymentId = 'gpt-35-turbo';
+        let response = '';
+        let tokens = 0;
+        let last_finishReason = '';
+        const events = await client.listChatCompletions(deploymentId, messages);
+
+        try {
+          for await (const event of events) {
+            for (const choice of event.choices) {
+              //process.stdout.write(choice.delta.content);
+              tokens += 1;
+              if (choice?.delta?.content || '') {
+                response += choice?.delta?.content || '';
+              } else {
+                console.log('The current token:', tokens, ' choice:', choice);
+              }
+
+              last_finishReason = choice.finishReason || '';
+            }
+          }
+          console.log(
+            'The whole tokens is:',
+            tokens,
+            '. The whole response is :'
+          );
+          console.log(last_finishReason);
+          console.log(response);
+          //process.stdout.write('\n');
+        } catch (error) {
+          console.error(error);
+        }
+
+        result = 'Done.';
         // const action_result = await this.process_actions(cell_text);
 
         // if (!action_result.isProcessed) {
