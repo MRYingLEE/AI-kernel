@@ -18,18 +18,19 @@ import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 export class AIRemoteKernel {
   private _executionCount = 0;
-  private openai_client: OpenAIClient;
+  // private openai_client: OpenAIClient;
 
-  constructor() {
-    // client setup
-    const endpoint = 'https://ailearn-live.openai.azure.com/';
-    const azureApiKey = '644f0583d9464db18a2539ee9683a111';
+  // constructor() {
+  // client setup
+  // const endpoint = 'https://ailearn-live.openai.azure.com/';
+  // const azureApiKey = '644f0583d9464db18a2539ee9683a111';
 
-    this.openai_client = new OpenAIClient(
-      endpoint,
-      new AzureKeyCredential(azureApiKey)
-    );
-  }
+  // this.openai_client = new OpenAIClient(
+  //   endpoint,
+  //   azureApiKey
+  //   // new AzureKeyCredential(azureApiKey)
+  // );
+  // }
   /**
    * Initialize the remote kernel.
    *
@@ -411,42 +412,91 @@ export class AIRemoteKernel {
           }
         }
 
-        const deploymentId = 'gpt-35-turbo';
-        let response = '';
-        let tokens = 0;
-        let last_finishReason = '';
-        const messages = [{ role: 'user', content: cell_text }];
-        const events = await this.openai_client.listChatCompletions(
-          deploymentId,
-          messages
-        );
+        // const deploymentId = 'gpt-35-turbo';
+        // let response = '';
+        // let tokens = 0;
+        // let last_finishReason = '';
+        // const messages = [{ role: 'user', content: cell_text }];
+        // const events = await this.openai_client.listChatCompletions(
+        //   deploymentId,
+        //   messages
+        // );
+
+        // try {
+        //   for await (const event of events) {
+        //     for (const choice of event.choices) {
+        //       //process.stdout.write(choice.delta.content);
+        //       tokens += 1;
+        //       if (choice?.delta?.content || '') {
+        //         response += choice?.delta?.content || '';
+        //       } else {
+        //         console.log('The current token:', tokens, ' choice:', choice);
+        //       }
+
+        //       last_finishReason = choice.finishReason || '';
+        //     }
+        //   }
+        //   console.log(
+        //     'The whole tokens is:',
+        //     tokens,
+        //     '. The whole response is :'
+        //   );
+        //   console.log(last_finishReason);
+        //   console.log(response);
+        //   //process.stdout.write('\n');
+        // } catch (error) {
+        //   console.error(error);
+        // }
+
+        // Copyright (c) Microsoft Corporation.
+        // Licensed under the MIT License.
+
+        /**
+         * Demonstrates how to list chat completions for a chat context.
+         *
+         * @summary list chat completions.
+         */
+
+        // You will need to set these environment variables or edit the following values
+        const endpoint = 'https://ailearn-live.openai.azure.com/';
+        const azureApiKey = '644f0583d9464db18a2539ee9683a111';
+
+        const messages = [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant. You will talk like a pirate.'
+          },
+          { role: 'user', content: 'Can you help me?' },
+          {
+            role: 'assistant',
+            content: 'Arrrr! Of course, me hearty! What can I do for ye?'
+          },
+          { role: 'user', content: "What's the best way to train a parrot?" }
+        ];
+
+        console.log('== Streaming Chat Completions Sample ==');
 
         try {
+          const client = new OpenAIClient(
+            endpoint,
+            new AzureKeyCredential(azureApiKey)
+          );
+          const deploymentId = 'gpt-35-turbo';
+          const events = await client.listChatCompletions(
+            deploymentId,
+            messages,
+            { maxTokens: 128 }
+          );
+
           for await (const event of events) {
             for (const choice of event.choices) {
-              //process.stdout.write(choice.delta.content);
-              tokens += 1;
-              if (choice?.delta?.content || '') {
-                response += choice?.delta?.content || '';
-              } else {
-                console.log('The current token:', tokens, ' choice:', choice);
-              }
-
-              last_finishReason = choice.finishReason || '';
+              //console.log(choice.delta?.content);
+              this.stream_inline(choice.delta?.content || '');
             }
           }
-          console.log(
-            'The whole tokens is:',
-            tokens,
-            '. The whole response is :'
-          );
-          console.log(last_finishReason);
-          console.log(response);
-          //process.stdout.write('\n');
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
+          console.error('The sample encountered an error:', err);
         }
-
         result = 'Done.';
         // const action_result = await this.process_actions(cell_text);
 
