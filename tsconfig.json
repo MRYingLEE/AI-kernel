@@ -19,7 +19,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "ES2019",//Align with Jupyterlite
-    "types": [] //,
+    // "types": [] //,
     // "sourceMap": false //true,
     // "inlineSourceMap": false,
     // "sourceRoot": "./src"

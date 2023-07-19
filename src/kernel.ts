@@ -11,6 +11,7 @@ import { KernelMessage } from '@jupyterlab/services';
 import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
 import { MyConsole } from './controlMode';
+import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 /**
  * A kernel that executes code in an IFrame.
@@ -281,9 +282,46 @@ export class AIKernel extends BaseKernel implements IKernel {
   async executeRequest(
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    const result = await this.remoteKernel.execute(content, this.parent);
-    result.execution_count = this.executionCount;
-    return result;
+    // const result = await this.remoteKernel.execute(content, this.parent);
+    // result.execution_count = this.executionCount;
+    // You will need to set these environment variables or edit the following values
+    const endpoint = 'https://ailearn-live.openai.azure.com/';
+    const azureApiKey = '644f0583d9464db18a2539ee9683a111';
+
+    const messages = [{ role: 'user', content: content.code }];
+
+    console.log('== Streaming Chat Completions Sample ==');
+
+    try {
+      const client = new OpenAIClient(
+        endpoint,
+        new AzureKeyCredential(azureApiKey)
+      );
+      const deploymentId = 'gpt-35-turbo';
+      const events = await client.listChatCompletions(deploymentId, messages, {
+        maxTokens: 128
+      });
+
+      for await (const event of events) {
+        for (const choice of event.choices) {
+          //console.log(choice.delta?.content);
+          const parentHeader = this.parentHeader;
+          const bundle = {
+            name: 'stdout' as const,
+            text: choice.delta?.content || ''
+          };
+          this.stream(bundle, parentHeader);
+        }
+      }
+    } catch (err) {
+      console.error('The sample encountered an error:', err);
+    }
+
+    return {
+      status: 'ok',
+      execution_count: this.executionCount,
+      user_expressions: {}
+    };
   }
 }
 
