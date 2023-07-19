@@ -745,7 +745,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       content.code = js_code;
       return super.executeRequest(content);
     } else {
-      const result = await this.chatCompletion_sync(cell_text);
+      const result = await this.chatCompletion_async(cell_text);
       return result;
     }
   }
