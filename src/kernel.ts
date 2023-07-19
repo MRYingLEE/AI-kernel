@@ -303,26 +303,6 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   }
 
   async process_actions(cell_text: string): Promise<IActionResult> {
-    // The stream test failed!
-
-    // // action_stream(cell_text: string): Promise < IActionResult > {
-    // if (cell_text.trim().toLowerCase().startsWith('/stream')) {
-    //   const value = cell_text.trim().slice('/stream'.length);
-    //   const delay = 5000;
-    //   for (const ch of value) {
-    //     await this.streamSync(ch, delay);
-    //   }
-
-    //   // return Promise.resolve({
-    //   //   outputResult: '\nStream is over.',
-    //   //   outputFormat: 'text/markdown',
-    //   //   isProcessed: true
-    //   // });
-    //   return this.publishMessage('\nStream is over.', 'ok', 'text/markdown');
-    // }
-    //   return inChainedCodeAction.notProcessed();
-    // }
-
     //To process in chaned actions in turn, ususally non-AI actions
 
     for (let i = 0; i < globalCodeActions.length; i++) {
