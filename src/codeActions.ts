@@ -296,7 +296,7 @@ function action_defineUser(code: string): Promise<IActionResult> {
 }
 
 function action_debug(code: string): Promise<IActionResult> {
-  if (code.trim() === '/debug:AILive.live') {
+  if (code.trim() === '/debug:AILearn.live') {
     MyConsole.inDebug = !MyConsole.inDebug;
     const mode = MyConsole.inDebug ? 'enabled' : 'disbaled';
     return Promise.resolve({
