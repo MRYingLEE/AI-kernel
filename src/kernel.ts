@@ -171,6 +171,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     throw new Error('Not implemented');
   }
 
+  static global_Worker: Worker;
   /**
    * Load the worker.
    *
@@ -180,9 +181,15 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
    * webpack to find it.
    */
   protected initWorker(_options: IOptions): Worker {
-    return new Worker(new URL('./comlink.worker.js', import.meta.url), {
-      type: 'module'
-    });
+    if (AIKernel.global_Worker === undefined) {
+      AIKernel.global_Worker = new Worker(
+        new URL('./comlink.worker.js', import.meta.url),
+        {
+          type: 'module'
+        }
+      );
+    }
+    return AIKernel.global_Worker;
   }
 
   // /**
@@ -573,7 +580,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    this.stream_inline('**' + theTemplateName + '**' + ' is typing ...\n');
+    this.stream_inline(theTemplateName + ' is typing ...\n');
     if (actions.length === 0) {
       //No actions are mentioned
       messages2send.push({ role: 'user', content: pureMessage });
@@ -663,7 +670,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     }
 
     this.clearOutputNow();
-    this.stream_inline('**' + theTemplateName + '**' + ':\n' + response);
+    this.stream_inline(theTemplateName + ':\n' + response);
     // MyConsole.table('completion.choices', completion.choices);
 
     // const response = completion.choices[0].message?.content ?? '';
@@ -777,7 +784,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       );
     }
 
-    const js_prefix = '%%js';
+    const js_prefix = '@js';
 
     if (cell_text.startsWith(js_prefix)) {
       const js_code = cell_text.slice(js_prefix.length);
