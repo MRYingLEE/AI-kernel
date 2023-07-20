@@ -503,6 +503,19 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //     );
   //   }
   // }
+  stream_inline(text: string): void {
+    const parentHeader = this.parentHeader;
+    const bundle = {
+      name: 'stdout' as const,
+      text: text || ''
+    };
+    this.stream(bundle, parentHeader);
+  }
+
+  clearOutputNow(): void {
+    const bundle = { wait: false };
+    this.clearOutput(bundle, this.parentHeader);
+  }
 
   async chatCompletion_async(cell_text: string) {
     const [actions, pureMessage] = extractPersonAndMessage(cell_text);
@@ -560,6 +573,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
+    this.stream_inline(theTemplateName + ' is thinking ...\n');
     if (actions.length === 0) {
       //No actions are mentioned
       messages2send.push({ role: 'user', content: pureMessage });
@@ -579,6 +593,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     MyConsole.table(messages2send);
 
     const startTime = performance.now();
+    let firstTokenTime = startTime;
 
     // try {
     //   let completion: any = null;
@@ -606,6 +621,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     try {
       const deploymentId = 'gpt-35-turbo';
       let events;
+
       if (MyConsole.inDebug) {
         events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
           deploymentId,
@@ -630,12 +646,11 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         tokens += 1;
         for (const choice of event.choices) {
           //console.log(choice.delta?.content);
-          const parentHeader = this.parentHeader;
-          const bundle = {
-            name: 'stdout' as const,
-            text: choice.delta?.content || ''
-          };
-          this.stream(bundle, parentHeader);
+          if (firstTokenTime === startTime) {
+            firstTokenTime = performance.now();
+            // this.clearOutputNow();
+          }
+          this.stream_inline(choice.delta?.content || '');
           response += choice?.delta?.content || '';
           last_finishReason = choice.finishReason || '';
           // console.log('The whole tokens is:', tokens, '. The whole response is :');
@@ -647,6 +662,8 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       console.error('The AI Kernel encountered an error:', err);
     }
 
+    this.clearOutputNow();
+    this.stream_inline(theTemplateName + ':\n' + response);
     // MyConsole.table('completion.choices', completion.choices);
 
     // const response = completion.choices[0].message?.content ?? '';
@@ -701,11 +718,18 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     }
 
     const endTime = performance.now();
+    const firstTokenLag = firstTokenTime - startTime;
     const executionTime = endTime - startTime;
 
     let timepassed = '';
     if (MyConsole.inDebug) {
-      timepassed = '\n(Execution time: ' + executionTime + ' milliseconds)';
+      timepassed =
+        '\n(First Token lag: ' +
+        firstTokenLag +
+        ' milliseconds)' +
+        '\n(Execution time: ' +
+        executionTime +
+        ' milliseconds)';
     }
 
     return this.publishMarkDownMessage(
