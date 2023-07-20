@@ -573,7 +573,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    this.stream_inline(theTemplateName + ' is thinking ...\n');
+    this.stream_inline('**' + theTemplateName + '**' + ' is typing ...\n');
     if (actions.length === 0) {
       //No actions are mentioned
       messages2send.push({ role: 'user', content: pureMessage });
@@ -663,7 +663,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     }
 
     this.clearOutputNow();
-    this.stream_inline(theTemplateName + ':\n' + response);
+    this.stream_inline('**' + theTemplateName + '**' + ':\n' + response);
     // MyConsole.table('completion.choices', completion.choices);
 
     // const response = completion.choices[0].message?.content ?? '';
