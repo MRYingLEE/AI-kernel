@@ -6,23 +6,39 @@ import { user } from './user';
 import { MyConsole } from './controlMode';
 
 import Handlebars from 'handlebars/lib/handlebars';
-interface IPromptTemplateProps {
-  systemMessageTemplate: string;
-  //short_reminding for every user message? Such as you are Ana.
+// interface ICodeSnippet {
+//   code: string; //systemMessageTemplate
+//   //short_reminding for every user message? Such as you are Ana.
 
-  userMessageTemplate: string;
+//   // userMessageTemplate: string;
 
-  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //If possible, we will support any templating language
-  // get_inputVariables(): [string];
+//   templateEngine?: 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //If possible, we will support any templating language
+//   // get_inputVariables(): [string];
 
-  // validateTemplate?: boolean;
+//   // validateTemplate?: boolean;
 
-  // We give up the idea of cell 2 cell, but use a code to result pattern.
-  // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
-  // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
+//   // We give up the idea of cell 2 cell, but use a code to result pattern.
+//   // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
+//   // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
-  withMemory: boolean; //false is the default //added by Ying
+//   withMemory: boolean | (() => boolean); //false is the default //added by Ying
+//   iconURL?: string;
+// }
+
+//TODO: To make it compatible to prompt compatible, add speech, icon
+export interface ICodeSnippet {
+  name: string;
+  description?: string;
+  language: string; //TODO:To make prompt as a kind of language, such as Handlebar, JINJIA2, or other templating languages
+  // code separated by a new line. This is a must for a prompt could be long.
+  code: string;
+  id: number; // for UI purpose
+  tags?: string[];
+
+  templateEngine?: '' | 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //such as Handlebar, JINJIA2, or other templating languages
+  voiceName?: string; // Role/Characters specific //TODO: to make it save along with lang and country, so that if no assigned voice available, we can fallback to a similar voice.
   iconURL?: string;
+  //NatualLanguage?: string; // Role/Characters specific
 }
 
 function renderTemplate(
@@ -54,7 +70,7 @@ function renderTemplate(
 
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime
 class message {
-  template: IPromptTemplateProps; // The prompt template
+  template: ICodeSnippet; // The prompt template
 
   msg2send: ChatMessage; // The real request message to OpenAI service
   // The following section is degested from https://platform.openai.com/docs/api-reference/chat/create (as of June 25)
@@ -90,7 +106,7 @@ class message {
   tokenUsage = 0;
 
   constructor(
-    template: IPromptTemplateProps,
+    template: ICodeSnippet,
     role: string, //system, user, assistant, or function
     content: string,
     name: string,
@@ -119,15 +135,16 @@ class message {
   // }
 }
 
-class promptTemplate implements IPromptTemplateProps {
+class promptTemplate implements ICodeSnippet {
   templateID: string;
-  templateDisplayName: string;
-
+  name: string;
+  language: string; // Add this property
+  id: number; // Add this property
   // To make code simple, there are 2 parts: system and user. But maybe we can use 1 later to follow Microsoft Guidance
-  systemMessageTemplate: string;
-  userMessageTemplate: string;
+  code: string;
+  // userMessageTemplate: string;
 
-  templateFormat?: 'f-string' | 'jinja2' | 'Handlebars' | 'ejs';
+  templateEngine?: 'f-string' | 'jinja2' | 'Handlebars' | 'ejs';
   // validateTemplate?: boolean;
 
   // get_inputVariables(): [string]{
@@ -141,7 +158,7 @@ class promptTemplate implements IPromptTemplateProps {
   // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Cell' is the default //added by Ying
   // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw'; //'Markdown' is the default //added by Ying
 
-  withMemory: boolean; //false is the default //added by Ying
+  // withMemory: boolean; //false is the default //added by Ying
   iconURL: string;
 
   newSession: boolean; // Whether this template will start a new session. true is the default //added by Ying
@@ -154,7 +171,7 @@ class promptTemplate implements IPromptTemplateProps {
   f_sysTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
   // f_userTemplate: { [key: string]: string } | undefined;
-  f_userTemplate: HandlebarsTemplateDelegate<any> | undefined;
+  // f_userTemplate: HandlebarsTemplateDelegate<any> | undefined;
 
   static global_messages: message[] = [];
 
@@ -162,7 +179,7 @@ class promptTemplate implements IPromptTemplateProps {
     templateID: string,
     templateDisplayName: string,
     systemMessageTemplate: string,
-    userMessageTemplate: string,
+    // userMessageTemplate: string,
     /* inputVariables: string[], messages: [message],*/ templateFormat?:
       | 'f-string'
       | 'jinja2'
@@ -170,23 +187,23 @@ class promptTemplate implements IPromptTemplateProps {
     // validateTemplate?: boolean,
     // inputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
     // outputCellType?: 'Cell' | 'Code' | 'Markdown' | 'Raw',
-    withMemory?: boolean, //,
+    // withMemory?: boolean, //,
     // newSession?: boolean
     iconURL?: string
   ) {
     this.templateID = templateID;
-    this.templateDisplayName = templateDisplayName;
+    this.name = templateDisplayName;
 
-    this.systemMessageTemplate = systemMessageTemplate;
-    this.userMessageTemplate = userMessageTemplate;
+    this.code = systemMessageTemplate;
+    // this.userMessageTemplate = userMessageTemplate;
 
     // this.inputVariables = inputVariables;
 
-    this.templateFormat = templateFormat;
+    this.templateEngine = templateFormat;
     // this.validateTemplate = validateTemplate;
     // this.inputCellType = inputCellType;
     // this.outputCellType = outputCellType;
-    this.withMemory = withMemory ?? false;
+    // this.withMemory = withMemory ?? false;
     this.newSession = true; //newSession ?? true;
     this.iconURL = iconURL ?? '';
 
@@ -194,15 +211,15 @@ class promptTemplate implements IPromptTemplateProps {
     // this.f_userTemplate = Handlebars.compile(this.userMessageTemplate);
   }
 
+  withMemory(): boolean {
+    return this.name.startsWith('@');
+  }
+
   get_Markdown_DisplayName(): string {
     let md_displayName = this.templateID.trim();
 
-    if (
-      this.templateDisplayName.trim().length > 0 &&
-      this.templateDisplayName.trim() !== this.templateID
-    ) {
-      md_displayName =
-        this.templateID.trim() + '(' + this.templateDisplayName.trim() + ')';
+    if (this.name.trim().length > 0 && this.name.trim() !== this.templateID) {
+      md_displayName = this.templateID.trim() + '(' + this.name.trim() + ')';
     }
 
     return md_displayName;
@@ -246,7 +263,7 @@ class promptTemplate implements IPromptTemplateProps {
   }
 
   removeLastMessage(): void {
-    if (this.withMemory) {
+    if (this.withMemory()) {
       promptTemplate.global_messages.pop();
     }
   }
@@ -304,19 +321,11 @@ class promptTemplate implements IPromptTemplateProps {
   // static TokenLimit = 1000;
 
   renderUserTemplate(statuses: { [key: string]: string }): string {
-    return renderTemplate(
-      this.userMessageTemplate,
-      this.f_userTemplate,
-      statuses
-    );
+    return statuses['cell_text'] || '';
   }
 
   renderSysTemplate(statuses: { [key: string]: string }): string {
-    return renderTemplate(
-      this.systemMessageTemplate,
-      this.f_sysTemplate,
-      statuses
-    );
+    return renderTemplate(this.code, this.f_sysTemplate, statuses);
   }
 
   buildMessages2send(statuses: { [key: string]: string }): {
@@ -339,7 +348,7 @@ class promptTemplate implements IPromptTemplateProps {
       return { messages2send, usrContent };
     }
 
-    if (this.withMemory) {
+    if (this.withMemory()) {
       if (this.newSession === false) {
         messages2send = this.getSessionHistory(usrContent.length * 2); // for temporation estimation of prompt tokens
       } else {
@@ -377,28 +386,26 @@ class promptTemplate implements IPromptTemplateProps {
         roleID,
         displayName,
         '{{self_introduction}}\n' + roleDefine,
-        '{{cell_text}}',
+        // '{{cell_text}}',
         'Handlebars',
-        withMemory,
+        // withMemory,
         iconURL
       );
 
       if (Handlebars) {
         try {
-          template.f_sysTemplate = Handlebars.compile(
-            template.systemMessageTemplate
-          );
+          template.f_sysTemplate = Handlebars.compile(template.code);
         } catch {
           template.f_sysTemplate = undefined;
         }
 
-        try {
-          template.f_userTemplate = Handlebars.compile(
-            template.userMessageTemplate
-          );
-        } catch {
-          template.f_userTemplate = undefined;
-        }
+        // try {
+        //   template.f_userTemplate = Handlebars.compile(
+        //     template.userMessageTemplate
+        //   );
+        // } catch {
+        //   template.f_userTemplate = undefined;
+        // }
       }
 
       MyConsole.debug('new template:', template);
@@ -760,20 +767,18 @@ class promptTemplate implements IPromptTemplateProps {
 
     for (const element of Object.values(promptTemplate._global_templates)) {
       try {
-        element.f_sysTemplate = Handlebars.compile(
-          element.systemMessageTemplate
-        );
+        element.f_sysTemplate = Handlebars.compile(element.code);
       } catch {
         element.f_sysTemplate = undefined;
       }
 
-      try {
-        element.f_userTemplate = Handlebars.compile(
-          element.userMessageTemplate
-        );
-      } catch {
-        element.f_userTemplate = undefined;
-      }
+      // try {
+      //   element.f_userTemplate = Handlebars.compile(
+      //     element.userMessageTemplate
+      //   );
+      // } catch {
+      //   element.f_userTemplate = undefined;
+      // }
     }
   }
 }

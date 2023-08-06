@@ -26,7 +26,8 @@ import {
   inChainedCodeAction,
   IActionResult
 } from './codeActions';
-import { promptTemplate } from './promptTemplate';
+// import { promptTemplate } from './promptTemplate';
+import { CodeSnippetService } from 'jupyterlite_prompts';
 import { MyConsole } from './controlMode';
 import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
 /**
@@ -333,14 +334,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //   } else if (actions.length === 1) {
   //     const theTemplateName = actions[0].substring(1);
 
-  //     if (!promptTemplate.get_global_templates()[theTemplateName]) {
+  //     if (!CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
   //       let errorMsg =
   //         'The action ' +
   //         theTemplateName +
   //         ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-  //       for (const key in promptTemplate.get_global_templates()) {
-  //         if (promptTemplate.get_global_templates()[key] === undefined) {
+  //       for (const key in CodeSnippetService.getCodeSnippetService()) {
+  //         if (CodeSnippetService.getCodeSnippetService()[key] === undefined) {
   //           continue;
   //         }
   //         errorMsg += '\n' + key;
@@ -423,10 +424,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //     const response = completion.choices[0].message?.content ?? '';
   //     //Todo: We should check the response carefully
 
-  //     let theTemplate = promptTemplate.get_global_templates()['ai'];
+  //     let theTemplate = CodeSnippetService.getCodeSnippetService()['ai'];
 
-  //     if (promptTemplate.get_global_templates()[theTemplateName]) {
-  //       theTemplate = promptTemplate.get_global_templates()[theTemplateName];
+  //     if (CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
+  //       theTemplate = CodeSnippetService.getCodeSnippetService()[theTemplateName];
   //     }
   //     //To add the prompt message here
   //     theTemplate.addMessage(
@@ -535,14 +536,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     } else if (actions.length === 1) {
       const theTemplateName = actions[0].substring(1);
 
-      if (!promptTemplate.get_global_templates()[theTemplateName]) {
+      if (!CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
         let errorMsg =
           'The action ' +
           theTemplateName +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-        for (const key in promptTemplate.get_global_templates()) {
-          if (promptTemplate.get_global_templates()[key] === undefined) {
+        for (const key in CodeSnippetService.getCodeSnippetService()) {
+          if (CodeSnippetService.getCodeSnippetService()[key] === undefined) {
             continue;
           }
           errorMsg += '\n' + key;
@@ -676,10 +677,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     // const response = completion.choices[0].message?.content ?? '';
     //Todo: We should check the response carefully
 
-    let theTemplate = promptTemplate.get_global_templates()['ai'];
+    let theTemplate = CodeSnippetService.getCodeSnippetService()['ai'];
 
-    if (promptTemplate.get_global_templates()[theTemplateName]) {
-      theTemplate = promptTemplate.get_global_templates()[theTemplateName];
+    if (CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
+      theTemplate = CodeSnippetService.getCodeSnippetService()[theTemplateName];
     }
     //To add the prompt message here
     theTemplate.addMessage(

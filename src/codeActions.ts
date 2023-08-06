@@ -18,7 +18,7 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-// const template = promptTemplate.get_global_templates()[templateName];
+// const template = CodeSnippetService.getCodeSnippetService()[templateName];
 
 // if (focalcode_text.toLowerCase().startsWith('/clear')) {
 //   if (template !== null) {
@@ -32,7 +32,8 @@ method newCaht: to start a new chat template without history.
 // } else {
 //   return [];
 // }
-import { promptTemplate } from './promptTemplate';
+// import { promptTemplate } from './promptTemplate';
+import { CodeSnippetService } from 'jupyterlite_prompts';
 // import { globalOpenAI } from './driver_azure';
 import { user } from './user';
 // import { Configuration, OpenAIApi } from 'openai';
@@ -45,8 +46,8 @@ import { MyConsole } from './controlMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
-  for (const key in promptTemplate.get_global_templates()) {
-    if (!promptTemplate.get_global_templates()[key]) {
+  for (const key in CodeSnippetService.getCodeSnippetService()) {
+    if (!CodeSnippetService.getCodeSnippetService()[key]) {
       continue;
     }
     allActions += '\n' + key;
