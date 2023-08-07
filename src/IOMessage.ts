@@ -212,7 +212,7 @@ export class IOMessage {
         description: displayName,
         language: 'Markdown',
         code: '{{self_introduction}}\n' + roleDefine,
-        id: CodeSnippetService.getCodeSnippetService().snippets.length,
+        id: CodeSnippetService.snippets.length,
         tags: [],
         templateEngine: 'Handlebars',
         voiceName: '',
@@ -240,7 +240,7 @@ export class IOMessage {
       // promptTemplate._global_templates[roleID] = template;
 
       // MyConsole.table(promptTemplate._global_templates);
-      CodeSnippetService.getCodeSnippetService().addSnippet(newSnippet);
+      CodeSnippetService.addSnippet(newSnippet);
       return newSnippet;
     } catch (error: any) {
       return undefined;

@@ -32,7 +32,7 @@ import { MyConsole } from './controlMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
-  for (const snippet of CodeSnippetService.getCodeSnippetService().snippets) {
+  for (const snippet of CodeSnippetService.snippets) {
     if (!(snippet.name.startsWith('@') || snippet.name.startsWith('/'))) {
       continue;
     }
@@ -110,7 +110,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
       if (Handlebars) {
         const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
         welcome = welcomeTemplate1({ name: user.current_user.name });
-        MyConsole.debug(welcome);
+        // MyConsole.debug(welcome);
       }
       if (OpenAIDriver.refreshAPIKey(apiKey)) {
         // else {
@@ -133,7 +133,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
                 }
               ]
             );
-          MyConsole.debug('completion.data', completion.choices);
+          MyConsole.debug(completion.choices);
         } catch (error: any) {
           return Promise.resolve({
             outputResult:
@@ -214,14 +214,14 @@ async function definePromptTemplate(
         description: '',
         language: 'Markdown',
         code: remainingPart,
-        id: CodeSnippetService.getCodeSnippetService().snippets.length,
+        id: CodeSnippetService.snippets.length,
         tags: [],
         templateEngine: 'Handlebars',
         voiceName: '',
         iconURL: iconURL
       };
 
-      await CodeSnippetService.getCodeSnippetService().addSnippet(newSnippet);
+      await CodeSnippetService.addSnippet(newSnippet);
       // debugger;
       const md_iconURL = newSnippet.iconURL || '';
 

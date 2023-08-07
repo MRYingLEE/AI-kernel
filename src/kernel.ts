@@ -337,14 +337,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //   } else if (actions.length === 1) {
   //     const theTemplateName = actions[0].substring(1);
 
-  //     if (!CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
+  //     if (!CodeSnippetService.[theTemplateName]) {
   //       let errorMsg =
   //         'The action ' +
   //         theTemplateName +
   //         ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-  //       for (const key in CodeSnippetService.getCodeSnippetService()) {
-  //         if (CodeSnippetService.getCodeSnippetService()[key] === undefined) {
+  //       for (const key in CodeSnippetService.) {
+  //         if (CodeSnippetService.[key] === undefined) {
   //           continue;
   //         }
   //         errorMsg += '\n' + key;
@@ -427,10 +427,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //     const response = completion.choices[0].message?.content ?? '';
   //     //Todo: We should check the response carefully
 
-  //     let theTemplate = CodeSnippetService.getCodeSnippetService()['ai'];
+  //     let theTemplate = CodeSnippetService.['ai'];
 
-  //     if (CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
-  //       theTemplate = CodeSnippetService.getCodeSnippetService()[theTemplateName];
+  //     if (CodeSnippetService.[theTemplateName]) {
+  //       theTemplate = CodeSnippetService.[theTemplateName];
   //     }
   //     //To add the prompt message here
   //     theTemplate.addMessage(
@@ -545,7 +545,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
           theTemplateName +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-        for (const key of CodeSnippetService.getCodeSnippetService().snippets) {
+        for (const key of CodeSnippetService.snippets) {
           if (key === undefined) {
             continue;
           }
