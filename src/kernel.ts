@@ -27,9 +27,11 @@ import {
   IActionResult
 } from './codeActions';
 // import { promptTemplate } from './promptTemplate';
-import { CodeSnippetService } from 'jupyterlite_prompts';
+import { CodeSnippetService } from 'jupyterlite-prompts';
 import { MyConsole } from './controlMode';
 import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
+
+const MaxTokenLimit = 2000;
 /**
  * A kernel that executes code in an IFrame.
  */
@@ -362,10 +364,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //     }
   //   }
 
-  //   if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
+  //   if (pureMessage.length * 2 > MaxTokenLimit) {
   //     return this.publishMarkDownMessage(
   //       'The maxinum of input should be half of ' +
-  //         promptTemplate.MaxTokenLimit,
+  //         MaxTokenLimit,
   //       'error'
   //     );
   //   }
@@ -551,9 +553,9 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         return this.publishMarkDownMessage(errorMsg, 'error');
       } else {
         if (pureMessage.trim().length === 0) {
-          promptTemplate
-            .get_global_templates()
-            [theTemplateName].startNewSession();
+          CodeSnippetService.getCodeSnippetService()[
+            theTemplateName
+          ].startNewSession();
           return this.publishMarkDownMessage(
             'The chat history with ' +
               theTemplateName +
@@ -564,10 +566,9 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       }
     }
 
-    if (pureMessage.length * 2 > promptTemplate.MaxTokenLimit) {
+    if (pureMessage.length * 2 > MaxTokenLimit) {
       return this.publishMarkDownMessage(
-        'The maxinum of input should be half of ' +
-          promptTemplate.MaxTokenLimit,
+        'The maxinum of input should be half of ' + MaxTokenLimit,
         'error'
       );
     }
@@ -588,9 +589,10 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     } else {
       // The mentioned actions, which are critical to the following processing
       MyConsole.table(actions);
-      const p = promptTemplate
-        .get_global_templates()
-        [theTemplateName].buildMessages2send(statuses);
+      const p =
+        CodeSnippetService.getCodeSnippetService()[
+          theTemplateName
+        ].buildMessages2send(statuses);
       messages2send = messages2send.concat(p.messages2send);
       usrContent = p.usrContent;
     }

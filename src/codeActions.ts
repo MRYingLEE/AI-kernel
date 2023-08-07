@@ -33,7 +33,9 @@ method newCaht: to start a new chat template without history.
 //   return [];
 // }
 // import { promptTemplate } from './promptTemplate';
-import { CodeSnippetService } from 'jupyterlite_prompts';
+
+import { ICodeSnippet, CodeSnippetService } from 'jupyterlite-prompts';
+
 // import { globalOpenAI } from './driver_azure';
 import { user } from './user';
 // import { Configuration, OpenAIApi } from 'openai';
@@ -46,11 +48,11 @@ import { MyConsole } from './controlMode';
 
 function getAllPromptTemplates() {
   let allActions = '';
-  for (const key in CodeSnippetService.getCodeSnippetService()) {
-    if (!CodeSnippetService.getCodeSnippetService()[key]) {
+  for (const snippet of CodeSnippetService.getCodeSnippetService().snippets) {
+    if (!(snippet.name.startsWith('@') || snippet.name.startsWith('/'))) {
       continue;
     }
-    allActions += '\n' + key;
+    allActions += '\n' + snippet.name;
   }
   return allActions;
 }
@@ -199,11 +201,12 @@ function action_list(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
-function definePromptTemplate(
+async function definePromptTemplate(
   code: string,
   prefix: string,
   promptKind: string,
-  withMemory: boolean
+  prefix_symbol: string
+  // withMemory: boolean
 ): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith(prefix)) {
     const innerCode = code.trim().substring(prefix.length);
@@ -219,17 +222,24 @@ function definePromptTemplate(
         }
       }
 
-      const theTemplate = promptTemplate.AddTemplate(
-        innerlines[0],
-        remainingPart,
-        innerlines[0],
-        withMemory,
-        iconURL
-      );
-      // debugger;
-      const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
+      if (!innerlines[0].startsWith(prefix_symbol)) {
+        innerlines[0] = prefix_symbol + innerlines[0];
+      }
+      const newSnippet: ICodeSnippet = {
+        name: innerlines[0],
+        description: '',
+        language: 'Markdown',
+        code: remainingPart,
+        id: CodeSnippetService.getCodeSnippetService().snippets.length,
+        tags: [],
+        templateEngine: 'Handlebars',
+        voiceName: '',
+        iconURL: iconURL
+      };
 
-      const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
+      await CodeSnippetService.getCodeSnippetService().addSnippet(newSnippet);
+      // debugger;
+      const md_iconURL = newSnippet.iconURL || '';
 
       const allTemplates = getAllPromptTemplates();
       return Promise.resolve({
@@ -239,8 +249,8 @@ function definePromptTemplate(
           ' ' +
           innerlines[0] +
           ' has been defined.</p><p>' +
-          '**' +
-          md_displayName +
+          // '**' +
+          // md_displayName +
           '**' +
           md_iconURL +
           ':</p><p>FYI: The current prompt templates (roles/actions) are as the following:</p><p>' +
@@ -256,17 +266,17 @@ function definePromptTemplate(
 function action_defineRole(code: string): Promise<IActionResult> {
   const prefix = '/role:';
   const promptKind = 'role';
-  const withMemory = true;
-
-  return definePromptTemplate(code, prefix, promptKind, withMemory);
+  // const withMemory = true;
+  const prefix_symbol = '@';
+  return definePromptTemplate(code, prefix, promptKind, prefix_symbol); // withMemory);
 }
 
 function action_defineInstruction(code: string): Promise<IActionResult> {
   const prefix = '/instruct:';
   const promptKind = 'instruction';
-  const withMemory = false;
-
-  return definePromptTemplate(code, prefix, promptKind, withMemory);
+  // const withMemory = false;
+  const prefix_symbol = '/';
+  return definePromptTemplate(code, prefix, promptKind, prefix_symbol); // withMemory);
 }
 
 function action_defineUser(code: string): Promise<IActionResult> {

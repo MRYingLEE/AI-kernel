@@ -6,6 +6,8 @@ import { user } from './user';
 import { MyConsole } from './controlMode';
 
 import Handlebars from 'handlebars/lib/handlebars';
+import { ICodeSnippet } from 'jupyterlite-prompts';
+
 // interface ICodeSnippet {
 //   code: string; //systemMessageTemplate
 //   //short_reminding for every user message? Such as you are Ana.
@@ -25,21 +27,21 @@ import Handlebars from 'handlebars/lib/handlebars';
 //   iconURL?: string;
 // }
 
-//TODO: To make it compatible to prompt compatible, add speech, icon
-export interface ICodeSnippet {
-  name: string;
-  description?: string;
-  language: string; //TODO:To make prompt as a kind of language, such as Handlebar, JINJIA2, or other templating languages
-  // code separated by a new line. This is a must for a prompt could be long.
-  code: string;
-  id: number; // for UI purpose
-  tags?: string[];
+// //TODO: To make it compatible to prompt compatible, add speech, icon
+// export interface ICodeSnippet {
+//   name: string;
+//   description?: string;
+//   language: string; //TODO:To make prompt as a kind of language, such as Handlebar, JINJIA2, or other templating languages
+//   // code separated by a new line. This is a must for a prompt could be long.
+//   code: string;
+//   id: number; // for UI purpose
+//   tags?: string[];
 
-  templateEngine?: '' | 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //such as Handlebar, JINJIA2, or other templating languages
-  voiceName?: string; // Role/Characters specific //TODO: to make it save along with lang and country, so that if no assigned voice available, we can fallback to a similar voice.
-  iconURL?: string;
-  //NatualLanguage?: string; // Role/Characters specific
-}
+//   templateEngine?: '' | 'f-string' | 'jinja2' | 'Handlebars' | 'ejs'; //such as Handlebar, JINJIA2, or other templating languages
+//   voiceName?: string; // Role/Characters specific //TODO: to make it save along with lang and country, so that if no assigned voice available, we can fallback to a similar voice.
+//   iconURL?: string;
+//   //NatualLanguage?: string; // Role/Characters specific
+// }
 
 function renderTemplate(
   template: string,
@@ -138,7 +140,7 @@ class message {
 class promptTemplate implements ICodeSnippet {
   templateID: string;
   name: string;
-  language: string; // Add this property
+  language = 'Markdown'; // Add this property
   id: number; // Add this property
   // To make code simple, there are 2 parts: system and user. But maybe we can use 1 later to follow Microsoft Guidance
   code: string;
