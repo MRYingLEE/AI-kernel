@@ -18,22 +18,6 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-// const template = CodeSnippetService.getCodeSnippetService()[templateName];
-
-// if (focalcode_text.toLowerCase().startsWith('/clear')) {
-//   if (template !== null) {
-//     template.startNewSession();
-//     return [];
-//   }
-// }
-
-// if (template !== null) {
-//   return template.buildTemplate(statuses);
-// } else {
-//   return [];
-// }
-// import { promptTemplate } from './promptTemplate';
-
 import { ICodeSnippet, CodeSnippetService } from 'jupyterlite-prompts';
 
 // import { globalOpenAI } from './driver_azure';

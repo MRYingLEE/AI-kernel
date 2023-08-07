@@ -20,6 +20,7 @@ import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './driver_azure';
 // import { ChatMessage } from 'openai';
 import { ChatMessage } from '@azure/openai';
+import { IOMessage } from './IOMessage';
 
 import {
   globalCodeActions,
@@ -538,14 +539,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     } else if (actions.length === 1) {
       const theTemplateName = actions[0].substring(1);
 
-      if (!CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
+      if (!CodeSnippetService.getUniqueSnippetByName(theTemplateName)) {
         let errorMsg =
           'The action ' +
           theTemplateName +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
-        for (const key in CodeSnippetService.getCodeSnippetService()) {
-          if (CodeSnippetService.getCodeSnippetService()[key] === undefined) {
+        for (const key of CodeSnippetService.getCodeSnippetService().snippets) {
+          if (key === undefined) {
             continue;
           }
           errorMsg += '\n' + key;
@@ -553,9 +554,9 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         return this.publishMarkDownMessage(errorMsg, 'error');
       } else {
         if (pureMessage.trim().length === 0) {
-          CodeSnippetService.getCodeSnippetService()[
-            theTemplateName
-          ].startNewSession();
+          IOMessage.startNewSession(
+            CodeSnippetService.getUniqueSnippetByName(theTemplateName)
+          );
           return this.publishMarkDownMessage(
             'The chat history with ' +
               theTemplateName +
@@ -578,29 +579,33 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       theTemplateName = actions[0].substring(1);
     }
 
-    let messages2send: ChatMessage[] = [];
-    let usrContent = '';
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
     this.stream_inline(theTemplateName + ' is typing ...\n');
+
+    let msg2send: ChatMessage[] = [];
+    let usr_Content = '';
     if (actions.length === 0) {
       //No actions are mentioned
-      messages2send.push({ role: 'user', content: pureMessage });
+      msg2send.push({ role: 'user', content: pureMessage });
     } else {
       // The mentioned actions, which are critical to the following processing
       MyConsole.table(actions);
-      const p =
-        CodeSnippetService.getCodeSnippetService()[
-          theTemplateName
-        ].buildMessages2send(statuses);
-      messages2send = messages2send.concat(p.messages2send);
-      usrContent = p.usrContent;
+
+      const snippet =
+        CodeSnippetService.getUniqueSnippetByName(theTemplateName);
+      const { messages2send, usrContent } = IOMessage.buildMessages2send(
+        snippet,
+        statuses
+      );
+      msg2send = msg2send.concat(messages2send);
+      usr_Content = usrContent;
     }
-    if (messages2send.length === 0) {
+    if (msg2send.length === 0) {
       // if some exception happened, we may give some default but simple processing
-      messages2send.push({ role: 'user', content: usrContent });
+      msg2send.push({ role: 'user', content: usr_Content });
     }
-    MyConsole.table(messages2send);
+    MyConsole.table(msg2send);
 
     const startTime = performance.now();
     let firstTokenTime = startTime;
@@ -635,7 +640,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       if (MyConsole.inDebug) {
         events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
           deploymentId,
-          messages2send,
+          msg2send,
           {
             maxTokens: 1280
           }
@@ -644,7 +649,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         events = await backOff(() =>
           OpenAIDriver.get_globalOpenAI().listChatCompletions(
             deploymentId,
-            messages2send,
+            msg2send,
             {
               maxTokens: 1280
             }
@@ -679,22 +684,33 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     // const response = completion.choices[0].message?.content ?? '';
     //Todo: We should check the response carefully
 
-    let theTemplate = CodeSnippetService.getCodeSnippetService()['ai'];
+    let theTemplate =
+      CodeSnippetService.getUniqueSnippetByName(theTemplateName);
 
-    if (CodeSnippetService.getCodeSnippetService()[theTemplateName]) {
-      theTemplate = CodeSnippetService.getCodeSnippetService()[theTemplateName];
+    if (!theTemplate) {
+      theTemplate = CodeSnippetService.getUniqueSnippetByName('@ai');
     }
+
     //To add the prompt message here
-    theTemplate.addMessage(
+
+    IOMessage.addMessage(
+      theTemplate,
       'user',
-      usrContent,
-      '',
+      usr_Content,
       tokens || 0 // Neee to recalculate
     );
+
     //To add the completion message here
-    theTemplate.addMessage('assistant', response || '', '', tokens || 0);
-    if (theTemplate.withMemory) {
-      theTemplate.newSession = false;
+
+    IOMessage.addMessage(
+      theTemplate,
+      'assistant',
+      response || '',
+      tokens || 0 // Neee to recalculate
+    );
+
+    if (IOMessage.withMemory(theTemplate)) {
+      IOMessage.global_newSession[theTemplate.name] = false;
     }
 
     // To process error in completion
@@ -723,7 +739,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       json_request =
         '**Prompt in JSON:**</p><p>' +
         '```json\n' +
-        JSON.stringify(messages2send, null, 2) +
+        JSON.stringify(msg2send, null, 2) +
         '\n```';
     }
 
