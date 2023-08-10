@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -51,21 +51,22 @@
     "@jupyterlab/services": "^6.1.13",
     "@jupyterlite/kernel": "^0.1.0-alpha.10",
     "@jupyterlite/server": "^0.1.0-alpha.10",
+    "@jupyterlite/javascript-kernel": "^0.1.0",
     "easy-speech": "^2.0.0",
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
-    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.3.tgz",
+    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.4.tgz",
     "openai": "^4.0.0-beta.5",
     "ts": "^0.0.0"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.1.0",
+    "@jupyterlite/javascript-kernel": "^0.1.0",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.25.3",
     "npm-run-all": "^1.7.0",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
