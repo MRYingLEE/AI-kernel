@@ -16,7 +16,7 @@ import { IKernel } from '@jupyterlite/kernel';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
-import { backOff } from 'exponential-backoff';
+// import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './driver_azure';
 // import { ChatMessage } from 'openai';
 import { ChatMessage } from '@azure/openai';
@@ -537,19 +537,22 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         'error'
       ); // We support this feature in the long future.
     } else if (actions.length === 1) {
-      const theTemplateName = actions[0].substring(1);
+      // const theTemplateName = actions[0].substring(1);
+      const theTemplateName = actions[0];
 
       if (!CodeSnippetService.getUniqueSnippetByName(theTemplateName)) {
         let errorMsg =
           'The action ' +
-          theTemplateName +
+          theTemplateName.substring(1) +
           ' is not defined! Please check. \n FYI: The current list is as the following:';
 
         for (const key of CodeSnippetService.snippets) {
           if (key === undefined) {
             continue;
           }
-          errorMsg += '\n' + key;
+          if (key.name.startsWith('@')) {
+            errorMsg += '\n' + key.name;
+          }
         }
         return this.publishMarkDownMessage(errorMsg, 'error');
       } else {
@@ -559,7 +562,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
           );
           return this.publishMarkDownMessage(
             'The chat history with ' +
-              theTemplateName +
+              theTemplateName.substring(1) +
               ' has been cleared. Now you have a new session with it.',
             'ok'
           );
@@ -574,14 +577,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       );
     }
 
-    let theTemplateName = 'ai';
+    let theTemplateName = '@ai';
     if (actions[0]) {
-      theTemplateName = actions[0].substring(1);
+      theTemplateName = actions[0];
     }
 
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    this.stream_inline(theTemplateName + ' is typing ...\n');
+    this.stream_inline(theTemplateName.substring(1) + ' is typing ...\n');
 
     let msg2send: ChatMessage[] = [];
     let usr_Content = '';
@@ -635,27 +638,27 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
 
     try {
       const deploymentId = 'gpt-35-turbo';
-      let events;
+      // let events;
 
-      if (MyConsole.inDebug) {
-        events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
-          deploymentId,
-          msg2send,
-          {
-            maxTokens: 1280
-          }
-        );
-      } else {
-        events = await backOff(() =>
-          OpenAIDriver.get_globalOpenAI().listChatCompletions(
-            deploymentId,
-            msg2send,
-            {
-              maxTokens: 1280
-            }
-          )
-        );
-      }
+      // if (MyConsole.inDebug) {
+      const events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
+        deploymentId,
+        msg2send,
+        {
+          maxTokens: 1280
+        }
+      );
+      // } else {
+      //   events = await backOff(() =>
+      //     OpenAIDriver.get_globalOpenAI().listChatCompletions(
+      //       deploymentId,
+      //       msg2send,
+      //       {
+      //         maxTokens: 1280
+      //       }
+      //     )
+      //   );
+      // }
 
       for await (const event of events) {
         tokens += 1;
