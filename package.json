@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -47,20 +47,19 @@
   "dependencies": {
     "@azure/communication-chat": "^1.3.1",
     "@azure/identity": "^3.2.3",
-    "@azure/openai": "^1.0.0-beta.3",
+    "@azure/openai": "^1.0.0-beta.4",
     "@jupyterlab/services": "^6.1.13",
-    "@jupyterlite/kernel": "^0.1.0-alpha.10",
-    "@jupyterlite/server": "^0.1.0-alpha.10",
+    "@jupyterlite/kernel": "^0.1.0",
+    "@jupyterlite/server": "^0.1.0",
     "@jupyterlite/javascript-kernel": "^0.1.0",
     "easy-speech": "^2.0.0",
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
-    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.4.tgz",
-    "openai": "^4.0.0-beta.5",
+    "jupyterlite-prompts": "^3.3.4",
     "ts": "^0.0.0"
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^3.1.0",
+    "@jupyterlab/builder": "^3.6.5",
     "@jupyterlite/javascript-kernel": "^0.1.0",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
@@ -99,7 +98,7 @@
     ],
     "hooks": {
       "before-build-npm": [
-        "python -m pip install jupyterlab~=3.1",
+        "python -m pip install jupyterlab~=3.6.5",
         "jlpm"
       ]
     }
