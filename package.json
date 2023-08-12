@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "0.9.13",
+  "version": "0.9.15",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -55,7 +55,7 @@
     "easy-speech": "^2.0.0",
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
-    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.10.tgz",
+    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.11.tgz",
     "ts": "^0.0.0"
   },
   "devDependencies": {
