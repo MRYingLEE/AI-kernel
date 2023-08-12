@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",

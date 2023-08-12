@@ -269,99 +269,99 @@ export class IOMessage {
     if (!newTemplte) {
       console.error('The define of prompt template' + 'Chat' + ' failed.');
     }
-    const all2EnglishPrompt = `
-    I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-    translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more
-    beautiful and elegant, upper level English words and sentences.
-    Keep the meaning same, but make them more literary.
-    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-    Here is the sentence for you:
-    `;
-    newTemplte = IOMessage.AddTemplate('/2e', all2EnglishPrompt, 'to English');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + '2e' + ' failed.');
-    }
+    // const all2EnglishPrompt = `
+    // I want you to act as an English translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    // translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentenceswith more
+    // beautiful and elegant, upper level English words and sentences.
+    // Keep the meaning same, but make them more literary.
+    // I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    // Here is the sentence for you:
+    // `;
+    // newTemplte = IOMessage.AddTemplate('/2e', all2EnglishPrompt, 'to English');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + '2e' + ' failed.');
+    // }
 
-    const all2ChinesePrompt = `
-    I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-    translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more
-    beautiful and elegant, upper level Chinese words and sentences.
-    Keep the meaning same, but make them more literary.
-    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-    Here is the sentence for you:
-    `;
-    newTemplte = IOMessage.AddTemplate('/2c', all2ChinesePrompt, 'to Chinese');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + '2c' + ' failed.');
-    }
+    // const all2ChinesePrompt = `
+    // I want you to act as an Chinese translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    // translate it and answer in the corrected and improved version of my text, in Chinese. I want you to replace my simplified A0-level words and sentenceswith more
+    // beautiful and elegant, upper level Chinese words and sentences.
+    // Keep the meaning same, but make them more literary.
+    // I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    // Here is the sentence for you:
+    // `;
+    // newTemplte = IOMessage.AddTemplate('/2c', all2ChinesePrompt, 'to Chinese');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + '2c' + ' failed.');
+    // }
 
-    const all2MotherLanguagePrompt = `
-    I want you to act as an translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
-    translate it and answer in the corrected and improved version of my text, in MY MOTHERLANGURAGE. I want you to replace my simplified A0-level words and sentenceswith more
-    beautiful and elegant, upper level words and sentences.
-    Keep the meaning same, but make them more literary.
-    I want you to only reply the correction, the improvements and nothing else, do not write explanations.
-    Here is the sentence for you:
-    `;
-    newTemplte = IOMessage.AddTemplate(
-      '/2m',
-      all2MotherLanguagePrompt,
-      'to my mother language'
-    );
-    if (!newTemplte) {
-      console.error('The define of prompt template' + '2m' + ' failed.');
-    }
+    // const all2MotherLanguagePrompt = `
+    // I want you to act as an translator,spelling corrector and improver. I will speak to you in any languageand you will detect the language,
+    // translate it and answer in the corrected and improved version of my text, in MY MOTHERLANGURAGE. I want you to replace my simplified A0-level words and sentenceswith more
+    // beautiful and elegant, upper level words and sentences.
+    // Keep the meaning same, but make them more literary.
+    // I want you to only reply the correction, the improvements and nothing else, do not write explanations.
+    // Here is the sentence for you:
+    // `;
+    // newTemplte = IOMessage.AddTemplate(
+    //   '/2m',
+    //   all2MotherLanguagePrompt,
+    //   'to my mother language'
+    // );
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + '2m' + ' failed.');
+    // }
 
-    const refineryPrompt = `
-    I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language,
-    correct it and explain the mistakes I made.
-    Here is the sentence for you:
-    `;
-    newTemplte = IOMessage.AddTemplate('/refine', refineryPrompt, 'Refine');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + 'Refine' + ' failed.');
-    }
+    // const refineryPrompt = `
+    // I want you to act as an spelling/syntax corrector and improver. I will speak to you in any languageand you will detect the language,
+    // correct it and explain the mistakes I made.
+    // Here is the sentence for you:
+    // `;
+    // newTemplte = IOMessage.AddTemplate('/refine', refineryPrompt, 'Refine');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + 'Refine' + ' failed.');
+    // }
 
-    const NewYorkGirlPrompt = `
-    I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
-    newTemplte = IOMessage.AddTemplate('@Ana', NewYorkGirlPrompt, 'Ana(US)');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + 'Ana(US)' + ' failed.');
-    }
+    // const NewYorkGirlPrompt = `
+    // I want you to act as Ana, a loverly girl. You are 10 years old. You stay in New York. You are friendly to everyone.`;
+    // newTemplte = IOMessage.AddTemplate('@Ana', NewYorkGirlPrompt, 'Ana(US)');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + 'Ana(US)' + ' failed.');
+    // }
 
-    const LondonGirlPrompt = `
-    I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
-    newTemplte = IOMessage.AddTemplate(
-      '@Maisie',
-      LondonGirlPrompt,
-      'Maisie(UK)'
-    );
-    if (!newTemplte) {
-      console.error(
-        'The define of prompt template' + 'Maisie(UK)' + ' failed.'
-      );
-    }
+    // const LondonGirlPrompt = `
+    // I want you to act as Maisie, a loverly girl. You are 10 years old. You stay in London. You are friendly to everyone.`;
+    // newTemplte = IOMessage.AddTemplate(
+    //   '@Maisie',
+    //   LondonGirlPrompt,
+    //   'Maisie(UK)'
+    // );
+    // if (!newTemplte) {
+    //   console.error(
+    //     'The define of prompt template' + 'Maisie(UK)' + ' failed.'
+    //   );
+    // }
 
-    const HongKongBoyPrompt = `
-    I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
-    newTemplte = IOMessage.AddTemplate('@Max', HongKongBoyPrompt, 'Max(HK)');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + 'Max(HK)' + ' failed.');
-    }
+    // const HongKongBoyPrompt = `
+    // I want you to act as Max, a loverly boy. You are 10 years old. You stay in Hong Kong. You are friendly to everyone.`;
+    // newTemplte = IOMessage.AddTemplate('@Max', HongKongBoyPrompt, 'Max(HK)');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + 'Max(HK)' + ' failed.');
+    // }
 
-    const ZhuGeLiangPrompt = `
-    我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
-    newTemplte = IOMessage.AddTemplate('@諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + '諸葛亮' + ' failed.');
-    }
+    // const ZhuGeLiangPrompt = `
+    // 我希望你扮演中國名著《三國演義》中的足智多謀的諸葛亮。請以他的身份用繁體中文和我對話。`;
+    // newTemplte = IOMessage.AddTemplate('@諸葛亮', ZhuGeLiangPrompt, '諸葛亮');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + '諸葛亮' + ' failed.');
+    // }
 
-    const SunWuKongPrompt = `
-    我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
-    newTemplte = IOMessage.AddTemplate('@孫悟空', SunWuKongPrompt, '孫悟空');
-    if (!newTemplte) {
-      console.error('The define of prompt template' + '孫悟空' + ' failed.');
-    }
+    // const SunWuKongPrompt = `
+    // 我希望你扮演中國名著《西遊記》中的勇敢的孫悟空。請以他的身份用繁體中文和我對話。`;
+    // newTemplte = IOMessage.AddTemplate('@孫悟空', SunWuKongPrompt, '孫悟空');
+    // if (!newTemplte) {
+    //   console.error('The define of prompt template' + '孫悟空' + ' failed.');
+    // }
   }
 }
 // }
