@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -49,13 +49,13 @@
     "@azure/identity": "^3.2.3",
     "@azure/openai": "^1.0.0-beta.4",
     "@jupyterlab/services": "^6.1.13",
+    "@jupyterlite/javascript-kernel": "^0.1.1",
     "@jupyterlite/kernel": "^0.1.0",
     "@jupyterlite/server": "^0.1.0",
-    "@jupyterlite/javascript-kernel": "^0.1.1",
     "easy-speech": "^2.0.0",
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
-    "jupyterlite-prompts": "^3.3.4",
+    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.8.tgz",
     "ts": "^0.0.0"
   },
   "devDependencies": {
