@@ -25,7 +25,8 @@ import { IOMessage } from './IOMessage';
 import {
   globalCodeActions,
   inChainedCodeAction,
-  IActionResult
+  IActionResult,
+  getAllPromptTemplates
 } from './codeActions';
 // import { promptTemplate } from './promptTemplate';
 import { CodeSnippetService } from 'jupyterlite-prompts';
@@ -541,19 +542,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       const theTemplateName = actions[0];
 
       if (!CodeSnippetService.getUniqueSnippetByName(theTemplateName)) {
-        let errorMsg =
-          'The action ' +
+        const allActions = getAllPromptTemplates();
+        const errorMsg =
+          '<p>The action ' +
           theTemplateName.substring(1) +
-          ' is not defined! Please check. \n FYI: The current list is as the following:';
+          ' is not defined! Please check.</p> \n <p>FYI: The current list is as the following:</p><p>' +
+          allActions +
+          '</p>';
 
-        for (const key of CodeSnippetService.snippets) {
-          if (key === undefined) {
-            continue;
-          }
-          if (key.name.startsWith('@')) {
-            errorMsg += '\n' + key.name;
-          }
-        }
         return this.publishMarkDownMessage(errorMsg, 'error');
       } else {
         if (pureMessage.trim().length === 0) {

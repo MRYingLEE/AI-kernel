@@ -30,7 +30,7 @@ import { OpenAIDriver } from './driver_azure';
 import Handlebars from 'handlebars/lib/handlebars';
 import { MyConsole } from './controlMode';
 
-function getAllPromptTemplates() {
+export function getAllPromptTemplates(): string {
   let allActions = '';
   for (const snippet of CodeSnippetService.snippets) {
     if (!(snippet.name.startsWith('@') || snippet.name.startsWith('/'))) {
