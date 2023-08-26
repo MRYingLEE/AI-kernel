@@ -529,7 +529,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
     this.clearOutput(bundle, this.parentHeader);
   }
 
-  async chatCompletion_async(cell_text: string) {
+  async chatStreaming_async(cell_text: string) {
     const [actions, pureMessage] = extractPersonAndMessage(cell_text);
 
     if (actions.length > 1) {
@@ -809,7 +809,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       content.code = js_code;
       return super.executeRequest(content);
     } else {
-      const result = await this.chatCompletion_async(cell_text);
+      const result = await this.chatStreaming_async(cell_text);
       return result;
     }
   }
