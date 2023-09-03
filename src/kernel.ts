@@ -16,10 +16,10 @@ import { IKernel } from '@jupyterlite/kernel';
 
 import { extractPersonAndMessage } from './chatSyntax';
 
-// import { backOff } from 'exponential-backoff';
+import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './driver_azure';
 // import { ChatMessage } from 'openai';
-import { ChatMessage } from '@azure/openai';
+import { ChatMessage, ChatCompletions } from '@azure/openai';
 import { IOMessage } from './IOMessage';
 
 import {
@@ -573,14 +573,14 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       );
     }
 
-    let theTemplateName = '@ai';
+    let theTemplateName = '/ai';
     if (actions[0]) {
       theTemplateName = actions[0];
     }
 
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    this.stream_inline(theTemplateName.substring(1) + ' is typing ...\n');
+    this.stream_inline(theTemplateName + ' is typing ...\n');
 
     let msg2send: ChatMessage[] = [];
     let usr_Content = '';
@@ -634,27 +634,29 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
 
     try {
       const deploymentId = 'gpt-35-turbo';
-      // let events;
+      let events: AsyncIterable<ChatCompletions>;
 
-      // if (MyConsole.inDebug) {
-      const events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
-        deploymentId,
-        msg2send,
-        {
-          maxTokens: 1280
-        }
-      );
-      // } else {
-      //   events = await backOff(() =>
-      //     OpenAIDriver.get_globalOpenAI().listChatCompletions(
-      //       deploymentId,
-      //       msg2send,
-      //       {
-      //         maxTokens: 1280
-      //       }
-      //     )
-      //   );
-      // }
+      if (MyConsole.inDebug) {
+        events = await OpenAIDriver.get_globalOpenAI().listChatCompletions(
+          deploymentId,
+          msg2send,
+          {
+            maxTokens: 1280
+          }
+        );
+      } else {
+        events = await backOff(() =>
+          Promise.resolve(
+            OpenAIDriver.get_globalOpenAI().listChatCompletions(
+              deploymentId,
+              msg2send,
+              {
+                maxTokens: 1280
+              }
+            )
+          )
+        );
+      }
 
       for await (const event of events) {
         tokens += 1;

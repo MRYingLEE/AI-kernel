@@ -12,7 +12,7 @@ class OpenAIDriver {
 
   static get_globalOpenAI(): OpenAIClient {
     if (!OpenAIDriver.initialized) {
-      OpenAIDriver.refreshAPIKey('0b219afb587d48b4' + 'be192a16cb044d25');
+      OpenAIDriver.refreshAPIKey('b2fa870d377b4b528b508e584' + '4bd105a');
       OpenAIDriver.initialized = true;
     }
 
@@ -23,7 +23,7 @@ class OpenAIDriver {
     const configuration = new AzureKeyCredential(apiKey);
     // delete configuration.baseOptions.headers['User-Agent'];
     // To make api can be used in browser instead of a server
-    const endpoint = 'https://ailearn-live.openai.azure.com/';
+    const endpoint = 'https://ailearnlive.openai.azure.com/';
     OpenAIDriver.globalOpenAI = new OpenAIClient(endpoint, configuration);
     // Later, we may valid the apiKey
     return true;
