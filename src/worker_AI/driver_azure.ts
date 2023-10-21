@@ -12,7 +12,7 @@ class OpenAIDriver {
 
   static get_globalOpenAI(): OpenAIClient {
     if (!OpenAIDriver.initialized) {
-      OpenAIDriver.refreshAPIKey('644f0583d9464db18a2539ee9683a111');
+      OpenAIDriver.refreshAPIKey('554105e9140c448ea4f9eef13b3131f2');
       OpenAIDriver.initialized = true;
     }
 
