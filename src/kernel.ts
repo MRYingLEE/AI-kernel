@@ -580,7 +580,11 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
 
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    this.stream_inline(theTemplateName + ' is typing ...\n');
+    if (theTemplateName.startsWith('\\')) {
+      this.stream_inline('\\' + theTemplateName + ' is typing ...\n');
+    } else {
+      this.stream_inline(theTemplateName + ' is typing ...\n');
+    }
 
     let msg2send: ChatMessage[] = [];
     let usr_Content = '';
@@ -645,8 +649,8 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
           }
         );
       } else {
-        events = await backOff(() =>
-          Promise.resolve(
+        try {
+          events = await backOff(async () =>
             OpenAIDriver.get_globalOpenAI().listChatCompletions(
               deploymentId,
               msg2send,
@@ -654,8 +658,28 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
                 maxTokens: 1280
               }
             )
-          )
-        );
+          );
+        } catch (err) {
+          this.clearOutputNow();
+          if (theTemplateName.startsWith('\\')) {
+            this.stream_inline(
+              '\\' +
+                theTemplateName +
+                ':\n' +
+                'The AI Kernel encountered an error:' +
+                err
+            );
+          } else {
+            this.stream_inline(
+              theTemplateName +
+                ':\n' +
+                'The AI Kernel encountered an error:' +
+                err
+            );
+          }
+
+          return;
+        }
       }
 
       for await (const event of events) {
@@ -675,7 +699,22 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
         }
       }
     } catch (err) {
-      console.error('The AI Kernel encountered an error:', err);
+      this.clearOutputNow();
+      if (theTemplateName.startsWith('\\')) {
+        this.stream_inline(
+          '\\' +
+            theTemplateName +
+            ':\n' +
+            'The AI Kernel encountered an error:' +
+            err
+        );
+      } else {
+        this.stream_inline(
+          theTemplateName + ':\n' + 'The AI Kernel encountered an error:' + err
+        );
+      }
+
+      return;
     }
 
     this.clearOutputNow();
@@ -812,7 +851,11 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
       return super.executeRequest(content);
     } else {
       const result = await this.chatStreaming_async(cell_text);
-      return result;
+      if (result === undefined) {
+        return this.publishMarkDownMessage('Other error happened', 'error');
+      } else {
+        return result;
+      }
     }
   }
 }

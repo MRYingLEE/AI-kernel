@@ -1,4 +1,6 @@
 import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
+// import { AutoRefreshTokenCredential } from '@azure/core-auth';
+// import { InteractiveBrowserCredential } from '@azure/identity';
 
 class OpenAIDriver {
   /*
@@ -28,6 +30,18 @@ class OpenAIDriver {
     // Later, we may valid the apiKey
     return true;
   }
+
+  // static refreshToken(credential: InteractiveBrowserCredential): boolean {
+  //   // const api_type = 'azure_ad';
+  //   // const api_key = token.token;
+  //   // const scope = 'https://cognitiveservices.azure.com/.default';
+  //   const endpoint = 'https://ailearnlive.openai.azure.com/';
+  //   // const api_version = "2023-05-15"
+
+  //   // const configuration = new TokenCredential(token);
+  //   OpenAIDriver.globalOpenAI = new OpenAIClient(endpoint, credential);
+  //   return true;
+  // }
 }
 
 export { OpenAIDriver };
