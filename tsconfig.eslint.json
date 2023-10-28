@@ -12,6 +12,11 @@
       "py/**/src/**/*",
       "scripts/*",
       "ui-tests/test/**/*",
-      "ui-tests/*.config.js"
+      "ui-tests/*.config.js",
+      "src/*","src/types/*", 
+      "*.js", 
+      "src/common/*.ts", 
+      "src/worker_AI/*.ts", 
+      "src/UI/tts.tsx"
     ]
   }
