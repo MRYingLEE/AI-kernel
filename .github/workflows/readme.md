@@ -1,0 +1,1 @@
+@AI Kernel for JupyterLite 0.2
