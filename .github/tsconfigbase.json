@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
+      "composite": true,
+      "declaration": true,
+      "esModuleInterop": true,
+      "incremental": true,
+      "jsx": "react",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "noEmitOnError": true,
+      "noImplicitAny": true,
+      "noUnusedLocals": true,
+      "preserveWatchOutput": true,
+      "resolveJsonModule": true,
+      "strict": true,
+      "skipLibCheck": true,
+      "strictNullChecks": true,
+      "target": "es2019",
+      "sourceMap": true,
+      "types": []
+    }
+  }
