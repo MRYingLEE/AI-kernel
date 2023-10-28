@@ -36,8 +36,7 @@ export class AIRemoteKernel {
    *
    * @param options The options for the kernel.
    */
-  async initialize(options: IAIWorkerKernel.IOptions) {
-    // MyConsole.inDebug = true;
+  async initialize(options: IAIWorkerKernel.IOptions): Promise<void> {
     console.log = function (...args) {
       const bundle = {
         name: 'stdout',

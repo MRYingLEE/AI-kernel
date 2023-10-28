@@ -1,10 +1,10 @@
 export class MyConsole {
-  static inDebug = true; //for temp
-  // static log(...data: any[]): void {
-  //   if (MyConsole.inDebug) {
-  //     console.log(data);
-  //   }
-  // }
+  static inDebug = false;
+  static log(...data: any[]): void {
+    if (MyConsole.inDebug) {
+      console.log(data);
+    }
+  }
   static debug(...data: any[]): void {
     if (MyConsole.inDebug) {
       console.info(data);
@@ -31,15 +31,20 @@ export class MyConsole {
       console.table(tabularData, properties);
     }
   }
-  //   static info(stdout: any[]): void {
-  //     if (MyConsole.inDebug) {
-  //       console.info(stdout);
-  //     }
-  //   }
+  static info(stdout: any[]): void {
+    if (MyConsole.inDebug) {
+      console.info(stdout);
+    }
+  }
 
   static warn(stdout: any[]): void {
     if (MyConsole.inDebug) {
       console.warn(stdout);
+    }
+  }
+  static error(stdout: any[]): void {
+    if (MyConsole.inDebug) {
+      console.error(stdout);
     }
   }
 }

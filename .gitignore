@@ -113,7 +113,6 @@ dmypy.json
 
 *.doit.db
 _output
-.yarn/
+.venv/**
 yarn.lock
 package-lock.json
-.pnp.*
