@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -62,7 +62,7 @@
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
     "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.38.tgz",
-    "ts": "^0.0.0"
+    "ts": "^5.0.4"
   },
   "resolutions": {
     "@types/react": "^18.0.26",
@@ -100,7 +100,7 @@
     "stylelint-config-standard": "^26.0.0",
     "stylelint-prettier": "^2.0.0",
     "ts-jest": "^29.1.1",
-    "typescript": "~5.0.2",
+    "typescript": "~5.0.4",
     "yjs": "^13.5.0"
   },
   "sideEffects": [
