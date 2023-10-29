@@ -18,21 +18,8 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-// const template = promptTemplate.get_global_templates()[templateName];
+import { ICodeSnippet, CodeSnippetService } from 'jupyterlite-prompts';
 
-// if (focalcode_text.toLowerCase().startsWith('/clear')) {
-//   if (template !== null) {
-//     template.startNewSession();
-//     return [];
-//   }
-// }
-
-// if (template !== null) {
-//   return template.buildTemplate(statuses);
-// } else {
-//   return [];
-// }
-import { promptTemplate } from './promptTemplate';
 // import { globalOpenAI } from './driver_azure';
 import { user } from './user';
 // import { Configuration, OpenAIApi } from 'openai';
@@ -41,15 +28,16 @@ import { OpenAIDriver } from './driver_azure';
 //Todo: to make sure Handlebars loaded at the beginning
 */
 import Handlebars from 'handlebars/lib/handlebars';
-import { MyConsole } from './controlMode_Worker';
+import { MyConsole } from './controlMode';
+// import { InteractiveBrowserCredential } from '@azure/identity';
 
-function getAllPromptTemplates() {
+export function getAllPromptTemplates(): string {
   let allActions = '';
-  for (const key in promptTemplate.get_global_templates()) {
-    if (!promptTemplate.get_global_templates()[key]) {
+  for (const snippet of CodeSnippetService.snippets) {
+    if (!(snippet.name.startsWith('@') || snippet.name.startsWith('/'))) {
       continue;
     }
-    allActions += '\n' + key;
+    allActions += '\n' + snippet.name;
   }
   return allActions;
 }
@@ -123,7 +111,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
       if (Handlebars) {
         const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
         welcome = welcomeTemplate1({ name: user.current_user.name });
-        MyConsole.debug(welcome);
+        // MyConsole.debug(welcome);
       }
       if (OpenAIDriver.refreshAPIKey(apiKey)) {
         // else {
@@ -146,7 +134,7 @@ async function action_SetKey(code: string): Promise<IActionResult> {
                 }
               ]
             );
-          MyConsole.debug('completion.data', completion.choices);
+          MyConsole.debug(completion.choices);
         } catch (error: any) {
           return Promise.resolve({
             outputResult:
@@ -183,6 +171,96 @@ async function action_SetKey(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
+// async function action_interactive_login(code: string): Promise<IActionResult> {
+//   if (code.trim().toLowerCase().startsWith('/login')) {
+//     // const scope = 'https://cognitiveservices.azure.com/.default';
+//     const AZURE_TENANT_ID = 'aa844a3c-cfca-4053-8961-7f20b8ab13f9';
+//     const AZURE_CLIENT_ID = '765bf2ba-33eb-464a-8fbb-80b7c4ef5496';
+//     const credential = new InteractiveBrowserCredential({
+//       // redirectUri: 'http://localhost:8081',
+//       tenantId: AZURE_TENANT_ID,
+//       clientId: AZURE_CLIENT_ID
+//     });
+
+//     // let error: Error | undefined;
+//     try {
+//       // const token = await credential.getToken(scope);
+//       {
+//         let welcome = 'Welcome';
+//         /**
+//          * Test Handlebars
+//          */
+
+//         if (Handlebars) {
+//           const welcomeTemplate1 = Handlebars.compile('Welcome {{name}}');
+//           welcome = welcomeTemplate1({ name: user.current_user.name });
+//           // MyConsole.debug(welcome);
+//         }
+//         if (OpenAIDriver.refreshToken(credential)) {
+//           // else {
+//           //   const Handlebars2 = await import('handlebars');
+//           //   const welcomeTemplate2 = Handlebars2.compile('Welcome 2 ：{{name}}');
+//           //   MyConsole.log(welcomeTemplate2({ name: user.current_user.name }));
+//           // }
+//           try {
+//             const completion =
+//               await OpenAIDriver.get_globalOpenAI().getChatCompletions(
+//                 'gpt-35-turbo',
+//                 [
+//                   {
+//                     role: 'system',
+//                     content: 'You are a helpful assistant'
+//                   },
+//                   {
+//                     role: 'user',
+//                     content: user.self_introduction() + '\n Please say hello.'
+//                   }
+//                 ]
+//               );
+//             MyConsole.debug(completion.choices);
+//           } catch (error: any) {
+//             return Promise.resolve({
+//               outputResult:
+//                 '<p>**The key is invalid.**' +
+//                 error.message +
+//                 '</p><p>**Stack trace**:' +
+//                 error.stack,
+//               outputFormat: 'text/markdown',
+//               isProcessed: true
+//             });
+//           }
+//           /*
+//                     To list all registered actions for debugging
+//                   */
+//           const allActions = getAllPromptTemplates();
+
+//           return {
+//             outputResult:
+//               welcome +
+//               ', try now!' +
+//               // '<p>' +
+//               // 'OpenAI API Key (' +
+//               // token +
+//               // ') has been assigned.</p>' +
+//               '<p>FYI: The current available instructions/ roles / characters for AI is as the following:</p><p>' +
+//               allActions +
+//               '</p>',
+//             outputFormat: 'text/markdown',
+//             isProcessed: true
+//           };
+//         }
+//       }
+//     } catch (e: any) {
+//       // error = e;
+//       console.error(e);
+//     }
+
+//     //The key should have a 20+ length. This one is of ying.li@AILean.live
+//   }
+
+//   return inChainedCodeAction.notProcessed();
+// }
+
 function action_list(code: string): Promise<IActionResult> {
   if (code.trim().toLowerCase() === '/list') {
     const allActions = getAllPromptTemplates();
@@ -198,11 +276,12 @@ function action_list(code: string): Promise<IActionResult> {
   return inChainedCodeAction.notProcessed();
 }
 
-function definePromptTemplate(
+async function definePromptTemplate(
   code: string,
   prefix: string,
   promptKind: string,
-  withMemory: boolean
+  prefix_symbol: string
+  // withMemory: boolean
 ): Promise<IActionResult> {
   if (code.trim().toLowerCase().startsWith(prefix)) {
     const innerCode = code.trim().substring(prefix.length);
@@ -218,17 +297,24 @@ function definePromptTemplate(
         }
       }
 
-      const theTemplate = promptTemplate.AddTemplate(
-        innerlines[0],
-        remainingPart,
-        innerlines[0],
-        withMemory,
-        iconURL
-      );
-      // debugger;
-      const md_iconURL = theTemplate?.get_Markdown_iconURL() || '';
+      if (!innerlines[0].startsWith(prefix_symbol)) {
+        innerlines[0] = prefix_symbol + innerlines[0];
+      }
+      const newSnippet: ICodeSnippet = {
+        name: innerlines[0],
+        description: '',
+        language: 'Markdown',
+        code: remainingPart,
+        id: CodeSnippetService.snippets.length,
+        tags: [],
+        templateEngine: 'Handlebars',
+        voiceName: '',
+        iconURL: iconURL
+      };
 
-      const md_displayName = theTemplate?.get_Markdown_DisplayName() || '';
+      await CodeSnippetService.addSnippet(newSnippet);
+      // debugger;
+      const md_iconURL = newSnippet.iconURL || '';
 
       const allTemplates = getAllPromptTemplates();
       return Promise.resolve({
@@ -238,8 +324,8 @@ function definePromptTemplate(
           ' ' +
           innerlines[0] +
           ' has been defined.</p><p>' +
-          '**' +
-          md_displayName +
+          // '**' +
+          // md_displayName +
           '**' +
           md_iconURL +
           ':</p><p>FYI: The current prompt templates (roles/actions) are as the following:</p><p>' +
@@ -255,17 +341,17 @@ function definePromptTemplate(
 function action_defineRole(code: string): Promise<IActionResult> {
   const prefix = '/role:';
   const promptKind = 'role';
-  const withMemory = true;
-
-  return definePromptTemplate(code, prefix, promptKind, withMemory);
+  // const withMemory = true;
+  const prefix_symbol = '@';
+  return definePromptTemplate(code, prefix, promptKind, prefix_symbol); // withMemory);
 }
 
 function action_defineInstruction(code: string): Promise<IActionResult> {
   const prefix = '/instruct:';
   const promptKind = 'instruction';
-  const withMemory = false;
-
-  return definePromptTemplate(code, prefix, promptKind, withMemory);
+  // const withMemory = false;
+  const prefix_symbol = '/';
+  return definePromptTemplate(code, prefix, promptKind, prefix_symbol); // withMemory);
 }
 
 function action_defineUser(code: string): Promise<IActionResult> {
@@ -311,13 +397,13 @@ function action_debug(code: string): Promise<IActionResult> {
     isProcessed: false
   });
 }
-
-globalCodeActions.push(new inChainedCodeAction(action_SetKey, 0));
-globalCodeActions.push(new inChainedCodeAction(action_list, 1));
-globalCodeActions.push(new inChainedCodeAction(action_defineUser, 2));
-globalCodeActions.push(new inChainedCodeAction(action_defineRole, 3));
-globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 4));
-globalCodeActions.push(new inChainedCodeAction(action_debug, 5));
+// globalCodeActions.push(new inChainedCodeAction(action_interactive_login, 0));
+globalCodeActions.push(new inChainedCodeAction(action_SetKey, 1));
+globalCodeActions.push(new inChainedCodeAction(action_list, 2));
+globalCodeActions.push(new inChainedCodeAction(action_defineUser, 3));
+globalCodeActions.push(new inChainedCodeAction(action_defineRole, 4));
+globalCodeActions.push(new inChainedCodeAction(action_defineInstruction, 5));
+globalCodeActions.push(new inChainedCodeAction(action_debug, 6));
 // globalCodeActions.push(new inChainedCodeAction(action_stream, 5));
 
 globalSortedCodeActions();

@@ -10,131 +10,140 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3.5.3
-    - name: Install node
-      uses: actions/setup-node@v3.7.0
-      with:
-       node-version: '20.x'
-    - name: Install Python
-      uses: actions/setup-python@v4.7.0
-      with:
-        python-version: '3.11'
-        architecture: 'x64'
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+      - name: Install node
+        uses: actions/setup-node@v3.7.0
+        with:
+          node-version: '18.x'
+      - name: Install Python
+        uses: actions/setup-python@v4.7.0
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
 
-    - name: Setup pip cache
-      uses: actions/cache@v1.2.1
-      with:
-        path: ~/.cache/pip
-        key: pip-3.11-${{ hashFiles('package.json') }}
-        restore-keys: |
-          pip-3.11-
-          pip-
+      - name: Setup pip cache
+        uses: actions/cache@v1.2.1
+        with:
+          path: ~/.cache/pip
+          key: pip-3.11-${{ hashFiles('package.json') }}
+          restore-keys: |
+            pip-3.11-
+            pip-
 
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - name: Setup yarn cache
-      uses: actions/cache@v1.2.1
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          yarn-
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Setup yarn cache
+        uses: actions/cache@v1.2.1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn-
 
-    - name: Install dependencies
-      run: python -m pip install -U jupyterlab>=4.0.7 check-manifest
-    - name: Build the extension
-      run: |
-        set -eux
-        YARN_ENABLE_IMMUTABLE_INSTALLS=false jlpm
-        jlpm run eslint:check
-        python -m pip install .
+      - name: Install dependencies
+        run: python -m pip install -U jupyterlab~=4.0.7 check-manifest
 
-        jupyter labextension list 2>&1 | grep -ie "@jupyterlite/ai-kernel.*OK"
+      - name: Install dependencies2
+        run: |
+          for f in ./*.whl; do pip install "$f"; done
+          for f in ./*.tgz; do npm install "$f"; done
 
-        # TODO: add JupyterLite browser check
-        # python -m jupyterlab.browser_check
+      - name: Build the extension
+        run: |
+          set -eux
+          jlpm
+          jlpm run eslint:check
+          python -m pip install .
 
-        check-manifest -v
+          jupyter labextension list 2>&1 | grep -ie "@jupyterlite/ai-kernel.*OK"
 
-        pip install build
-        python -m build --wheel
-        pip uninstall -y aikernel jupyterlab
-        
-    # - name: Stamp js sourcemaps
-    #   run: |
-    #     cd lib
-    #     npx azure-devops-symbols-sourcemap-cli --organization workyinglee
-      
-#     - name: Publish Symbols
-#       uses: microsoft/action-publish-symbols@v2.1.6
-#       with:
-#         # The Azure DevOps account name to publish the symbols to
-#         accountName: workyinglee
-#         # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
-#         personalAccessToken: ${{ secrets.AZURE_SYMBOL_SERVICE }}
-#         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
-#         symbolsFolder: lib # optional
-# #         # The search pattern used to search for symbols
-#         searchPattern: "*.map" # optional, default is **/bin/**/*.pdb
-# #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
-#         # symbolServiceUrl: "https://dev.azure.com/" # optional, default is https://artifacts.dev.azure.com
-    
-    # - name: Zip fie
-    #   run: |
-    #       sudo apt-get install zip
-    #       zip -j aikernel-wheel.zip *.whl
+          # TODO: add JupyterLite browser check
+          # python -m jupyterlab.browser_check
 
-    - uses: actions/upload-artifact@v3
-      with:
+          check-manifest -v
+
+          pip install build
+          python -m build --wheel
+          pip uninstall -y aikernel jupyterlab
+
+      # - name: Stamp js sourcemaps
+      #   run: |
+      #     cd lib
+      #     npx azure-devops-symbols-sourcemap-cli --organization workyinglee
+
+      #     - name: Publish Symbols
+      #       uses: microsoft/action-publish-symbols@v2.1.6
+      #       with:
+      #         # The Azure DevOps account name to publish the symbols to
+      #         accountName: workyinglee
+      #         # The Azure DevOps Personal Access Token (PAT) that has permission to publish symbols
+      #         personalAccessToken: ${{ secrets.AZURE_SYMBOL_SERVICE }}
+      #         # The base directory where the source code exists (defaults to GITHUB_WORKSPACE)
+      #         symbolsFolder: lib # optional
+      # #         # The search pattern used to search for symbols
+      #         searchPattern: "*.map" # optional, default is **/bin/**/*.pdb
+      # #         # The Url of your symbol server (defaults to https://artifacts.dev.azure.com)
+      #         # symbolServiceUrl: "https://dev.azure.com/" # optional, default is https://artifacts.dev.azure.com
+
+      # - name: Zip fie
+      #   run: |
+      #       sudo apt-get install zip
+      #       zip -j aikernel-wheel.zip *.whl
+
+      - uses: actions/upload-artifact@v3
+        with:
           name: aikernel
           path: dist/*.whl
 
-    # - name: Pushes test file
-    #   uses: antoineVIVIES/copy_file_to_another_repo_action@main
-    #   env:
-    #     API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILEAR }}
-    #   with:
-    #     source_files: 'aikernel-wheel.zip'
-    #     destination_repo: 'MRYingLEE/AILearn.live'
-    #     destination_folder: '/'
-    #     user_email: 'MRYingLEE@gmail.com'
-    #     user_name: 'MRYingLEE'
-    #     commit_message: 'A new version of  Kernel'
-          
-    - name: Clean up
-      run: |
-        rm -rf aikernel
+      # - name: Pushes test file
+      #   uses: antoineVIVIES/copy_file_to_another_repo_action@main
+      #   env:
+      #     API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_AILEAR }}
+      #   with:
+      #     source_files: 'aikernel-wheel.zip'
+      #     destination_repo: 'MRYingLEE/AILearn.live'
+      #     destination_folder: '/'
+      #     user_email: 'MRYingLEE@gmail.com'
+      #     user_name: 'MRYingLEE'
+      #     commit_message: 'A new version of  Kernel'
+
+      - name: Clean up
+        run: |
+          rm -rf aikernel
 
   test_isolated:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3.5.3
-    - name: Install Python
-      uses: actions/setup-python@v4.7.0
-      with:
-        python-version: '3.11'
-        architecture: 'x64'
-    - uses: actions/download-artifact@v3.0.2
-      with:
-        name: aikernel
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+      - name: Install Python
+        uses: actions/setup-python@v4.7.0
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: aikernel
 
-    - name: Install and Test
-      run: |
-        set -eux
-        # Remove NodeJS, twice to take care of system and locally installed node versions.
-        sudo rm -rf $(which node)
-        sudo rm -rf $(which node)
-        sudo apt-get install unzip
-        unzip -o aikernel-wheel.zip 
-        for f in *.whl; do pip install "$f"; done
-        pip install jupyterlab
-        jupyter labextension list 2>&1 | grep -ie "@jupyterlite/ai-kernel.*OK"
+      - name: Install Jupyterlite-prompts
+        run: for f in ./*.tgz; do npm install "$f"; done
 
-        # TODO: add JupyterLite browser check
-        # python -m jupyterlab.browser_check --no-chrome-test
+      - name: Install and Test
+        run: |
+          set -eux
+          # Remove NodeJS, twice to take care of system and locally installed node versions.
+          sudo rm -rf $(which node)
+          sudo rm -rf $(which node)
+          sudo apt-get install unzip
+          unzip -o aikernel-wheel.zip 
+          for f in *.whl; do pip install "$f"; done
+          pip install jupyterlab==4.0.7
+          jupyter labextension list 2>&1 | grep -ie "@jupyterlite/ai-kernel.*OK"
+
+          # TODO: add JupyterLite browser check
+          # python -m jupyterlab.browser_check --no-chrome-test

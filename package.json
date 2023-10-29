@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlite/ai-kernel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An AI kernel for JupyterLite",
   "keywords": [
     "jupyter",
@@ -32,7 +32,7 @@
     "build:prod": "jlpm run clean && jlpm run build:lib && jlpm run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "build:lib": "tsc",
+    "build:lib": "tsc -v && tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:labextension": "rimraf jupyterlite_ai_kernel/labextension",
@@ -56,7 +56,8 @@
     "comlink": "^4.3.1",
     "easy-speech": "^2.1.1",
     "exponential-backoff": "^3.1.1",
-    "handlebars": "^4.7.8",
+    "handlebars": "^4.7.7",
+    "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.38.tgz",
     "ts": "^0.0.0"
   },
   "devDependencies": {
@@ -118,7 +119,7 @@
     ],
     "hooks": {
       "before-build-npm": [
-        "python -m pip install jupyterlab~=3.1",
+        "python -m pip install jupyterlab~=3.6.5",
         "jlpm"
       ]
     }

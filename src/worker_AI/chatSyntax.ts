@@ -22,9 +22,8 @@ Output: ["@Jack","@2Tom"], "Don't say ‘I like @Linda’"
 export function extractPersonAndMessage(
   chatMessage: string
 ): [string[], string] {
-  // Regular expression to match '@' followed by alphabets or numbers in unicode (ignoring '@' in quoted subtext)
-  const personRegex = /(^|\s)@[\p{L}\p{N}]+(?=(?:[^"]*"[^"]*")*[^"]*$)/gu;
-
+  // Regular expression to match '@' or '/' followed by alphabets or numbers in unicode (ignoring '@' in quoted subtext)
+  const personRegex = /(^|\s)[@/][\p{L}\p{N}]+(?=(?:[^"]*"[^"]*")*[^"]*$)/gu;
   // Extract persons from the chat message
   const persons = (chatMessage.match(personRegex) || []).map(person =>
     person.trim()
@@ -47,3 +46,24 @@ export function extractPersonAndMessage(
 
 //   MyConsole.log(extractPersonAndMessage("@Jack @Tom Please use ‘@Linda’ to create a sentence"));
 //   // Output: ["@Jack","@ Tom"], "Please use ‘@Linda’ to create a sentence"
+
+// A test
+
+// const test_strings=[
+//   '@Ana What are you doing',
+//   '/Ana What are you doing',
+//   '@Ana /Ana What are you doing',
+//   '"@Ana What are you doing"',
+//   '"@Ana What are you doing"',
+//   '"/Ana What are you doing"',
+//   '"@Ana /Ana What are you doing"',
+//   '@Ana "/Ana What are you doing"',
+//   '/Ana "@Ana What are you doing"',
+//   ]
+
+//   for (const str of test_strings){
+//     console.log(str);
+//     let [persons, coreMessage]= extractPersonAndMessage(str);
+
+//     console.log(persons,coreMessage);
+//   }
