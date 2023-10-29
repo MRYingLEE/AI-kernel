@@ -134,6 +134,7 @@ jobs:
 
       - name: Install and Test
         run: |
+          ls -l
           set -eux
           # Remove NodeJS, twice to take care of system and locally installed node versions.
           sudo rm -rf $(which node)
