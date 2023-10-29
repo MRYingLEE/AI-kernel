@@ -64,6 +64,13 @@
     "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.38.tgz",
     "ts": "^0.0.0"
   },
+  "resolutions": {
+    "@types/react": "^18.0.26",
+    "json-schema": "^0.4.0",
+    "react": "^18.2.0",
+    "validator": "^13.7.0",
+    "yjs": "^13.5.40"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.12.1",
