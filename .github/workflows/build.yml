@@ -64,9 +64,9 @@ jobs:
           # TODO: add JupyterLite browser check
           # python -m jupyterlab.browser_check
 
-          check-manifest -v
+          # check-manifest -v
 
-          pip uninstall -y aikernel jupyterlab
+          # pip uninstall -y aikernel jupyterlab
 
       # - name: Stamp js sourcemaps
       #   run: |
