@@ -21,6 +21,7 @@
     "target": "ES2019",//Align with Jupyterlite
     "types": [] ,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "sourceMap": false //true,
     // "inlineSourceMap": false,
     // "sourceRoot": "./src"
