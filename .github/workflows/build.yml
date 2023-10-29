@@ -15,7 +15,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3.7.0
         with:
-          node-version: '18.x'
+          node-version: '20.x'
       - name: Install Python
         uses: actions/setup-python@v4.7.0
         with:
