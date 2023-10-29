@@ -38,7 +38,7 @@ const MaxTokenLimit = 2000;
 /**
  * A kernel that executes code in an IFrame.
  */
-export class AIKernel extends JavaScriptKernel implements IKernel { 
+export class AIKernel extends JavaScriptKernel implements IKernel {
   /**
    * Instantiate a new AIKernel
    *
@@ -47,10 +47,6 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   constructor(options: IOptions) {
     super(options);
   }
-  id: string = 'ai';
-  name: string = 'AI';
-  location: string = 'Browser';
-  isDisposed : boolean = true;
 
   /**
    * Dispose the kernel.
