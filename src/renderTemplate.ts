@@ -2,7 +2,7 @@
 
 // import { ChatMessage } from '@azure/openai';
 
-import { user } from './user';
+import { user } from './worker_AI/user';
 import { MyConsole } from './controlMode';
 
 import Handlebars from 'handlebars/lib/handlebars';

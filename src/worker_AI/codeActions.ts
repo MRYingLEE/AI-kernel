@@ -28,7 +28,7 @@ import { OpenAIDriver } from './driver_azure';
 //Todo: to make sure Handlebars loaded at the beginning
 */
 import Handlebars from 'handlebars/lib/handlebars';
-import { MyConsole } from './controlMode';
+import { MyConsole } from '../controlMode';
 // import { InteractiveBrowserCredential } from '@azure/identity';
 
 export function getAllPromptTemplates(): string {
