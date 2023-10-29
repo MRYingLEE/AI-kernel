@@ -1,14 +1,18 @@
 // import { PageConfig } from '@jupyterlab/coreutils';
 
+// import { KernelMessage } from '@jupyterlab/services';
+
+// import { BaseKernel, IKernel } from '@jupyterlite/kernel';
+
 // import { PromiseDelegate } from '@lumino/coreutils';
 
 // import { wrap } from 'comlink';
 
-// import { IRemoteAIWorkerKernel } from './common/tokens';
+// import { IRemoteAIWorkerKernel } from './tokens';
 
 import { KernelMessage } from '@jupyterlab/services';
 
-import { BaseKernel, IKernel } from '@jupyterlite/kernel';
+import { IKernel } from '@jupyterlite/kernel';
 
 import { extractPersonAndMessage } from './worker_AI/chatSyntax';
 
@@ -28,22 +32,25 @@ import {
 import { CodeSnippetService } from 'jupyterlite-prompts';
 import { MyConsole } from './controlMode';
 import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
+// import { ISignal } from '@lumino/signaling';
+
+const MaxTokenLimit = 2000;
 /**
  * A kernel that executes code in an IFrame.
  */
-export class AIKernel extends BaseKernel implements JavaScriptKernel {
+export class AIKernel extends JavaScriptKernel implements IKernel { 
   /**
    * Instantiate a new AIKernel
    *
    * @param options The instantiation options for a new AIKernel
    */
-  constructor(options: AIKernel.IOptions) {
+  constructor(options: IOptions) {
     super(options);
-    this._worker = this.initWorker(options);
-    this._worker.onmessage = e => this._processWorkerMessage(e.data);
-    this.remoteKernel = this.initRemote(options);
-    this._ready.resolve();
   }
+  id: string = 'ai';
+  name: string = 'AI';
+  location: string = 'Browser';
+  isDisposed : boolean = true;
 
   /**
    * Dispose the kernel.
@@ -52,16 +59,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
     if (this.isDisposed) {
       return;
     }
-    this._worker.terminate();
-    (this._worker as any) = null;
     super.dispose();
-  }
-
-  /**
-   * A promise that is fulfilled when the kernel is ready.
-   */
-  get ready(): Promise<void> {
-    return this._ready.promise;
   }
 
   /**
@@ -69,7 +67,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
    */
   async kernelInfoRequest(): Promise<KernelMessage.IInfoReplyMsg['content']> {
     const content: KernelMessage.IInfoReply = {
-      implementation: 'JavaScript',
+      implementation: 'AI',
       implementation_version: '1.0.0',
       language_info: {
         codemirror_mode: {
@@ -77,11 +75,11 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
           // lineWrapping: true,
           // spellcheck: true
         },
-        file_extension: '.txt',
+        file_extension: '.js',
         mimetype: 'text/x-markdown',
         name: 'AI',
-        nbconvert_exporter: 'Text',
-        pygments_lexer: 'Text',
+        nbconvert_exporter: 'AI',
+        pygments_lexer: 'AI',
         version: 'es2017'
       },
       protocol_version: '5.3',
@@ -90,7 +88,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
       help_links: [
         {
           text: 'AI Kernel',
-          url: 'https://github.com/MRYingLEE/AI-kernel/'
+          url: 'https://github.com/MRYingLEE/ai-kernel/'
         }
       ]
     };
@@ -111,12 +109,12 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
   /**
    * Handle an `inspect_request` message.
    *
-   * @param content - The content of the request.
+   * @param _content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async inspectRequest(
-    content: KernelMessage.IInspectRequestMsg['content']
+    _content: KernelMessage.IInspectRequestMsg['content']
   ): Promise<KernelMessage.IInspectReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -124,12 +122,12 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
   /**
    * Handle an `is_complete_request` message.
    *
-   * @param content - The content of the request.
+   * @param _content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async isCompleteRequest(
-    content: KernelMessage.IIsCompleteRequestMsg['content']
+    _content: KernelMessage.IIsCompleteRequestMsg['content']
   ): Promise<KernelMessage.IIsCompleteReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -137,12 +135,12 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
   /**
    * Handle a `comm_info_request` message.
    *
-   * @param content - The content of the request.
+   * @param _content - The content of the request.
    *
    * @returns A promise that resolves with the response message.
    */
   async commInfoRequest(
-    content: KernelMessage.ICommInfoRequestMsg['content']
+    _content: KernelMessage.ICommInfoRequestMsg['content']
   ): Promise<KernelMessage.ICommInfoReplyMsg['content']> {
     throw new Error('Not implemented');
   }
@@ -150,27 +148,27 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
   /**
    * Send an `input_reply` message.
    *
-   * @param content - The content of the reply.
+   * @param _content - The content of the reply.
    */
-  inputReply(content: KernelMessage.IInputReplyMsg['content']): void {
+  inputReply(_content: KernelMessage.IInputReplyMsg['content']): void {
     throw new Error('Not implemented');
   }
 
   /**
    * Send an `comm_open` message.
    *
-   * @param msg - The comm_open message.
+   * @param _msg - The comm_open message.
    */
-  async commOpen(msg: KernelMessage.ICommOpenMsg): Promise<void> {
+  async commOpen(_msg: KernelMessage.ICommOpenMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
   /**
    * Send an `comm_msg` message.
    *
-   * @param msg - The comm_msg message.
+   * @param _msg - The comm_msg message.
    */
-  async commMsg(msg: KernelMessage.ICommMsgMsg): Promise<void> {
+  async commMsg(_msg: KernelMessage.ICommMsgMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -179,7 +177,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
    *
    * @param close - The comm_close message.
    */
-  async commClose(msg: KernelMessage.ICommCloseMsg): Promise<void> {
+  async commClose(_msg: KernelMessage.ICommCloseMsg): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -587,11 +585,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
 
     const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
-    if (theTemplateName.startsWith('\\')) {
-      this.stream_inline('\\' + theTemplateName + ' is typing ...\n');
-    } else {
-      this.stream_inline(theTemplateName + ' is typing ...\n');
-    }
+    this.stream_inline(theTemplateName + ' is typing ...\n');
 
     let msg2send: ChatMessage[] = [];
     let usr_Content = '';
@@ -656,8 +650,8 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
           }
         );
       } else {
-        try {
-          events = await backOff(async () =>
+        events = await backOff(() =>
+          Promise.resolve(
             OpenAIDriver.get_globalOpenAI().listChatCompletions(
               deploymentId,
               msg2send,
@@ -665,28 +659,8 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
                 maxTokens: 1280
               }
             )
-          );
-        } catch (err) {
-          this.clearOutputNow();
-          if (theTemplateName.startsWith('\\')) {
-            this.stream_inline(
-              '\\' +
-                theTemplateName +
-                ':\n' +
-                'The AI Kernel encountered an error:' +
-                err
-            );
-          } else {
-            this.stream_inline(
-              theTemplateName +
-                ':\n' +
-                'The AI Kernel encountered an error:' +
-                err
-            );
-          }
-
-          return;
-        }
+          )
+        );
       }
 
       for await (const event of events) {
@@ -706,23 +680,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
         }
       }
     } catch (err) {
-      this.clearOutputNow();
-      if (theTemplateName.startsWith('\\')) {
-        this.stream_inline(
-          '\\' +
-            theTemplateName +
-            ':\n' +
-            'The AI Kernel encountered an error:' +
-            err
-        );
-      } else {
-        this.stream_inline(
-          theTemplateName + ':\n' + 'The AI Kernel encountered an error:' + err
-        );
-        break;
-      }
-
-      return;
+      console.error('The AI Kernel encountered an error:', err);
     }
 
     this.clearOutputNow();
@@ -840,39 +798,15 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
   async executeRequest(
     content: KernelMessage.IExecuteRequestMsg['content']
   ): Promise<KernelMessage.IExecuteReplyMsg['content']> {
-    // const result = await this.remoteKernel.execute(content, this.parent);
-    // result.execution_count = this.executionCount;
-    // You will need to set these environment variables or edit the following values
-    const endpoint = 'https://ailearn-live.openai.azure.com/';
-    const azureApiKey = '644f0583d9464db18a2539ee9683a111';
+    const cell_text = content.code;
+    const action_result = await this.process_actions(cell_text);
 
-    const messages = [{ role: 'user', content: content.code }];
-
-    console.log('== Streaming Chat Completions Sample ==');
-
-    try {
-      const client = new OpenAIClient(
-        endpoint,
-        new AzureKeyCredential(azureApiKey)
+    if (action_result.isProcessed) {
+      return this.publishMessage(
+        action_result.outputResult,
+        'ok',
+        action_result.outputFormat
       );
-      const deploymentId = 'gpt-35-turbo';
-      const events = await client.listChatCompletions(deploymentId, messages, {
-        maxTokens: 128
-      });
-
-      for await (const event of events) {
-        for (const choice of event.choices) {
-          //console.log(choice.delta?.content);
-          const parentHeader = this.parentHeader;
-          const bundle = {
-            name: 'stdout' as const,
-            text: choice.delta?.content || ''
-          };
-          this.stream(bundle, parentHeader);
-        }
-      }
-    } catch (err) {
-      console.error('The sample encountered an error:', err);
     }
 
     const js_prefix = '@js';
@@ -883,11 +817,7 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
       return super.executeRequest(content);
     } else {
       const result = await this.chatStreaming_async(cell_text);
-      if (result === undefined) {
-        return this.publishMarkDownMessage('Other error happened', 'error');
-      } else {
-        return result;
-      }
+      return result;
     }
   }
 }
@@ -895,9 +825,11 @@ export class AIKernel extends BaseKernel implements JavaScriptKernel {
 /**
  * A namespace for AIKernel statics
  */
-namespace AIKernel {
-  /**
-   * The instantiation options for an AI kernel.
-   */
-  export type IOptions = IKernel.IOptions;
-}
+export type IOptions = IKernel.IOptions;
+
+// export namespace AIKernel {
+//   /**
+//    * The instantiation options for a AI kernel.
+//    */
+//   export type IOptions = IKernel.IOptions;
+// }
