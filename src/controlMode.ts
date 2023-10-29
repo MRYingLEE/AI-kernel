@@ -10,11 +10,6 @@ export class MyConsole {
       console.info(data);
     }
   }
-  static log(...data: any[]): void {
-    if (MyConsole.inDebug) {
-      console.log(data);
-    }
-  }
   static info(...data: any[]): void {
     if (MyConsole.inDebug) {
       console.info(data);
@@ -31,20 +26,10 @@ export class MyConsole {
       console.table(tabularData, properties);
     }
   }
-  static info(stdout: any[]): void {
-    if (MyConsole.inDebug) {
-      console.info(stdout);
-    }
-  }
 
   static warn(stdout: any[]): void {
     if (MyConsole.inDebug) {
       console.warn(stdout);
-    }
-  }
-  static error(stdout: any[]): void {
-    if (MyConsole.inDebug) {
-      console.error(stdout);
     }
   }
 }

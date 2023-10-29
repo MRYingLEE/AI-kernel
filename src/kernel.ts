@@ -1,19 +1,19 @@
-import { PageConfig } from '@jupyterlab/coreutils';
+// import { PageConfig } from '@jupyterlab/coreutils';
 
-import { PromiseDelegate } from '@lumino/coreutils';
+// import { PromiseDelegate } from '@lumino/coreutils';
 
-import { wrap } from 'comlink';
+// import { wrap } from 'comlink';
 
-import { IRemoteAIWorkerKernel } from './common/tokens';
+// import { IRemoteAIWorkerKernel } from './common/tokens';
 
 import { KernelMessage } from '@jupyterlab/services';
 
 import { BaseKernel, IKernel } from '@jupyterlite/kernel';
 
-import { extractPersonAndMessage } from './chatSyntax';
+import { extractPersonAndMessage } from './worker_AI/chatSyntax';
 
 import { backOff } from 'exponential-backoff';
-import { OpenAIDriver } from './driver_azure';
+import { OpenAIDriver } from './worker_AI/driver_azure';
 // import { ChatMessage } from 'openai';
 import { ChatMessage, ChatCompletions } from '@azure/openai';
 import { IOMessage } from './IOMessage';
@@ -23,17 +23,15 @@ import {
   inChainedCodeAction,
   IActionResult,
   getAllPromptTemplates
-} from './codeActions';
+} from './worker_AI/codeActions';
 // import { promptTemplate } from './promptTemplate';
 import { CodeSnippetService } from 'jupyterlite-prompts';
 import { MyConsole } from './controlMode';
 import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
-
-const MaxTokenLimit = 2000;
 /**
  * A kernel that executes code in an IFrame.
  */
-export class AIKernel extends BaseKernel implements IKernel {
+export class AIKernel extends BaseKernel implements JavaScriptKernel {
   /**
    * Instantiate a new AIKernel
    *
