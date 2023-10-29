@@ -78,7 +78,7 @@
     "@jupyterlab/testutils": "~4.0.7",
     "@types/jest": "^29.5.3",
     "@types/json-schema": "^7.0.11",
-    "@types/react": "^18.2.33",
+    "@types/react": "^18.0.26",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
     "css-loader": "^6.7.1",
