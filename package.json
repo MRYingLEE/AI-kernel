@@ -62,7 +62,7 @@
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
     "jupyterlite-prompts": "file:jupyterlite-prompts-3.3.38.tgz",
-    "ts": "^5.0.4"
+    "ts": "^0.0.0"
   },
   "resolutions": {
     "@types/react": "^18.0.26",
