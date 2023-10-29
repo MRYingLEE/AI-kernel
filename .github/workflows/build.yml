@@ -94,7 +94,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: aikernel
+          name: aikernel-wheel
           path: dist/*.whl
 
       # - name: Pushes test file
