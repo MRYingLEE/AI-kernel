@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies2
         run: |
           for f in ./*.whl; do pip install "$f"; done
-          for f in ./*.tgz; do npm install "$f"; done
+          # for f in ./*.tgz; do npm install "$f"; done
 
       - name: Build the extension
         run: |
@@ -129,8 +129,8 @@ jobs:
         with:
           name: aikernel-wheel
 
-      - name: Install Jupyterlite-prompts
-        run: for f in ./*.tgz; do npm install "$f"; done
+      # - name: Install Jupyterlite-prompts
+      #   run: for f in ./*.tgz; do npm install "$f"; done
 
       - name: Install and Test
         run: |
@@ -138,9 +138,9 @@ jobs:
           set -eux
           # Remove NodeJS, twice to take care of system and locally installed node versions.
           sudo rm -rf $(which node)
-          sudo rm -rf $(which node)
-          sudo apt-get install unzip
-          unzip -o aikernel-wheel.zip 
+          # sudo rm -rf $(which node)
+          # sudo apt-get install unzip
+          # unzip -o aikernel-wheel.zip 
           for f in *.whl; do pip install "$f"; done
           pip install jupyterlab==4.0.7
           jupyter labextension list 2>&1 | grep -ie "@jupyterlite/ai-kernel.*OK"
