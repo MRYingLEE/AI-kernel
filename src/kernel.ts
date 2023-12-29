@@ -19,7 +19,7 @@ import { extractPersonAndMessage } from './worker_AI/chatSyntax';
 import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './worker_AI/driver_azure';
 // import { ChatMessage } from 'openai';
-import { ChatMessage, ChatCompletions } from '@azure/openai';
+import { ChatRequestMessage, ChatCompletions } from '@azure/openai';
 import { IOMessage } from './IOMessage';
 
 import {
@@ -29,7 +29,7 @@ import {
   getAllPromptTemplates
 } from './worker_AI/codeActions';
 // import { promptTemplate } from './promptTemplate';
-import { CodeSnippetService } from 'jupyterlite-prompts';
+import { CodeSnippetService } from 'jupyterlab_examples_prompts';
 import { MyConsole } from './controlMode';
 import { JavaScriptKernel } from '@jupyterlite/javascript-kernel';
 // import { ISignal } from '@lumino/signaling';

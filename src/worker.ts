@@ -462,15 +462,17 @@ export class AIRemoteKernel {
 
         const messages = [
           {
+            name: '',
             role: 'system',
             content: 'You are a helpful assistant. You will talk like a pirate.'
           },
-          { role: 'user', content: 'Can you help me?' },
+          { name: '', role: 'user', content: 'Can you help me?' },
           {
+            name: '',
             role: 'assistant',
             content: 'Arrrr! Of course, me hearty! What can I do for ye?'
           },
-          { role: 'user', content: "What's the best way to train a parrot?" }
+          { name: '', role: 'user', content: "What's the best way to train a parrot?" }
         ];
 
         console.log('== Streaming Chat Completions Sample ==');

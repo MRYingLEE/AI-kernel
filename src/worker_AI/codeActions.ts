@@ -18,7 +18,7 @@ method newCaht: to start a new chat template without history.
 /clear slash command
 */
 
-import { ICodeSnippet, CodeSnippetService } from 'jupyterlite-prompts';
+import { ICodeSnippet, CodeSnippetService } from 'jupyterlab_examples_prompts';
 
 // import { globalOpenAI } from './driver_azure';
 import { user } from './user';

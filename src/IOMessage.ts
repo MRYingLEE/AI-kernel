@@ -1,12 +1,12 @@
 // The chat format terms are based on ones of ChatGPT
 
-import { ChatMessage } from '@azure/openai';
+import { ChatRequestMessage } from '@azure/openai';
 
 // import { user } from './user';
 import { MyConsole } from './controlMode';
 
 // import Handlebars from 'handlebars/lib/handlebars';
-import { ICodeSnippet } from 'jupyterlite-prompts';
+import { ICodeSnippet } from 'jupyterlab_examples_prompts';
 import { renderUserTemplate, renderSysTemplate } from './renderTemplate';
 
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime

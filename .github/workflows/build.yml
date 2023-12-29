@@ -44,7 +44,7 @@ jobs:
             yarn-
 
       - name: Install dependencies
-        run: python -m pip install -U jupyterlab~=4.0.7 check-manifest
+        run: python -m pip install -U jupyterlab~=4.0.9 check-manifest
 
       - name: Install dependencies2
         run: |
@@ -129,7 +129,7 @@ jobs:
         with:
           name: aikernel-wheel
 
-      # - name: Install Jupyterlite-prompts
+      # - name: Install jupyterlab_examples_prompts
       #   run: for f in ./*.tgz; do npm install "$f"; done
 
       - name: Install and Test

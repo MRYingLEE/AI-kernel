@@ -6,7 +6,7 @@ import { user } from './worker_AI/user';
 import { MyConsole } from './controlMode';
 
 import Handlebars from 'handlebars/lib/handlebars';
-import { ICodeSnippet } from 'jupyterlite-prompts';
+import { ICodeSnippet } from 'jupyterlab_examples_prompts';
 
 // To render a template to real message to be sent ======================
 function renderTemplate(
