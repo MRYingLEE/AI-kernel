@@ -61,7 +61,7 @@
     "easy-speech": "^2.1.1",
     "exponential-backoff": "^3.1.1",
     "handlebars": "^4.7.7",
-    "jupyterlab_examples_prompts": "file:jupyterlab_examples_prompts-3.3.38.tgz",
+    "jupyterlab_examples_prompts": "file:jupyterlab_examples_prompts-0.1.0.tar.gz",
     "ts": "^0.0.0"
   },
   "resolutions": {
