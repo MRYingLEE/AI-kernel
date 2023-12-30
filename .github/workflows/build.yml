@@ -46,10 +46,10 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -U jupyterlab~=4.0.9 check-manifest
 
-      # - name: Install dependencies2
-      #   run: |
-      #     for f in ./*.whl; do pip install "$f"; done
-      #     # for f in ./*.tgz; do npm install "$f"; done
+      - name: Install dependencies2
+        run: |
+          for f in ./*.whl; do pip install "$f"; done
+          # for f in ./*.tgz; do npm install "$f"; done
 
       - name: Build the extension
         run: |
