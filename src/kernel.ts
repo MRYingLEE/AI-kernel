@@ -18,7 +18,7 @@ import { extractPersonAndMessage } from './worker_AI/chatSyntax';
 
 import { backOff } from 'exponential-backoff';
 import { OpenAIDriver } from './worker_AI/driver_azure';
-// import { ChatMessage } from 'openai';
+// import { ChatRequestMessage } from 'openai';
 import { ChatRequestMessage, ChatCompletions } from '@azure/openai';
 import { IOMessage } from './IOMessage';
 
@@ -380,7 +380,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
   //     theTemplateName = actions[0].substring(1);
   //   }
 
-  //   let messages2send: ChatMessage[] = [];
+  //   let messages2send: ChatRequestMessage[] = [];
   //   let usrContent = '';
   //   const statuses: { [key: string]: string } = { cell_text: pureMessage };
 
@@ -583,7 +583,7 @@ export class AIKernel extends JavaScriptKernel implements IKernel {
 
     this.stream_inline(theTemplateName + ' is typing ...\n');
 
-    let msg2send: ChatMessage[] = [];
+    let msg2send: ChatRequestMessage[] = [];
     let usr_Content = '';
     if (actions.length === 0) {
       //No actions are mentioned

@@ -15,7 +15,7 @@ export class IOMessage {
   timestamp: Date;
   newSession: boolean;
   tokenUsage = 0;
-  msg2send: ChatMessage; // The real request message to OpenAI service
+  msg2send: ChatRequestMessage; // The real request message to OpenAI service
 
   private constructor(
     snippet: ICodeSnippet,
@@ -29,6 +29,7 @@ export class IOMessage {
     // A big supprise is that if the name is '', the request will fail.
     // So we have to make the following adjust following 1 week debugging
     this.msg2send = {
+      name: '',
       role: role,
       content: content
     };
@@ -101,10 +102,10 @@ export class IOMessage {
   static getSessionHistory(
     snippet: ICodeSnippet,
     currentToken: number
-  ): ChatMessage[] {
+  ): ChatRequestMessage[] {
     //Todo: A lot of improvement here. 1. Token limit instead of char limit 2. Guarantee the pair of messages are added. 3. Avoid failed user message 4. Retry
 
-    const history: ChatMessage[] = [];
+    const history: ChatRequestMessage[] = [];
 
     let totalToken = currentToken;
 
@@ -151,14 +152,14 @@ export class IOMessage {
     snippet: ICodeSnippet,
     statuses: { [key: string]: string }
   ): {
-    messages2send: ChatMessage[]; //The Request Messages to be sent to ChatGPT
+    messages2send: ChatRequestMessage[]; //The Request Messages to be sent to ChatGPT
     usrContent: string; //The logical user message for the current chat session
   } {
     // MyConsole.debug('statuses:', statuses);
     // MyConsole.debug('this.systemMessageTemplate:', this.systemMessageTemplate);
     // MyConsole.debug('this.userMessageTemplate:', this.userMessageTemplate);
 
-    let messages2send: ChatMessage[] = [];
+    let messages2send: ChatRequestMessage[] = [];
 
     const sysContent = renderSysTemplate(snippet, statuses);
     MyConsole.debug('sysContent:', sysContent);
@@ -181,7 +182,8 @@ export class IOMessage {
       }
     }
 
-    const msg2send = {
+    const msg2send: ChatRequestMessage = {
+      name: '',
       role: 'user',
       content: sysContent + '\n' + usrContent
     };
@@ -367,4 +369,4 @@ export class IOMessage {
   // }
 }
 // }
-export { ChatMessage as ChatMessage, IOMessage as promptTemplate };
+export { ChatRequestMessage, IOMessage as promptTemplate };

@@ -4,7 +4,7 @@ import { IAIWorkerKernel } from './common/tokens';
 // import { backOff } from 'exponential-backoff';
 // import { OpenAIDriver } from './worker_AI/driver_azure';
 // // import { ChatMessage } from 'openai';
-// import { ChatMessage } from '@azure/openai';
+import { ChatRequestMessage } from '@azure/openai';
 
 // import { promptTemplate } from './worker_AI/promptTemplate';
 // import { MyConsole } from './worker_AI/controlMode_Worker';
@@ -460,7 +460,7 @@ export class AIRemoteKernel {
         const endpoint = 'https://ailearn-live.openai.azure.com/';
         const azureApiKey = '644f0583d9464db18a2539ee9683a111';
 
-        const messages = [
+        const messages: ChatRequestMessage[] = [
           {
             name: '',
             role: 'system',
@@ -472,7 +472,11 @@ export class AIRemoteKernel {
             role: 'assistant',
             content: 'Arrrr! Of course, me hearty! What can I do for ye?'
           },
-          { name: '', role: 'user', content: "What's the best way to train a parrot?" }
+          {
+            name: '',
+            role: 'user',
+            content: "What's the best way to train a parrot?"
+          }
         ];
 
         console.log('== Streaming Chat Completions Sample ==');

@@ -21,7 +21,7 @@
     "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "main": "lib/index.js",
-  "types": "lib/index.d.ts, src/types/handlebars1.ts",
+  "types": "lib/index.d.ts, src/types/handlebars1.ts, src/types/jupyterlab_examples_prompts.ts",
   "style": "style/index.css",
   "repository": {
     "type": "git",
@@ -48,6 +48,7 @@
     "@azure/communication-chat": "^1.3.2",
     "@azure/identity": "^3.3.2",
     "@azure/openai": "^1.0.0-beta.7",
+    "@jupyterlab-examples/prompts": "file:jupyterlab_examples_prompts-0.1.0.tar.gz",
     "@jupyterlab/application": "^4.0.7",
     "@jupyterlab/coreutils": "~6.0.7",
     "@jupyterlab/services": "^7.0.7",
