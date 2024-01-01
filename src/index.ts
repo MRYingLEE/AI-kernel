@@ -1,7 +1,6 @@
-// Copyright (c) Jupyter Development Team.
-// Distributed under the terms of the Modified BSD License.
-// Copyright (c) JupyterLite Contributors
-// Distributed under the terms of the Modified BSD License.
+// import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
+// import { requestAPI } from './handler';
 
 import {
   JupyterLiteServer,
@@ -38,9 +37,7 @@ const kernel: JupyterLiteServerPlugin<void> = {
   }
 };
 
-const plugins: JupyterLiteServerPlugin<any>[] = [kernel];
-
-export default plugins;
+export default kernel;
 
 export * from './kernel';
-export * from './common/tokens';
+export * from './tokens';

@@ -2,11 +2,11 @@
 
 // import { ChatMessage } from '@azure/openai';
 
-import { user } from './worker_AI/user';
+import { user } from './user';
 import { MyConsole } from './controlMode';
 
-import Handlebars from 'handlebars/lib/handlebars';
-import { ICodeSnippet } from 'jupyterlab_examples_prompts';
+import Handlebars from 'handlebars';
+import { ICodeSnippet } from "@jupyterlab-examples/prompts";
 
 // To render a template to real message to be sent ======================
 function renderTemplate(

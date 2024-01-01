@@ -1,4 +1,4 @@
-import { IAIWorkerKernel } from './common/tokens';
+import { IAIWorkerKernel } from './tokens';
 // import { extractPersonAndMessage } from './worker_AI/chatSyntax';
 
 // import { backOff } from 'exponential-backoff';

@@ -6,7 +6,7 @@ import { ChatRequestMessage } from '@azure/openai';
 import { MyConsole } from './controlMode';
 
 // import Handlebars from 'handlebars/lib/handlebars';
-import { ICodeSnippet } from 'jupyterlab_examples_prompts';
+import { ICodeSnippet } from "@jupyterlab-examples/prompts";
 import { renderUserTemplate, renderSysTemplate } from './renderTemplate';
 
 // Create a class named chatItem with attributes: promptName:String, Role:String, contents:string, timestamp:Datetime
